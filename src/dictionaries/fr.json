@@ -1,0 +1,16 @@
+{
+  "meta": {
+    "title": "Clément Cochod — IA × Business",
+    "description": "Étudiant à Eugenia School en IA, Data & Business. Je transforme des besoins métier en outils IA. En recherche d'une alternance IA pour septembre 2027."
+  },
+  "hero": {
+    "eyebrow": "Eugenia School · IA, Data & Business",
+    "title": "Je transforme des besoins métier en outils IA.",
+    "status": "Alternance IA · septembre 2027",
+    "wip": "Site en construction"
+  },
+  "langSwitch": {
+    "label": "EN",
+    "aria": "Switch to English"
+  }
+}

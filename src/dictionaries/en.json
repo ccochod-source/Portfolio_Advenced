@@ -1,0 +1,16 @@
+{
+  "meta": {
+    "title": "Clément Cochod — AI × Business",
+    "description": "AI, Data & Business student at Eugenia School. I turn business needs into AI tools. Looking for an AI apprenticeship starting September 2027."
+  },
+  "hero": {
+    "eyebrow": "Eugenia School · AI, Data & Business",
+    "title": "I turn business needs into AI tools.",
+    "status": "AI apprenticeship · September 2027",
+    "wip": "Work in progress"
+  },
+  "langSwitch": {
+    "label": "FR",
+    "aria": "Passer en français"
+  }
+}

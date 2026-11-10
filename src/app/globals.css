@@ -1,0 +1,25 @@
+@import "tailwindcss";
+@import "lenis/dist/lenis.css";
+
+@theme {
+  --color-cream: #fff4e6;
+  --color-sun: #ff7a1a;
+  --color-coral: #ff5a4e;
+  --color-gold: #ffc145;
+  --color-ink: #2b1a12;
+  --font-sans: var(--font-grotesk), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-mono-face), ui-monospace, monospace;
+}
+
+body {
+  background: var(--color-cream);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+}
+
+.golden-hour {
+  background:
+    radial-gradient(120% 80% at 80% 110%, var(--color-gold) 0%, transparent 55%),
+    radial-gradient(90% 70% at 10% 100%, var(--color-coral) 0%, transparent 60%),
+    linear-gradient(180deg, var(--color-cream) 0%, #ffd9b3 45%, var(--color-sun) 100%);
+}
