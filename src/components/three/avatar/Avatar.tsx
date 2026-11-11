@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
-import { Canvas } from "@react-three/fiber";
+import { useEffect, useMemo, useRef, useState, type RefObject } from "react";
+import { Canvas, useFrame } from "@react-three/fiber";
 import { ContactShadows, useAnimations, useGLTF } from "@react-three/drei";
-import type { Group } from "three";
+import { LoopOnce, LoopRepeat, type AnimationAction, type Group } from "three";
 import { SkeletonUtils } from "three-stdlib";
 import {
   AVATAR_MODEL_URL,
@@ -27,7 +27,13 @@ export type AvatarProps = {
   rotation?: [number, number, number];
   scale?: number;
   timeScale?: number;
+  /** Per-frame time scale override (read inside the render loop, no re-render): walk speed tied to scroll velocity. */
+  timeScaleRef?: RefObject<number>;
+  /** Cross-fade duration in seconds between two clips (0.4–0.6 s reads as natural). */
   crossFade?: number;
+  /** Play the current clip once and hold its last frame, then call `onFinished`. */
+  playOnce?: boolean;
+  onFinished?: (clip: AvatarClip) => void;
   onLoaded?: () => void;
 };
 
@@ -50,13 +56,33 @@ export function useAvatarScrollClip(progress: number): AvatarClip {
   return clipForProgress(Math.min(1, Math.max(0, progress)));
 }
 
+function prepareAction(action: AnimationAction, playOnce: boolean) {
+  action.enabled = true;
+  action.reset();
+  if (playOnce) {
+    action.setLoop(LoopOnce, 1);
+    action.clampWhenFinished = true;
+  } else {
+    action.setLoop(LoopRepeat, Infinity);
+    action.clampWhenFinished = false;
+  }
+}
+
+function holdAction(action: AnimationAction) {
+  action.enabled = true;
+  action.setEffectiveTimeScale(action.getEffectiveTimeScale() || 1);
+}
+
 export function Avatar({
   clip,
   position = [0, 0, 0],
   rotation = [0, 0, 0],
   scale = 1,
   timeScale = 1,
-  crossFade = 0.4,
+  timeScaleRef,
+  crossFade = 0.5,
+  playOnce = false,
+  onFinished,
   onLoaded,
 }: AvatarProps) {
   const groupRef = useRef<Group>(null);
@@ -65,10 +91,13 @@ export function Avatar({
   const { actions, mixer } = useAnimations(animations, groupRef);
   const reducedMotion = useReducedMotion();
   const onLoadedRef = useRef(onLoaded);
+  const onFinishedRef = useRef(onFinished);
+  const current = useRef<AnimationAction | null>(null);
 
   useEffect(() => {
     onLoadedRef.current = onLoaded;
-  }, [onLoaded]);
+    onFinishedRef.current = onFinished;
+  }, [onLoaded, onFinished]);
 
   useEffect(() => {
     model.traverse((child) => {
@@ -78,12 +107,17 @@ export function Avatar({
     onLoadedRef.current?.();
   }, [model]);
 
+  // Clip changes cross-fade from whatever is playing; the time scale is applied separately so that
+  // changing it never restarts the clip.
   useEffect(() => {
     const action = actions[clip];
     if (!action) return;
-    action.reset();
+    const previous = current.current;
+    current.current = action;
+    prepareAction(action, playOnce);
     if (reducedMotion) {
       // Static pose: jump to a representative frame, then freeze the clip.
+      previous?.stop();
       action.setEffectiveWeight(1).setEffectiveTimeScale(1).play();
       mixer.setTime(0.6);
       action.setEffectiveTimeScale(0);
@@ -91,11 +125,34 @@ export function Avatar({
         action.stop();
       };
     }
-    action.setEffectiveTimeScale(timeScale).fadeIn(crossFade).play();
-    return () => {
-      action.fadeOut(crossFade);
+    action.setEffectiveWeight(1);
+    if (previous && previous !== action) {
+      // Hold the clip that was playing and blend it out while the new one blends in.
+      holdAction(previous);
+      previous.fadeOut(crossFade);
+      action.fadeIn(crossFade);
+    } else {
+      action.setEffectiveWeight(1);
+    }
+    action.play();
+    const onMixerFinished = (event: { action: AnimationAction }) => {
+      if (event.action === action) onFinishedRef.current?.(clip);
     };
-  }, [actions, clip, crossFade, mixer, reducedMotion, timeScale]);
+    mixer.addEventListener("finished", onMixerFinished);
+    return () => {
+      mixer.removeEventListener("finished", onMixerFinished);
+    };
+  }, [actions, clip, crossFade, mixer, playOnce, reducedMotion]);
+
+  useEffect(() => {
+    if (reducedMotion) return;
+    actions[clip]?.setEffectiveTimeScale(timeScale);
+  }, [actions, clip, reducedMotion, timeScale]);
+
+  useFrame(() => {
+    if (!timeScaleRef || reducedMotion) return;
+    actions[clip]?.setEffectiveTimeScale(timeScaleRef.current ?? 1);
+  });
 
   return (
     <group
