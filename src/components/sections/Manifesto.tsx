@@ -18,7 +18,7 @@ export function Manifesto({ copy, index = "01" }: ManifestoProps) {
         <p className="mt-10 max-w-2xl text-lead text-ink-soft">{copy.intro}</p>
       </Container>
 
-      <div id="manifesto-stage" aria-hidden data-avatar-anchor={AVATAR_ANCHORS.band} className="relative mt-10 h-[24vh] min-h-40 w-full md:mt-6 md:h-[22vh]" />
+      <div id="manifesto-stage" aria-hidden data-avatar-anchor={AVATAR_ANCHORS.band} className="relative mt-10 h-[24vh] min-h-40 w-full md:mt-4 md:h-[26vh]" />
 
       <Container>
         <ol className="manifesto-promises grid gap-x-10 gap-y-12 border-t border-ink/10 pt-12 md:grid-cols-2 xl:grid-cols-4">

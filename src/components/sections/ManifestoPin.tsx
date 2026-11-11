@@ -14,7 +14,7 @@ export function ManifestoPin({ id, children }: { id: string; children: ReactNode
       pinOnMobile={false}
       onProgress={setManifestoProgress}
       className="relative"
-      innerClassName="manifesto-stage relative flex flex-col justify-between overflow-hidden py-24 md:min-h-svh md:py-20"
+      innerClassName="manifesto-stage relative flex flex-col justify-between overflow-hidden py-24 md:min-h-svh md:py-16"
     >
       {children}
     </Pin>
