@@ -12,5 +12,21 @@
   "langSwitch": {
     "label": "EN",
     "aria": "Switch to English"
+  },
+  "nav": {
+    "aria": "Navigation principale",
+    "projects": "Projets",
+    "journey": "Parcours",
+    "contact": "Contact",
+    "cta": "Me contacter"
+  },
+  "footer": {
+    "eyebrow": "Contact",
+    "title": "Un projet IA, une alternance ? Parlons-en.",
+    "emailPersonal": "Email perso",
+    "emailPro": "Email pro",
+    "phone": "Téléphone",
+    "cv": "Télécharger mon CV",
+    "made": "Conçu et codé à Paris"
   }
 }

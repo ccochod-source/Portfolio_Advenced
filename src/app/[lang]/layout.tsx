@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Space_Grotesk, Space_Mono } from "next/font/google";
+import { Nav } from "@/components/Nav";
 import { SmoothScroll } from "@/components/SmoothScroll";
 import { locales } from "@/i18n";
 import { getDictionary, getLocale } from "./dictionaries";
@@ -35,8 +36,11 @@ export default async function RootLayout({ children }: LayoutProps<"/[lang]">) {
       lang={await getLocale()}
       className={`${grotesk.variable} ${mono.variable} h-full antialiased`}
     >
-      <body className="min-h-full">
-        <SmoothScroll>{children}</SmoothScroll>
+      <body className="grain min-h-full">
+        <SmoothScroll>
+          <Nav />
+          {children}
+        </SmoothScroll>
       </body>
     </html>
   );

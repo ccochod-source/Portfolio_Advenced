@@ -12,5 +12,21 @@
   "langSwitch": {
     "label": "FR",
     "aria": "Passer en français"
+  },
+  "nav": {
+    "aria": "Main navigation",
+    "projects": "Work",
+    "journey": "Journey",
+    "contact": "Contact",
+    "cta": "Get in touch"
+  },
+  "footer": {
+    "eyebrow": "Contact",
+    "title": "An AI project, an apprenticeship? Let's talk.",
+    "emailPersonal": "Personal email",
+    "emailPro": "Work email",
+    "phone": "Phone",
+    "cv": "Download my resume",
+    "made": "Designed and built in Paris"
   }
 }
