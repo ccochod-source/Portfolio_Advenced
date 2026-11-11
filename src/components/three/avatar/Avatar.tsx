@@ -5,10 +5,21 @@ import { Canvas } from "@react-three/fiber";
 import { ContactShadows, useAnimations, useGLTF } from "@react-three/drei";
 import type { Group } from "three";
 import { SkeletonUtils } from "three-stdlib";
-import { AVATAR_MODEL_URL, AVATAR_POSTER_URL, type AvatarClip, clipForProgress } from "./clips";
+import {
+  AVATAR_MODEL_URL,
+  AVATAR_POSTER_URL,
+  type AvatarClip,
+  clipForProgress,
+} from "./clips";
+import { useWebGL } from "../useWebGL";
 
 export type { AvatarClip } from "./clips";
-export { AVATAR_CLIPS, AVATAR_MODEL_URL, AVATAR_POSTER_URL, clipForProgress } from "./clips";
+export {
+  AVATAR_CLIPS,
+  AVATAR_MODEL_URL,
+  AVATAR_POSTER_URL,
+  clipForProgress,
+} from "./clips";
 
 export type AvatarProps = {
   clip: AvatarClip;
@@ -87,7 +98,13 @@ export function Avatar({
   }, [actions, clip, crossFade, mixer, reducedMotion, timeScale]);
 
   return (
-    <group ref={groupRef} position={position} rotation={rotation} scale={scale} dispose={null}>
+    <group
+      ref={groupRef}
+      position={position}
+      rotation={rotation}
+      scale={scale}
+      dispose={null}
+    >
       <primitive object={model} />
     </group>
   );
@@ -103,36 +120,70 @@ type AvatarStageProps = Omit<AvatarProps, "position"> & {
 };
 
 /** Canvas with warm key light, soft rim light and a contact shadow; decorative (aria-hidden). */
-export function AvatarStage({ className = "", cameraZ = 3.9, ...avatarProps }: AvatarStageProps) {
+export function AvatarStage({
+  className = "",
+  cameraZ = 3.9,
+  ...avatarProps
+}: AvatarStageProps) {
+  const webgl = useWebGL();
   return (
     <div aria-hidden className={`pointer-events-none ${className}`}>
-      <Canvas
-        dpr={[1, 1.5]}
-        shadows
-        camera={{ position: [0, 0.15, cameraZ], fov: 32 }}
-        gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
-        style={{ background: "transparent" }}
-      >
-        <ambientLight intensity={0.55} color="#FFE4C4" />
-        <directionalLight
-          position={[2.5, 4, 3]}
-          intensity={2.4}
-          color="#FFC145"
-          castShadow
-          shadow-mapSize={[1024, 1024]}
-          shadow-bias={-0.0004}
-        />
-        <directionalLight position={[-3, 2.5, -2.5]} intensity={1.4} color="#FF7A1A" />
-        <hemisphereLight intensity={0.5} color="#FFF4E6" groundColor="#6B4A3A" />
-        <Avatar position={[0, AVATAR_FLOOR_Y, 0]} {...avatarProps} />
-        <ContactShadows position={[0, AVATAR_FLOOR_Y + 0.001, 0]} opacity={0.45} scale={4} blur={2.2} far={2} color="#6B4A3A" frames={Infinity} />
-      </Canvas>
+      {!webgl && <AvatarFallback />}
+      {webgl && (
+        <Canvas
+          dpr={[1, 1.5]}
+          shadows
+          camera={{ position: [0, 0.15, cameraZ], fov: 32 }}
+          gl={{
+            antialias: true,
+            alpha: true,
+            powerPreference: "high-performance",
+          }}
+          style={{ background: "transparent" }}
+        >
+          <ambientLight intensity={0.55} color="#FFE4C4" />
+          <directionalLight
+            position={[2.5, 4, 3]}
+            intensity={2.4}
+            color="#FFC145"
+            castShadow
+            shadow-mapSize={[1024, 1024]}
+            shadow-bias={-0.0004}
+          />
+          <directionalLight
+            position={[-3, 2.5, -2.5]}
+            intensity={1.4}
+            color="#FF7A1A"
+          />
+          <hemisphereLight
+            intensity={0.5}
+            color="#FFF4E6"
+            groundColor="#6B4A3A"
+          />
+          <Avatar position={[0, AVATAR_FLOOR_Y, 0]} {...avatarProps} />
+          <ContactShadows
+            position={[0, AVATAR_FLOOR_Y + 0.001, 0]}
+            opacity={0.45}
+            scale={4}
+            blur={2.2}
+            far={2}
+            color="#6B4A3A"
+            frames={Infinity}
+          />
+        </Canvas>
+      )}
     </div>
   );
 }
 
 /** Static poster used while the 3D bundle loads (next/dynamic ssr:false) or when WebGL is unavailable. */
-export function AvatarFallback({ className = "", alt = "" }: { className?: string; alt?: string }) {
+export function AvatarFallback({
+  className = "",
+  alt = "",
+}: {
+  className?: string;
+  alt?: string;
+}) {
   return (
     // eslint-disable-next-line @next/next/no-img-element -- plain img keeps the fallback dependency-free inside the dynamic loader
     <img
