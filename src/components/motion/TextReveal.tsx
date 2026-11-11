@@ -63,7 +63,7 @@ export function TextReveal({
         let played = false;
 
         const init = () => {
-          if (cancelled) return;
+          if (cancelled || split) return;
           split = SplitText.create(element, {
             type: splitTypes[type],
             mask: "lines",
