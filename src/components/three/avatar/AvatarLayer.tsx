@@ -223,7 +223,8 @@ export function AvatarLayer() {
 
   const frameloop = useMemo(() => (reduced ? "demand" : tabVisible && onPage ? "always" : "never"), [reduced, tabVisible, onPage]);
 
-  if (!webgl) return null;
+  // Under prefers-reduced-motion the hero shows the static poster instead (see Hero.tsx).
+  if (!webgl || reduced) return null;
 
   return (
     <div aria-hidden className="pointer-events-none fixed inset-0 z-40">
