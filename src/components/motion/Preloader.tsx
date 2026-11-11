@@ -72,12 +72,14 @@ export function Preloader({
       if (!element) return;
       const q = gsap.utils.selector(element);
       let finished = false;
+      let removeSkip = () => {};
 
       // Everything behind the curtain is inert while it plays: no focus, no clicks reach the page.
       const page = document.getElementById(PRELOADER_INERT_ID);
       const finish = () => {
         if (finished) return;
         finished = true;
+        removeSkip();
         page?.removeAttribute("inert");
         element.dataset.state = "done";
         markSeen(storageKey);
@@ -133,9 +135,10 @@ export function Preloader({
       };
       const events = ["pointerdown", "keydown", "wheel", "touchmove"] as const;
       events.forEach((name) => window.addEventListener(name, skip, { passive: true }));
+      removeSkip = () => events.forEach((name) => window.removeEventListener(name, skip));
 
       return () => {
-        events.forEach((name) => window.removeEventListener(name, skip));
+        removeSkip();
         if (!finished) {
           page?.removeAttribute("inert");
           unlockScroll();
