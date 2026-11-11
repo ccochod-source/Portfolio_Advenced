@@ -33,7 +33,7 @@ export async function Nav() {
           <LangSwitch label={dict.langSwitch.label} ariaLabel={dict.langSwitch.aria} />
           <Link
             href={`/${lang}#contact`}
-            className="flex min-h-11 items-center whitespace-nowrap rounded-full bg-ink px-3 text-cream transition-[color,background-color] hover:bg-sun sm:px-4"
+            className="hidden min-h-11 items-center whitespace-nowrap rounded-full bg-ink px-3 text-cream transition-[color,background-color] hover:bg-sun sm:flex sm:px-4"
           >
             {dict.nav.cta}
           </Link>
