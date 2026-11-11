@@ -4,8 +4,9 @@ import { hasLocale, locales } from "@/i18n";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
-export function generateImageMetadata({ params }: { params: { lang: string } }) {
-  const lang = hasLocale(params.lang) ? params.lang : "fr";
+export async function generateImageMetadata({ params }: { params: Promise<{ lang: string }> }) {
+  const { lang: raw } = await params;
+  const lang = hasLocale(raw) ? raw : "fr";
   return [
     {
       id: "default",
