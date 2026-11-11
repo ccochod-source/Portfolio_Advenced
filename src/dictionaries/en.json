@@ -7,7 +7,10 @@
     "eyebrow": "Eugenia School · AI, Data & Business",
     "title": "I turn business needs into AI tools.",
     "status": "AI apprenticeship · September 2027",
-    "wip": "Work in progress"
+    "wip": "Work in progress",
+    "ctaProjects": "See my work",
+    "ctaContact": "Get in touch",
+    "visualAlt": "Decorative 3D scene"
   },
   "langSwitch": {
     "label": "FR",
@@ -28,5 +31,66 @@
     "phone": "Phone",
     "cv": "Download my resume",
     "made": "Designed and built in Paris"
+  },
+  "manifesto": {
+    "eyebrow": "Manifesto",
+    "headline": "AI × Business.",
+    "intro": "I don't build demos: I start from a real business need and ship a tool teams use the next day.",
+    "promises": [
+      {
+        "title": "Understand the need",
+        "text": "Before the first line of code: interviews, the real process, edge cases. Eight interviews for AR Plate, five scopes framed with the Brasserie de Tahiti teams."
+      },
+      {
+        "title": "Build fast with AI",
+        "text": "RAG, agents, document extraction: AI is a controlled step of the product, not a gimmick. Five applications in eight weeks, a computer-use agent in 36 hours."
+      },
+      {
+        "title": "Measure",
+        "text": "22,000 entries migrated, around 400 anomalies detected, 19 dashboards, 1,018 tests: what isn't measured isn't shipped."
+      },
+      {
+        "title": "Ship to real users",
+        "text": "User testing, permissions, exports, documentation. A live website for Auralife, tools in service in Tahiti, an agent acting in front of the user."
+      }
+    ]
+  },
+  "projects": {
+    "eyebrow": "Selected work",
+    "title": "Five projects where AI answers a concrete need.",
+    "cta": "Read the case study",
+    "otherEyebrow": "More work",
+    "otherTitle": "Studies, prototypes and applications.",
+    "featuredAria": "Featured projects",
+    "otherAria": "Other projects"
+  },
+  "skills": {
+    "eyebrow": "Stack",
+    "title": "AI first, code to ship it, business sense to make it useful.",
+    "related": "Related projects",
+    "projectsCount": "{count} projects",
+    "projectCount": "1 project"
+  },
+  "journey": {
+    "eyebrow": "Journey",
+    "title": "From Annecy to Tahiti, and back to Paris.",
+    "cta": "Let's talk",
+    "open": "Open step"
+  },
+  "project": {
+    "eyebrow": "Case study",
+    "back": "All projects",
+    "context": "Context",
+    "role": "My role",
+    "approach": "Approach",
+    "stack": "Stack",
+    "skills": "Skills",
+    "results": "Results",
+    "gallery": "In pictures",
+    "links": "Links",
+    "next": "Next project",
+    "year": "Year",
+    "category": "Category",
+    "contact": "Get in touch"
   }
 }

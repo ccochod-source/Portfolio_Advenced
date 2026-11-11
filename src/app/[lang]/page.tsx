@@ -1,25 +1,27 @@
 import { Footer } from "@/components/Footer";
-import { Container } from "@/components/ui/Container";
-import { Eyebrow } from "@/components/ui/Eyebrow";
-import { getDictionary } from "./dictionaries";
+import { FeaturedProjects } from "@/components/sections/FeaturedProjects";
+import { Hero } from "@/components/sections/Hero";
+import { Journey } from "@/components/sections/Journey";
+import { Manifesto } from "@/components/sections/Manifesto";
+import { ProjectGrid } from "@/components/sections/ProjectGrid";
+import { Skills } from "@/components/sections/Skills";
+import { journey } from "@/content/journey";
+import { featuredProjects, otherProjects } from "@/content/projects";
+import { skills } from "@/content/skills";
+import { getDictionary, getLocale } from "./dictionaries";
 
 export default async function Home() {
-  const dict = await getDictionary();
+  const [dict, lang] = await Promise.all([getDictionary(), getLocale()]);
 
   return (
     <>
-      <main className="golden-hour flex min-h-svh flex-col justify-end pb-10 pt-32">
-        <Container>
-          <Eyebrow className="mb-6 opacity-80">{dict.hero.eyebrow}</Eyebrow>
-          <h1 className="max-w-6xl text-h1 font-medium">{dict.hero.title}</h1>
-          <div className="mt-16 flex flex-wrap items-center justify-between gap-4 font-mono text-label uppercase">
-            <span className="flex items-center gap-2">
-              <span className="size-2 rounded-full bg-ink" aria-hidden />
-              {dict.hero.status}
-            </span>
-            <span className="opacity-70">{dict.hero.wip}</span>
-          </div>
-        </Container>
+      <main>
+        <Hero lang={lang} copy={dict.hero} />
+        <Manifesto copy={dict.manifesto} index="01" />
+        <FeaturedProjects id="projets" index="02" lang={lang} copy={dict.projects} projects={featuredProjects} />
+        <ProjectGrid index="03" lang={lang} copy={dict.projects} projects={otherProjects} />
+        <Skills id="stack" index="04" lang={lang} copy={dict.skills} skills={skills} />
+        <Journey id="parcours" index="05" lang={lang} copy={dict.journey} steps={journey} />
       </main>
       <Footer />
     </>
