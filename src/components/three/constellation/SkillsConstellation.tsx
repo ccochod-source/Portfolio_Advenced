@@ -1,6 +1,8 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useWebGL } from "../useWebGL";
+import { ActivityPause } from "../ActivityPause";
 import { Canvas } from "@react-three/fiber";
 import { ConstellationScene } from "./ConstellationScene";
 import { GROUP_TAILWIND, layoutSkills } from "./layout";
@@ -19,19 +21,6 @@ function useMediaQuery(query: string, fallback = false) {
   return matches;
 }
 
-let webglSupport: boolean | null = null;
-function hasWebGL() {
-  if (webglSupport !== null) return webglSupport;
-  try {
-    const canvas = document.createElement("canvas");
-    webglSupport = Boolean(canvas.getContext("webgl2") ?? canvas.getContext("webgl"));
-  } catch {
-    webglSupport = false;
-  }
-  return webglSupport;
-}
-const noopSubscribe = () => () => {};
-const useWebGL = () => useSyncExternalStore(noopSubscribe, hasWebGL, () => null);
 
 export function SkillsConstellation({
   skills,
@@ -112,7 +101,7 @@ export function SkillsConstellation({
   }, []);
   const onSelect = useCallback((index: number) => setPinned((p) => (p === index ? null : index)), []);
 
-  if (webgl === false) {
+  if (!webgl) {
     return <SkillsConstellationFallback skills={skills} labels={labels} projectHref={href} className={className} />;
   }
 
@@ -131,6 +120,7 @@ export function SkillsConstellation({
               onPointerMissed={() => setPinned(null)}
               style={{ background: "transparent" }}
             >
+              <ActivityPause frameloop={visible ? "always" : "never"} />
               <ConstellationScene
                 nodes={nodes}
                 edges={edges}
@@ -175,7 +165,7 @@ export function SkillsConstellation({
                 onFocus={() => setFocused(index)}
                 onBlur={() => setFocused((f) => (f === index ? null : f))}
                 onClick={() => onSelect(index)}
-                className="sr-only rounded-full bg-cream px-3 py-1 font-mono text-[11px] uppercase tracking-[0.14em] text-ink focus:not-sr-only focus:m-1 focus:border focus:border-ink/20"
+                className="sr-only rounded-full bg-cream px-4 py-2 font-mono text-label uppercase tracking-[0.14em] text-ink focus:not-sr-only focus:m-1 focus:inline-flex focus:min-h-11 focus:items-center focus:border focus:border-ink/20"
               >
                 {skill.label}
                 <span className="sr-only"> — {labels.groups[skill.group]}</span>
@@ -185,10 +175,10 @@ export function SkillsConstellation({
         </ul>
       </div>
 
-      <aside
-        aria-live="polite"
-        className="flex flex-col justify-between rounded-3xl border border-ink/10 bg-cream-deep/50 p-6 backdrop-blur-sm md:p-8"
-      >
+      <aside className="flex flex-col justify-between rounded-3xl border border-ink/10 bg-cream-deep/50 p-6 backdrop-blur-sm md:p-8">
+        <p className="sr-only" aria-live="polite">
+          {active ? (labels.status ?? "{skill} — {group}").replace("{skill}", active.label).replace("{group}", labels.groups[active.group]) : ""}
+        </p>
         {active ? (
           <div>
             <span className="inline-flex items-center gap-2 font-mono text-label uppercase text-ink-soft">
@@ -211,7 +201,7 @@ export function SkillsConstellation({
                     <li key={p.slug}>
                       <a
                         href={href(p.slug)}
-                        className="group flex items-center justify-between gap-4 py-3 text-sm font-medium transition-colors hover:text-sun"
+                        className="group flex min-h-11 items-center justify-between gap-4 py-3 text-sm font-medium underline decoration-ink/30 underline-offset-4 transition-colors hover:text-sun-deep hover:decoration-current"
                       >
                         {p.title}
                         <span aria-hidden className="transition-transform duration-300 ease-out-expo group-hover:translate-x-1">

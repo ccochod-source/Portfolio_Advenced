@@ -10,7 +10,7 @@ export function ManifestoPin({ id, children }: { id: string; children: ReactNode
     <Pin
       as="section"
       id={id}
-      length={1.5}
+      length={1.1}
       pinOnMobile={false}
       onProgress={setManifestoProgress}
       className="relative"

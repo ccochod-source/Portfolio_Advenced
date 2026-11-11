@@ -16,7 +16,7 @@ export default async function Home() {
 
   return (
     <>
-      <main>
+      <main id="main" tabIndex={-1} className="outline-none">
         <Hero lang={lang} copy={dict.hero} />
         <Manifesto copy={dict.manifesto} index="01" />
         <FeaturedProjects id="projets" index="02" lang={lang} copy={dict.projects} projects={featuredProjects} />

@@ -41,6 +41,9 @@ function markSeen(key: string) {
   }
 }
 
+/** Id of the wrapper that receives `inert` while the curtain is up (see `[lang]/layout.tsx`). */
+export const PRELOADER_INERT_ID = "page";
+
 /**
  * Full-screen curtain with a counter. Render it once, as early as possible in <body>, and never
  * inside a `Reveal` / transformed / hidden ancestor (it is `position: fixed`).
@@ -50,7 +53,7 @@ export function Preloader({
   greeting,
   label,
   skipHint,
-  duration = 1.05,
+  duration = 0.85,
   force = false,
   storageKey = PRELOADER_STORAGE_KEY,
   onComplete,
@@ -70,9 +73,12 @@ export function Preloader({
       const q = gsap.utils.selector(element);
       let finished = false;
 
+      // Everything behind the curtain is inert while it plays: no focus, no clicks reach the page.
+      const page = document.getElementById(PRELOADER_INERT_ID);
       const finish = () => {
         if (finished) return;
         finished = true;
+        page?.removeAttribute("inert");
         element.dataset.state = "done";
         markSeen(storageKey);
         markPageRevealed();
@@ -86,6 +92,7 @@ export function Preloader({
       }
 
       element.dataset.state = "active";
+      page?.setAttribute("inert", "");
       markPreloaderActive();
       lockScroll();
 
@@ -129,7 +136,10 @@ export function Preloader({
 
       return () => {
         events.forEach((name) => window.removeEventListener(name, skip));
-        if (!finished) unlockScroll();
+        if (!finished) {
+          page?.removeAttribute("inert");
+          unlockScroll();
+        }
       };
     },
     { scope: root, dependencies: [duration, force, storageKey], revertOnUpdate: true },

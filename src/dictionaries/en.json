@@ -1,16 +1,16 @@
 {
   "meta": {
     "title": "Clément Cochod — AI × Business",
-    "description": "AI, Data & Business student at Eugenia School. I turn business needs into AI tools. Looking for an AI apprenticeship starting September 2027."
+    "description": "AI, Data & Business student at Eugenia School. I turn business needs into AI tools. Looking for an AI apprenticeship starting September 2027.",
+    "ogAlt": "Clément Cochod — AI × Business, portfolio",
+    "siteName": "Clément Cochod"
   },
   "hero": {
     "eyebrow": "Eugenia School · AI, Data & Business",
     "title": "I turn business needs into AI tools.",
     "status": "AI apprenticeship · September 2027",
-    "wip": "Work in progress",
     "ctaProjects": "See my work",
-    "ctaContact": "Get in touch",
-    "visualAlt": "Decorative 3D scene"
+    "ctaContact": "Get in touch"
   },
   "langSwitch": {
     "label": "FR",
@@ -21,7 +21,10 @@
     "projects": "Work",
     "journey": "Journey",
     "contact": "Contact",
-    "cta": "Get in touch"
+    "cta": "Get in touch",
+    "menu": "Menu",
+    "close": "Close menu",
+    "skip": "Skip to content"
   },
   "footer": {
     "eyebrow": "Contact",
@@ -29,8 +32,9 @@
     "emailPersonal": "Personal email",
     "emailPro": "Work email",
     "phone": "Phone",
-    "cv": "Download my resume",
-    "made": "Designed and built in Paris"
+    "cv": "Download my CV (French, PDF)",
+    "made": "Designed and built in Paris",
+    "phoneDisplay": "+33 7 43 70 05 96"
   },
   "manifesto": {
     "eyebrow": "Manifesto",
@@ -39,7 +43,7 @@
     "promises": [
       {
         "title": "Understand the need",
-        "text": "Before the first line of code: interviews, the real process, edge cases. Eight interviews for AR Plate, five scopes framed with the Brasserie de Tahiti teams."
+        "text": "Before the first line of code: interviews, the real process, edge cases. Eight interviews for AR Plate, five projects scoped with the Brasserie de Tahiti teams."
       },
       {
         "title": "Build fast with AI",
@@ -68,7 +72,7 @@
         "value": 16000,
         "prefix": "",
         "suffix": "+",
-        "label": "documentation pages migrated"
+        "label": "documentation pages searchable with RAG"
       },
       {
         "value": 19,
@@ -88,20 +92,23 @@
         "suffix": "",
         "label": "anomalies detected"
       }
-    ]
+    ],
+    "figuresAria": "Key figures",
+    "stackAria": "Technologies",
+    "tagsAria": "Keywords"
   },
   "skills": {
     "eyebrow": "Stack",
     "title": "AI first, code to ship it, business sense to make it useful.",
     "related": "Related projects",
-    "projectsCount": "{count} projects",
-    "projectCount": "1 project",
     "groups": {
       "ai": "Artificial intelligence",
       "build": "Build",
       "business": "Business"
     },
-    "hint": "Hover a star to see related projects. Tab to navigate with the keyboard."
+    "hint": "Hover a star to see related projects. Tab to navigate with the keyboard.",
+    "fullList": "See the full list of skills",
+    "status": "{skill} — {group}"
   },
   "journey": {
     "eyebrow": "Journey",
@@ -128,9 +135,16 @@
   "preloader": {
     "greeting": "Hello.",
     "label": "Clément Cochod — Portfolio",
-    "skipHint": "Click to skip"
+    "skipHint": "Click or Esc to skip"
   },
   "common": {
     "cursorView": "View"
+  },
+  "notFound": {
+    "eyebrow": "Error 404",
+    "title": "This page doesn't exist.",
+    "text": "The link may be old, or the address mistyped. The projects and contact are one click away.",
+    "home": "Back to home",
+    "projects": "See the projects"
   }
 }

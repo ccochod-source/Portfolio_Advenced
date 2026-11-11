@@ -53,8 +53,8 @@ export const skills: Skill[] = [
     group: "ai",
     label: { fr: "RAG", en: "RAG" },
     description: {
-      fr: "Recherche documentaire sur plus de 16 000 pages à la Brasserie de Tahiti.",
-      en: "Document search over 16,000+ pages at Brasserie de Tahiti.",
+      fr: "Recherche documentaire (RAG) sur plus de 16 000 pages à la Brasserie de Tahiti.",
+      en: "Retrieval-augmented search (RAG) over 16,000+ documentation pages at Brasserie de Tahiti.",
     },
     relatedProjects: ["brasserie-de-tahiti", "hackathon-essec"],
   },

@@ -10,6 +10,7 @@ import { Eyebrow } from "@/components/ui/Eyebrow";
 import { getNextProject, getProject, projects } from "@/content/projects";
 import { getSkill } from "@/content/skills";
 import { t } from "@/content/types";
+import { absoluteUrl, localeAlternates } from "@/lib/site";
 import { getDictionary, getLocale } from "../../dictionaries";
 
 export function generateStaticParams() {
@@ -21,14 +22,17 @@ export async function generateMetadata({ params }: PageProps<"/[lang]/projets/[s
   const project = getProject(slug);
   if (!project) notFound();
   const lang = await getLocale();
-  const title = `${project.title} — Clément Cochod`;
+  const title = project.title;
   const description = t(project.summary, lang);
   const cover = project.images[0];
+  const path = `/projets/${slug}`;
+  const images = cover ? [{ url: absoluteUrl(cover.src), alt: t(cover.alt, lang), width: cover.width, height: cover.height }] : undefined;
   return {
     title,
     description,
-    alternates: { languages: { fr: `/fr/projets/${slug}`, en: `/en/projets/${slug}` } },
-    openGraph: cover ? { title, description, images: [{ url: cover.src, alt: t(cover.alt, lang) }] } : { title, description },
+    alternates: { canonical: absoluteUrl(`/${lang}${path}`), languages: localeAlternates(path) },
+    openGraph: { type: "article", url: absoluteUrl(`/${lang}${path}`), title, description, images },
+    twitter: { card: "summary_large_image", title, description, images: images?.map((i) => i.url) },
   };
 }
 
@@ -44,9 +48,9 @@ export default async function ProjectPage({ params }: PageProps<"/[lang]/projets
 
   return (
     <>
-      <main className="pt-28 md:pt-36">
+      <main id="main" tabIndex={-1} className="pt-28 outline-none md:pt-36">
         <Container>
-          <Link href={`/${lang}#projets`} className="group inline-flex items-center gap-2 font-mono text-label uppercase text-ink-soft hover:text-ink">
+          <Link href={`/${lang}#projets`} className="group inline-flex min-h-11 items-center gap-2 font-mono text-label uppercase text-ink-soft underline decoration-ink/20 underline-offset-4 hover:text-ink hover:decoration-current">
             <span aria-hidden className="transition-transform duration-300 ease-out-expo group-hover:-translate-x-1">
               ←
             </span>
@@ -77,10 +81,14 @@ export default async function ProjectPage({ params }: PageProps<"/[lang]/projets
               </div>
               <div>
                 <dt className="uppercase text-ink-soft">{copy.stack}</dt>
-                <dd className="mt-2 flex flex-wrap gap-2">
-                  {project.tags.map((tag) => (
-                    <Badge key={tag}>{tag}</Badge>
-                  ))}
+                <dd className="mt-2">
+                  <ul className="flex flex-wrap gap-2" aria-label={dict.projects.stackAria}>
+                    {project.tags.map((tag) => (
+                      <li key={tag}>
+                        <Badge>{tag}</Badge>
+                      </li>
+                    ))}
+                  </ul>
                 </dd>
               </div>
             </dl>
@@ -93,7 +101,8 @@ export default async function ProjectPage({ params }: PageProps<"/[lang]/projets
                 alt={t(cover.alt, lang)}
                 width={cover.width}
                 height={cover.height}
-                sizes="(max-width: 1440px) 100vw, 1440px"
+                sizes="(max-width: 1280px) calc(100vw - 2rem), 1200px"
+                quality={70}
                 preload
                 className={`absolute inset-0 size-full ${project.slug === "brasserie-de-tahiti" ? "object-contain p-16 md:p-28" : "object-cover"}`}
               />
@@ -102,11 +111,11 @@ export default async function ProjectPage({ params }: PageProps<"/[lang]/projets
 
           <section className="mt-20 grid gap-12 md:mt-28 md:grid-cols-2 md:gap-16">
             <div>
-              <Eyebrow index="01">{copy.context}</Eyebrow>
+              <Eyebrow as="h2" index="01">{copy.context}</Eyebrow>
               <p className="mt-6 text-lead">{t(project.context, lang)}</p>
             </div>
             <div>
-              <Eyebrow index="02">{copy.role}</Eyebrow>
+              <Eyebrow as="h2" index="02">{copy.role}</Eyebrow>
               <p className="mt-6 text-lead">{t(project.role, lang)}</p>
               {project.skills.length > 0 && (
                 <ul className="mt-6 flex flex-wrap gap-2" aria-label={copy.skills}>
@@ -114,8 +123,10 @@ export default async function ProjectPage({ params }: PageProps<"/[lang]/projets
                     const skill = getSkill(id);
                     return skill ? (
                       <li key={id}>
-                        <Link href={`/${lang}#stack`}>
-                          <Badge tone="dark">{t(skill.label, lang)}</Badge>
+                        <Link href={`/${lang}#stack`} className="touch-target inline-flex rounded-full">
+                          <Badge tone="dark" className="underline decoration-cream/40 underline-offset-2">
+                            {t(skill.label, lang)}
+                          </Badge>
                         </Link>
                       </li>
                     ) : null;
@@ -126,11 +137,11 @@ export default async function ProjectPage({ params }: PageProps<"/[lang]/projets
           </section>
 
           <section className="mt-20 md:mt-28">
-            <Eyebrow index="03">{copy.approach}</Eyebrow>
+            <Eyebrow as="h2" index="03">{copy.approach}</Eyebrow>
             <ol className="mt-8 divide-y divide-ink/10 border-y border-ink/10">
               {project.approach.map((step, i) => (
                 <li key={i} className="grid gap-4 py-8 md:grid-cols-[6rem_1fr]">
-                  <span className="font-mono text-label text-sun">{String(i + 1).padStart(2, "0")}</span>
+                  <span className="font-mono text-label text-sun-deep">{String(i + 1).padStart(2, "0")}</span>
                   <p className="max-w-3xl text-lg">{t(step, lang)}</p>
                 </li>
               ))}
@@ -138,7 +149,7 @@ export default async function ProjectPage({ params }: PageProps<"/[lang]/projets
           </section>
 
           <section className="mt-20 md:mt-28">
-            <Eyebrow index="04">{copy.results}</Eyebrow>
+            <Eyebrow as="h2" index="04">{copy.results}</Eyebrow>
             <ul className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {project.results.map((result, i) => (
                 <li key={i} className="rounded-[1.5rem] bg-cream-deep/60 p-6 text-lg font-medium leading-snug">
@@ -150,7 +161,7 @@ export default async function ProjectPage({ params }: PageProps<"/[lang]/projets
 
           {gallery.length > 0 && (
             <section className="mt-20 md:mt-28">
-              <Eyebrow index="05">{copy.gallery}</Eyebrow>
+              <Eyebrow as="h2" index="05">{copy.gallery}</Eyebrow>
               <ul className={`mt-8 grid gap-6 ${gallery.length > 1 ? "md:grid-cols-2" : ""}`}>
                 {gallery.map((image) => (
                   <li key={image.src} className="overflow-hidden rounded-[1.5rem] border border-ink/10 bg-cream-deep/40">
@@ -159,7 +170,8 @@ export default async function ProjectPage({ params }: PageProps<"/[lang]/projets
                       alt={t(image.alt, lang)}
                       width={image.width}
                       height={image.height}
-                      sizes="(max-width: 768px) 100vw, 50vw"
+                      sizes="(max-width: 768px) calc(100vw - 2rem), (max-width: 1280px) 48vw, 600px"
+                      loading="lazy"
                       className="h-auto w-full"
                     />
                   </li>
@@ -197,7 +209,8 @@ export default async function ProjectPage({ params }: PageProps<"/[lang]/projets
                   alt=""
                   width={nextCover.width}
                   height={nextCover.height}
-                  sizes="(max-width: 768px) 100vw, 33vw"
+                  sizes="(max-width: 768px) calc(100vw - 4rem), 360px"
+                  loading="lazy"
                   className={`absolute inset-0 size-full transition-transform duration-700 ease-out-expo group-hover:scale-[1.04] ${next.slug === "brasserie-de-tahiti" ? "object-contain p-8" : "object-cover"}`}
                 />
               </div>

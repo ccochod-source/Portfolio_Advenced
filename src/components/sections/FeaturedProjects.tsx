@@ -24,7 +24,7 @@ export function FeaturedProjects({ lang, copy, projects, id = "projets", index =
         <Eyebrow index={index}>{copy.eyebrow}</Eyebrow>
         <h2 className="mt-6 max-w-5xl text-h2 font-medium">{copy.title}</h2>
 
-        <Reveal as="ul" stagger className="mt-14 grid grid-cols-2 gap-x-6 gap-y-10 border-y border-ink/10 py-10 md:mt-20 lg:grid-cols-4" aria-label={copy.eyebrow}>
+        <Reveal as="ul" stagger className="mt-14 grid grid-cols-2 gap-x-6 gap-y-10 border-y border-ink/10 py-10 md:mt-20 lg:grid-cols-4" aria-label={copy.figuresAria}>
           {copy.figures.map((figure) => (
             <li key={figure.label}>
               <p className="text-h2 font-medium tabular-nums">
@@ -47,9 +47,11 @@ export function FeaturedProjects({ lang, copy, projects, id = "projets", index =
                 data-project={project.slug}
                 className="grid items-center gap-8 md:grid-cols-12 md:gap-12"
               >
+                {/* Decorative duplicate of the title link below: not in the tab order, not announced. */}
                 <Link
                   href={href}
-                  aria-label={project.title}
+                  aria-hidden
+                  tabIndex={-1}
                   data-cursor="view"
                   className={`group relative block overflow-hidden rounded-[2rem] sunset-card md:col-span-7 ${reversed ? "md:order-2" : ""} ${i === 0 ? "aspect-[4/3]" : "aspect-[5/4] md:aspect-[4/3]"}`}
                 >
@@ -60,8 +62,9 @@ export function FeaturedProjects({ lang, copy, projects, id = "projets", index =
                       alt={t(cover.alt, lang)}
                       width={cover.width}
                       height={cover.height}
-                      sizes="(max-width: 768px) 100vw, 60vw"
+                      sizes="(max-width: 768px) calc(100vw - 2rem), (max-width: 1280px) 56vw, 760px"
                       preload={i === 0}
+                      loading={i === 0 ? "eager" : "lazy"}
                       className={`absolute inset-0 size-full transition-transform duration-700 ease-out-expo group-hover:scale-[1.03] ${project.slug === "brasserie-de-tahiti" ? "object-contain p-12 md:p-20" : "object-cover"}`}
                     />
                     </Parallax>
@@ -86,14 +89,14 @@ export function FeaturedProjects({ lang, copy, projects, id = "projets", index =
                     </Link>
                   </h3>
                   <p className="mt-6 text-lead text-ink-soft">{t(project.summary, lang)}</p>
-                  <ul className="mt-6 flex flex-wrap gap-2" aria-label={copy.eyebrow}>
+                  <ul className="mt-6 flex flex-wrap gap-2" aria-label={copy.tagsAria}>
                     {project.tags.slice(0, 5).map((tag) => (
                       <li key={tag}>
                         <Badge>{tag}</Badge>
                       </li>
                     ))}
                   </ul>
-                  <Link href={href} className="group mt-8 inline-flex items-center gap-2 font-medium underline-offset-4 hover:underline">
+                  <Link href={href} className="group mt-8 inline-flex min-h-11 items-center gap-2 font-medium underline decoration-ink/30 underline-offset-4 hover:decoration-current">
                     {copy.cta}
                     <span aria-hidden className="transition-transform duration-300 ease-out-expo group-hover:translate-x-1">
                       →

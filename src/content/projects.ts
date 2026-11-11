@@ -38,11 +38,11 @@ export const projects: Project[] = [
     skills: ["rag", "llm", "recueil-besoins", "reprise-donnees", "gestion-droits", "tests-utilisateurs", "dashboards"],
     role: {
       fr: "Stagiaire développeur d'applications métiers : recueil des besoins, modélisation des données, développement, reprise des historiques, gestion des droits, contrôles de cohérence, tests utilisateurs et préparation du déploiement.",
-      en: "Business-application developer intern: requirements gathering, data modelling, development, history migration, access management, consistency checks, user testing and deployment preparation.",
+      en: "Business-application developer intern: requirements gathering, data modelling, development, legacy data migration, access management, consistency checks, user testing and deployment preparation.",
     },
     context: {
       fr: "Les équipes travaillaient avec des sources hétérogènes : documents internes, historiques Excel, données financières et procédures terrain. Chaque application devait respecter les rôles métier, reprendre l'existant et rester compréhensible par des utilisateurs non techniques.",
-      en: "Teams worked with heterogeneous sources: internal documents, Excel histories, financial data and field procedures. Each application had to respect business roles, take over the existing data and stay understandable for non-technical users.",
+      en: "Teams worked with heterogeneous sources: internal documents, Excel histories, financial data and field procedures. Each application had to respect business roles, migrate the existing data and stay understandable for non-technical users.",
     },
     approach: [
       {
@@ -63,7 +63,7 @@ export const projects: Project[] = [
       },
       {
         fr: "Pilotage DSI : intégration ITSM, extraction assistée par IA des contrats PDF et espace de documentation interne.",
-        en: "IT steering: ITSM integration, AI-assisted extraction of PDF contracts and an internal documentation space.",
+        en: "IT management: ITSM integration, AI-assisted extraction of PDF contracts and an internal documentation space.",
       },
     ],
     results: [
@@ -100,17 +100,17 @@ export const projects: Project[] = [
       en: "Owner of the H (computer-use) agent in a team of four: session creation and tracking, instructions and stop conditions, bridge to the local browser, Flight module and the demo bench on my Mac.",
     },
     context: {
-      fr: "Un voyage lointain, c'est surtout des papiers : pour Bali, un visa électronique, une carte d'arrivée et une taxe touristique sur trois sites officiels, entourés de sites copie qui font payer des formulaires gratuits. Le hackathon H Company × 42AI portait sur les agents « computer use » : des IA qui observent un écran et agissent par clics et saisies.",
+      fr: "Un voyage lointain, c'est surtout des papiers : pour Bali, un visa électronique, une carte d'arrivée et une taxe touristique sur trois sites officiels, entourés de sites miroirs qui font payer des formulaires gratuits. Le hackathon H Company × 42AI portait sur les agents « computer use » : des IA qui observent un écran et agissent par clics et saisies.",
       en: "A long-haul trip is mostly paperwork: for Bali, an e-visa, an arrival card and a tourist tax on three official websites, surrounded by copycat sites charging for free forms. The H Company × 42AI hackathon focused on computer-use agents: AIs that observe a screen and act through clicks and typing.",
     },
     approach: [
       {
         fr: "L'utilisateur parle comme à un concierge. Nami comprend la demande, déduit les papiers nécessaires, retrouve le passeport sur l'ordinateur et le lit avec un modèle de vision, MRZ vérifiée.",
-        en: "The user talks as to a concierge. Nami understands the request, infers the required papers, finds the passport on the computer and reads it with a vision model, MRZ verified.",
+        en: "The user talks to Nami like a concierge. Nami understands the request, infers the required papers, finds the passport on the computer and reads it with a vision model, MRZ verified.",
       },
       {
-        fr: "Un agent H pilote un Chrome dédié par le port de debug (CDP) : il remplit le visa e-VOA puis la carte d'arrivée, et cherche un vol réel sur Google Flights. Le dépôt de fichiers et les menus fragiles passent par des outils personnalisés servis par Nami.",
-        en: "An H agent drives a dedicated Chrome through the debug port (CDP): it fills the e-VOA visa then the arrival card, and searches a real flight on Google Flights. File uploads and fragile menus go through custom tools served by Nami.",
+        fr: "Un agent H pilote un Chrome dédié par le port de débogage (CDP) : il remplit le visa e-VOA puis la carte d'arrivée, et cherche un vol réel sur Google Flights. Le dépôt de fichiers et les menus fragiles passent par des outils personnalisés servis par Nami.",
+        en: "An H agent drives a dedicated Chrome through the debug port (CDP): it fills the e-VOA visa then the arrival card, and looks up a real flight on Google Flights. File uploads and fragile menus go through custom tools served by Nami.",
       },
       {
         fr: "Les garde-fous sont dans le code, pas dans la bonne volonté de l'agent : domaine officiel obligatoire, boutons interdits (Submit, Pay, Sign in…), contenu des pages traité comme non fiable, arrêt par construction avant tout envoi ou paiement.",
@@ -123,9 +123,9 @@ export const projects: Project[] = [
     ],
     results: [
       { fr: "Visa e-VOA : menus, passeport et photo déposés, arrêt à l'étape 1 sans clic humain (60 à 125 s)", en: "e-VOA visa: menus, passport and photo uploaded, stopped at step 1 with no human click (60 to 125 s)" },
-      { fr: "Carte d'arrivée remplie, arrêt avant Submit ; vols réels lus en 13 s, page de réservation en 27 s", en: "Arrival card filled, stopped before Submit; real flights read in 13 s, booking page at 27 s" },
+      { fr: "Carte d'arrivée remplie, arrêt avant Submit ; vols réels lus en 13 s, page de réservation en 27 s", en: "Arrival card filled, stopped before Submit; real flights read in 13 s, booking page reached in 27 s" },
       { fr: "Environ 0,09 $ par session de visa", en: "Around $0.09 per visa session" },
-      { fr: "~117 PR fusionnées, 1 018 tests vitest, lint et build verts au rendu", en: "~117 merged PRs, 1,018 vitest tests, lint and build green at submission" },
+      { fr: "Équipe : ~117 PR fusionnées, 1 018 tests vitest, lint et build verts au rendu", en: "Team: ~117 merged PRs, 1,018 vitest tests, lint and build green at submission" },
       { fr: "Parcours complet à la voix démontré sur mon Mac la nuit du 7 au 8 novembre", en: "Full voice journey demonstrated on my Mac on the night of 7–8 November" },
     ],
     images: [
@@ -144,7 +144,7 @@ export const projects: Project[] = [
     category: { fr: "Hackathon · Rédaction assistée paie & RH", en: "Hackathon · AI-assisted payroll & HR writing" },
     year: "2026",
     featured: true,
-    award: { fr: "1er prix PayFit", en: "1st prize PayFit" },
+    award: { fr: "1er prix · Hackathon PayFit", en: "1st prize · PayFit hackathon" },
     summary: {
       fr: "Une plateforme de rédaction assistée pour la paie et les RH : agents Dust (EEAT, SEO, garde-fous juridiques), interface React, démo sur Vercel. 1er prix en équipe.",
       en: "An assisted-writing platform for payroll and HR: Dust agents (EEAT, SEO, legal guardrails), React interface, demo on Vercel. 1st prize as a team.",
@@ -206,7 +206,7 @@ export const projects: Project[] = [
     category: { fr: "Hackathon · Prospection automatisée par IA", en: "Hackathon · AI-automated prospecting" },
     year: "2026",
     featured: true,
-    award: { fr: "1er cas d'usage Mirakl", en: "1st use case Mirakl" },
+    award: { fr: "1er du cas d'usage · Hackathon Mirakl", en: "1st in the use-case track · Mirakl hackathon" },
     summary: {
       fr: "Une chaîne complète de prospection : collecte, enrichissement des prospects, e-mails personnalisés par IA générative et suivi des campagnes. 1er sur le cas d'usage, 2e au général.",
       en: "An end-to-end prospecting pipeline: collection, lead enrichment, AI-generated personalised e-mails and campaign tracking. 1st on the use case, 2nd overall.",
@@ -316,7 +316,6 @@ export const projects: Project[] = [
     category: { fr: "Hackathon ESSEC · Sécurité des agents IA", en: "ESSEC hackathon · AI-agent security" },
     year: "2026",
     featured: false,
-    award: { fr: "Chef de projet ESSEC", en: "Project lead ESSEC" },
     summary: {
       fr: "36 heures sur la sécurité des agents IA et le contrôle humain, avec des mentors KPMG : un copilote SOC pour enquêter sur les incidents impliquant des agents compromis.",
       en: "36 hours on AI-agent security and human oversight, with KPMG mentors: a SOC copilot to investigate incidents involving compromised agents.",
@@ -325,7 +324,7 @@ export const projects: Project[] = [
     skills: ["agents-ia", "rag", "openai-api", "python", "nextjs", "supabase"],
     role: {
       fr: "Chef de projet : répartition du travail, cadrage du parcours, arbitrages pendant 36 heures et restitution devant les mentors KPMG.",
-      en: "Project lead: work split, scoping of the user journey, trade-offs over 36 hours and presentation to the KPMG mentors.",
+      en: "Project lead: task allocation, scoping of the user journey, trade-offs over 36 hours and presentation to the KPMG mentors.",
     },
     context: {
       fr: "Hackathon ESSEC Secure Horizons : comment garder la main sur des agents IA qui exécutent des outils, et enquêter quand l'un d'eux est compromis ?",
@@ -338,12 +337,12 @@ export const projects: Project[] = [
       },
       {
         fr: "Une passerelle qui trace les conversations des agents, un coffre, des leurres et un contrôle des paquets installés ; les suspensions d'outils sont appliquées après approbation humaine.",
-        en: "A gateway that traces agent conversations, a vault, decoys and a control of installed packages; tool suspensions are applied after human approval.",
+        en: "A gateway that traces agent conversations, a vault, decoys and an audit of installed packages; tool suspensions are applied after human approval.",
       },
     ],
     results: [
       { fr: "Prototype de bout en bout : question → RAG → traces → incidents → confinement", en: "End-to-end prototype: question → RAG → traces → incidents → containment" },
-      { fr: "Tests Python et build front verts", en: "Python tests and front build green" },
+      { fr: "Tests Python et build front-end au vert", en: "Python tests passing, front-end build green" },
     ],
     images: [
       {
@@ -471,7 +470,7 @@ export const projects: Project[] = [
       },
     ],
     results: [
-      { fr: "Site réellement en production, modifiable par la cliente", en: "Site really in production, editable by the client" },
+      { fr: "Site en production, modifiable par la cliente", en: "Live in production, editable by the client" },
     ],
     images: [
       {

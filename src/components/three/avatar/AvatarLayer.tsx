@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
+import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { ContactShadows } from "@react-three/drei";
 import { Group, MathUtils } from "three";
@@ -9,6 +9,8 @@ import { useCanHover, useIsMobile, usePrefersReducedMotion } from "../hero/useHe
 import { Avatar } from "./Avatar";
 import type { AvatarClip } from "./clips";
 import { AVATAR_ANCHORS, getManifestoProgress } from "@/lib/avatar/story";
+import { useWebGL } from "../useWebGL";
+import { ActivityPause } from "../ActivityPause";
 
 /** Camera of this layer: z and fov decide how a pixel rectangle maps to world units. */
 const LAYER_Z = 10;
@@ -166,7 +168,7 @@ function Rig({ reduced, mobile }: { reduced: boolean; mobile: boolean }) {
     <group ref={group} visible={visible}>
       <Avatar clip={clip} timeScale={clip === "Walk" ? 1.15 : 1} crossFade={0.3} />
       {!mobile && (
-        <ContactShadows position={[0, 0.002, 0]} opacity={0.35} scale={3.2} blur={2.4} far={1.6} color="#6B4A3A" frames={reduced ? 1 : Infinity} />
+        <ContactShadows position={[0, 0.002, 0]} opacity={0.35} scale={3.2} blur={2.4} far={1.6} color="#6B4A3A" frames={reduced ? 1 : 90} />
       )}
     </group>
   );
@@ -185,21 +187,6 @@ function bandPose(band: DOMRect, p: number, H: number, W: number) {
   };
 }
 
-const subscribeNoop = () => () => {};
-function useWebGL() {
-  return useSyncExternalStore(
-    subscribeNoop,
-    () => {
-      try {
-        const c = document.createElement("canvas");
-        return !!(c.getContext("webgl2") || c.getContext("webgl"));
-      } catch {
-        return false;
-      }
-    },
-    () => false,
-  );
-}
 
 /**
  * One fixed, transparent, pointer-transparent canvas that holds the only avatar instance on the page.
@@ -245,13 +232,16 @@ export function AvatarLayer() {
         frameloop={frameloop}
         camera={{ position: [0, 0, LAYER_Z], fov: LAYER_FOV, near: 0.1, far: 40 }}
         gl={{ antialias: hover, alpha: true, powerPreference: "high-performance" }}
-        style={{ background: "transparent" }}
+        // R3F's wrapper sets its own `pointer-events`; the fixed canvas must never swallow clicks.
+        className="pointer-events-none!"
+        style={{ background: "transparent", pointerEvents: "none" }}
         fallback={null}
       >
         <ambientLight intensity={0.6} color="#FFE4C4" />
         <directionalLight position={[2.5, 4, 3]} intensity={2.2} color="#FFC145" />
         <directionalLight position={[-3, 2.5, -2.5]} intensity={1.3} color="#FF7A1A" />
         <hemisphereLight intensity={0.5} color="#FFF4E6" groundColor="#6B4A3A" />
+        <ActivityPause frameloop={frameloop} />
         <Suspense fallback={null}>
           <Rig reduced={reduced} mobile={mobile} />
         </Suspense>

@@ -28,7 +28,7 @@ export function Skills({ lang, copy, skills, id = "stack", index = "04" }: Skill
       return project ? [{ slug, title: project.title }] : [];
     }),
   }));
-  const labels = { groups: copy.groups, relatedProjects: copy.related, hint: copy.hint };
+  const labels = { groups: copy.groups, relatedProjects: copy.related, hint: copy.hint, status: copy.status };
 
   return (
     <section id={id} className="py-24 md:py-36">
@@ -36,7 +36,7 @@ export function Skills({ lang, copy, skills, id = "stack", index = "04" }: Skill
         <Eyebrow index={index}>{copy.eyebrow}</Eyebrow>
         <h2 className="mt-6 max-w-5xl text-h2 font-medium">{copy.title}</h2>
 
-        <SkillsVisual skills={constellationSkills} labels={labels} projectBasePath={`/${lang}/projets`}>
+        <SkillsVisual skills={constellationSkills} labels={labels} projectBasePath={`/${lang}/projets`} listLabel={copy.fullList}>
           <div id="skills-visual" className="grid gap-16 lg:grid-cols-3 lg:gap-10">
             {skillGroups.map((group, gi) => {
               const items = skills.filter((s) => s.group === group.id);
@@ -56,7 +56,7 @@ export function Skills({ lang, copy, skills, id = "stack", index = "04" }: Skill
                             const project = getProject(slug);
                             return project ? (
                               <li key={slug}>
-                                <Link href={`/${lang}/projets/${slug}`} className="inline-block py-1 underline-offset-4 hover:text-sun hover:underline">
+                                <Link href={`/${lang}/projets/${slug}`} className="touch-target inline-block py-1 underline decoration-ink/30 underline-offset-4 hover:text-sun-deep hover:decoration-current">
                                   {project.title}
                                 </Link>
                               </li>

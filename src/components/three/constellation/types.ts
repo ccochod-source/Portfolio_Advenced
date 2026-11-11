@@ -12,6 +12,8 @@ export type ConstellationLabels = {
   groups: Record<SkillGroup, string>;
   relatedProjects: string;
   hint: string;
+  /** Live-region template, e.g. "{skill} — {group}" (optional for labs). */
+  status?: string;
 };
 
 export type SkillsConstellationProps = {

@@ -1,5 +1,6 @@
 import type { Dictionary } from "@/app/[lang]/dictionaries";
 import { Reveal } from "@/components/motion";
+import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Container";
 import { Eyebrow } from "@/components/ui/Eyebrow";
@@ -47,6 +48,12 @@ export function Journey({ lang, copy, steps, id = "parcours", index = "05" }: Jo
               </p>
               <p className="mt-3 font-mono text-label uppercase text-ink-soft">{t(step.place, lang)}</p>
               <h3 className="mt-3 text-h3 font-medium">{t(step.title, lang)}</h3>
+              {step.open && (
+                <Badge tone="gold" className="mt-3">
+                  <span aria-hidden className="size-1.5 rounded-full bg-sun-deep" />
+                  {copy.open}
+                </Badge>
+              )}
               <p className="mt-4 text-ink-soft">{t(step.text, lang)}</p>
               {step.open && (
                 <div className="mt-6">

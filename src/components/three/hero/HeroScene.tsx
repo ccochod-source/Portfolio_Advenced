@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { ActivityPause } from "../ActivityPause";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { Vector2 } from "three";
 import { CameraRig } from "./CameraRig";
@@ -106,6 +107,7 @@ export function HeroScene({ className = "", reducedMotion, onReady }: HeroSceneP
           onCreated={handleCreated}
           fallback={null}
         >
+          <ActivityPause frameloop={frameloop} />
           <Sky animate={animate} />
           <Halo animate={animate} />
           <Particles count={count} animate={animate} mouseRef={mouseRef} />

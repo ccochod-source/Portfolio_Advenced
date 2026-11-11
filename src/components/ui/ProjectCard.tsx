@@ -13,7 +13,7 @@ export type ProjectCardProps = {
   award?: string;
   tags?: string[];
   image?: ProjectCardImage;
-  /** Compact variant for dense grids (smaller title, no summary). */
+  /** Compact variant for dense grids (smaller title, two-line summary). */
   compact?: boolean;
   className?: string;
 };
@@ -28,7 +28,8 @@ export function ProjectCard({ href, title, category, year, summary, award, tags 
             alt={image.alt}
             width={image.width}
             height={image.height}
-            sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
+            sizes="(max-width: 768px) calc(100vw - 2rem), (max-width: 1280px) 45vw, 400px"
+            loading="lazy"
             className="absolute inset-0 size-full object-cover transition-transform duration-700 ease-out-expo group-hover:scale-[1.04]"
           />
         ) : (
@@ -49,7 +50,7 @@ export function ProjectCard({ href, title, category, year, summary, award, tags 
         </div>
         <span className="font-mono text-label text-ink-soft">{year}</span>
       </div>
-      {!compact && <p className="mt-3 max-w-xl text-ink-soft">{summary}</p>}
+      <p className={compact ? "mt-3 line-clamp-2 text-sm text-ink-soft" : "mt-3 max-w-xl text-ink-soft"}>{summary}</p>
       {tags.length > 0 && (
         <div className="mt-4 flex flex-wrap gap-2">
           {tags.map((tag) => (

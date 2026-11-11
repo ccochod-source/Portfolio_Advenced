@@ -21,11 +21,11 @@ export function Hero({ lang, copy }: HeroProps) {
         <HeroSceneLazy />
       </div>
       <Container className="relative z-10">
-        <Reveal as="div" y={0} delay={0.1}>
+        <Reveal as="div" y={0} delay={0.1} start="top bottom">
           <Eyebrow className="mb-6 opacity-80">{copy.eyebrow}</Eyebrow>
         </Reveal>
-        <HeroTitle title={copy.title} className="max-w-3xl text-h1 font-medium lg:max-w-[46rem]" />
-        <Reveal as="div" delay={0.5} className="mt-10 flex flex-wrap items-center gap-3 md:mt-14">
+        <HeroTitle title={copy.title} className="hero-title max-w-3xl text-h1 font-medium lg:max-w-[46rem]" />
+        <Reveal as="div" delay={0.5} start="top bottom" className="mt-10 flex flex-wrap items-center gap-3 md:mt-14">
           <Magnetic>
             <Button href={`/${lang}#projets`} arrow>
               {copy.ctaProjects}
@@ -37,7 +37,7 @@ export function Hero({ lang, copy }: HeroProps) {
             </Button>
           </Magnetic>
         </Reveal>
-        <Reveal as="div" delay={0.7} className="mt-12 flex flex-wrap items-center justify-between gap-4 font-mono text-label uppercase md:mt-16">
+        <Reveal as="div" delay={0.7} start="top bottom" className="mt-12 flex flex-wrap items-center justify-between gap-4 font-mono text-label uppercase md:mt-16">
           <span className="flex items-center gap-2">
             <span className="size-2 rounded-full bg-ink" aria-hidden />
             {copy.status}

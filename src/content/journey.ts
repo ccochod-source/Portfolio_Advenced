@@ -18,7 +18,7 @@ export const journey: JourneyStep[] = [
     title: { fr: "Grandir entre lac et montagnes", en: "Growing up between lake and mountains" },
     text: {
       fr: "Un environnement très sportif : rugby, football, VTT, randonnée, musculation, course et trail. Le goût de l'effort et des objectifs clairs vient de là.",
-      en: "A very sporty upbringing: rugby, football, mountain biking, hiking, weight training, running and trail. The taste for effort and clear goals comes from there.",
+      en: "A very sporty upbringing: rugby, football, mountain biking, hiking, weight training, running and trail running. The taste for effort and clear goals comes from there.",
     },
   },
   {
@@ -27,8 +27,8 @@ export const journey: JourneyStep[] = [
     place: { fr: "Eugenia School, Paris", en: "Eugenia School, Paris" },
     title: { fr: "Bachelor IA, Data & Business", en: "Bachelor in AI, Data & Business" },
     text: {
-      fr: "Départ pour Paris et un cursus hybride : développement, données et compréhension des enjeux de l'entreprise. Premiers projets : Eugeniagram, Analyse Accidentologie, Ping Pang.",
-      en: "Moving to Paris for a hybrid curriculum: development, data and an understanding of business stakes. First projects: Eugeniagram, Analyse Accidentologie, Ping Pang.",
+      fr: "Départ pour Paris et un cursus hybride : développement, données et compréhension des enjeux de l'entreprise. Premiers projets : Eugeniagram, Analyse Accidentologie.",
+      en: "Moving to Paris for a hybrid curriculum: development, data and an understanding of how businesses work. First projects: Eugeniagram, Analyse Accidentologie.",
     },
   },
   {
@@ -58,7 +58,7 @@ export const journey: JourneyStep[] = [
     title: { fr: "Alternance IA", en: "AI apprenticeship" },
     text: {
       fr: "La prochaine étape : rejoindre une équipe qui met l'IA au service de vrais besoins métier, et continuer à livrer des outils utilisés au quotidien.",
-      en: "The next step: joining a team that puts AI to work on real business needs, and keep shipping tools people use every day.",
+      en: "The next step: joining a team that puts AI to work on real business needs, and continuing to ship tools people use every day.",
     },
     open: true,
   },

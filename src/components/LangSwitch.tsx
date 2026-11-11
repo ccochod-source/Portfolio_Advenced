@@ -15,7 +15,7 @@ export function LangSwitch({ label, ariaLabel }: { label: string; ariaLabel: str
       href={href}
       aria-label={`${label} — ${ariaLabel}`}
       hrefLang={target}
-      className="rounded-full border border-ink/30 px-3 py-1 transition-colors hover:bg-ink hover:text-cream"
+      className="flex min-h-11 items-center rounded-full border border-ink/30 px-3 transition-[color,background-color,border-color] hover:bg-ink hover:text-cream"
     >
       {label}
     </Link>

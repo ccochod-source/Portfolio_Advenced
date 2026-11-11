@@ -47,11 +47,12 @@ export function Reveal({
         const targets = stagger ? Array.from(element.children) : element;
         let cancelWait = () => {};
 
+        // Opacity only (never `visibility: hidden`): hidden content must stay reachable by keyboard and AT.
         const tween = gsap.fromTo(
           targets,
-          { autoAlpha: 0, x, y, scale },
+          { opacity: 0, x, y, scale },
           {
-            autoAlpha: 1,
+            opacity: 1,
             x: 0,
             y: 0,
             scale: 1,
@@ -62,13 +63,13 @@ export function Reveal({
             paused: true,
             // Leftover transforms would break sticky/fixed descendants.
             onComplete: () => {
-              if (once) gsap.set(targets, { clearProps: "transform,opacity,visibility" });
+              if (once) gsap.set(targets, { clearProps: "transform,opacity" });
             },
           },
         );
         element.removeAttribute("data-motion-pending");
 
-        ScrollTrigger.create({
+        const trigger = ScrollTrigger.create({
           trigger: element,
           start,
           once,
@@ -78,7 +79,18 @@ export function Reveal({
           onLeaveBack: () => tween.pause(0),
         });
 
-        return () => cancelWait();
+        // Keyboard users tabbing into a not-yet-revealed block see it at once.
+        const onFocus = () => {
+          cancelWait();
+          tween.progress(1);
+          if (once) trigger.kill();
+        };
+        element.addEventListener("focusin", onFocus);
+
+        return () => {
+          cancelWait();
+          element.removeEventListener("focusin", onFocus);
+        };
       });
     },
     { scope: ref, dependencies: [x, y, scale, duration, delay, stagger, start, once], revertOnUpdate: true },

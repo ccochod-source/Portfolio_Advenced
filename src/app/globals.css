@@ -43,13 +43,48 @@ body {
 }
 
 ::selection {
-  background: var(--color-sun);
+  background: var(--color-ink);
   color: var(--color-cream);
 }
 
+/* Two-tone ring: readable on cream, on the sun/coral hero gradient and on ink. */
 :focus-visible {
-  outline: 2px solid var(--color-sun);
+  outline: 2px solid var(--color-ink);
   outline-offset: 3px;
+  box-shadow: 0 0 0 5px var(--color-cream);
+}
+
+.bg-ink :focus-visible,
+.text-cream:focus-visible {
+  outline-color: var(--color-cream);
+  box-shadow: 0 0 0 5px var(--color-ink);
+}
+
+/* Inline links and small pills grow to a 44 px hit area on touch screens (WCAG 2.5.8). */
+@media (pointer: coarse) {
+  .touch-target {
+    min-height: 2.75rem;
+    display: inline-flex;
+    align-items: center;
+  }
+}
+
+.skip-link {
+  position: fixed;
+  top: 1rem;
+  left: 1rem;
+  z-index: 110;
+  transform: translateY(-200%);
+  border-radius: 9999px;
+  background: var(--color-ink);
+  color: var(--color-cream);
+  padding: 0.75rem 1.25rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.skip-link:focus-visible {
+  transform: none;
 }
 
 .grain::after {
@@ -94,17 +129,34 @@ html.motion-scroll-lock {
   overflow: clip;
 }
 
+/* Pinned manifesto: promoted to its own layer so the pin/unpin swap does not reflow the page. */
+.manifesto-stage {
+  will-change: transform;
+}
+
+/* Hero title: avoid a lonely last word on wide screens. */
+.hero-title {
+  text-wrap: balance;
+}
+
+/* Small mono labels keep their tracking only where there is room. */
+@media (max-width: 767px) {
+  .badge {
+    letter-spacing: 0.08em;
+  }
+}
+
 /* Reveal / TextReveal: hidden until GSAP has set the start state, so nothing flashes. */
 @media (scripting: enabled) and (prefers-reduced-motion: no-preference) {
   [data-motion-pending] {
-    visibility: hidden;
+    opacity: 0;
     animation: motion-failsafe 0s linear 4s forwards;
   }
 }
 
 @keyframes motion-failsafe {
   to {
-    visibility: visible;
+    opacity: 1;
   }
 }
 
@@ -229,14 +281,10 @@ html.motion-scroll-lock {
   opacity: 1;
 }
 
-/* Native cursor stays on links, buttons and fields (their own `cursor` wins over the inherited `none`). */
-html.has-custom-cursor body {
-  cursor: none;
-}
-
+/* The system pointer is kept everywhere (low-vision users rely on it); the ring is only an overlay. */
 html.has-custom-cursor [data-cursor="view"],
 html.has-custom-cursor [data-cursor="view"] * {
-  cursor: none;
+  cursor: pointer;
 }
 
 /* /motion */
@@ -244,7 +292,7 @@ html.has-custom-cursor [data-cursor="view"] * {
 /* Manifesto: the four promises fade in as the pinned scene's --progress grows (desktop, motion allowed). */
 @media (min-width: 768px) and (prefers-reduced-motion: no-preference) and (scripting: enabled) {
   .manifesto-promises > li {
-    --reveal: clamp(0, (var(--progress, 1) - 0.3 - var(--i, 0) * 0.13) * 5, 1);
+    --reveal: clamp(0, (var(--progress, 1) - var(--i, 0) * 0.2) * 4, 1);
     opacity: var(--reveal);
     transform: translateY(calc((1 - var(--reveal)) * 28px));
   }
