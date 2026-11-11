@@ -30,4 +30,6 @@ export type MotionBaseProps = {
   className?: string;
   style?: CSSProperties;
   children?: ReactNode;
+  "aria-label"?: string;
+  [dataAttribute: `data-${string}`]: string | undefined;
 };

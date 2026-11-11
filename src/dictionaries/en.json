@@ -62,14 +62,46 @@
     "otherEyebrow": "More work",
     "otherTitle": "Studies, prototypes and applications.",
     "featuredAria": "Featured projects",
-    "otherAria": "Other projects"
+    "otherAria": "Other projects",
+    "figures": [
+      {
+        "value": 16000,
+        "prefix": "",
+        "suffix": "+",
+        "label": "documentation pages migrated"
+      },
+      {
+        "value": 19,
+        "prefix": "",
+        "suffix": "",
+        "label": "dashboards delivered"
+      },
+      {
+        "value": 22000,
+        "prefix": "",
+        "suffix": "",
+        "label": "entries migrated"
+      },
+      {
+        "value": 400,
+        "prefix": "~",
+        "suffix": "",
+        "label": "anomalies detected"
+      }
+    ]
   },
   "skills": {
     "eyebrow": "Stack",
     "title": "AI first, code to ship it, business sense to make it useful.",
     "related": "Related projects",
     "projectsCount": "{count} projects",
-    "projectCount": "1 project"
+    "projectCount": "1 project",
+    "groups": {
+      "ai": "Artificial intelligence",
+      "build": "Build",
+      "business": "Business"
+    },
+    "hint": "Hover a star to see related projects. Tab to navigate with the keyboard."
   },
   "journey": {
     "eyebrow": "Journey",
@@ -92,5 +124,13 @@
     "year": "Year",
     "category": "Category",
     "contact": "Get in touch"
+  },
+  "preloader": {
+    "greeting": "Hello.",
+    "label": "Clément Cochod — Portfolio",
+    "skipHint": "Click to skip"
+  },
+  "common": {
+    "cursorView": "View"
   }
 }

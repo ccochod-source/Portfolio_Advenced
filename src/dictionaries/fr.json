@@ -62,14 +62,46 @@
     "otherEyebrow": "Autres projets",
     "otherTitle": "Études, prototypes et applications.",
     "featuredAria": "Projets mis en avant",
-    "otherAria": "Autres projets"
+    "otherAria": "Autres projets",
+    "figures": [
+      {
+        "value": 16000,
+        "prefix": "",
+        "suffix": "+",
+        "label": "pages de documentation reprises"
+      },
+      {
+        "value": 19,
+        "prefix": "",
+        "suffix": "",
+        "label": "dashboards livrés"
+      },
+      {
+        "value": 22000,
+        "prefix": "",
+        "suffix": "",
+        "label": "entrées migrées"
+      },
+      {
+        "value": 400,
+        "prefix": "~",
+        "suffix": "",
+        "label": "anomalies détectées"
+      }
+    ]
   },
   "skills": {
     "eyebrow": "Stack",
     "title": "L'IA d'abord, le code pour la livrer, le métier pour la rendre utile.",
     "related": "Projets liés",
     "projectsCount": "{count} projets",
-    "projectCount": "1 projet"
+    "projectCount": "1 projet",
+    "groups": {
+      "ai": "Intelligence artificielle",
+      "build": "Construire",
+      "business": "Métier"
+    },
+    "hint": "Survolez une étoile pour voir les projets liés. Tab pour naviguer au clavier."
   },
   "journey": {
     "eyebrow": "Parcours",
@@ -92,5 +124,13 @@
     "year": "Année",
     "category": "Catégorie",
     "contact": "Me contacter"
+  },
+  "preloader": {
+    "greeting": "Bonjour.",
+    "label": "Clément Cochod — Portfolio",
+    "skipHint": "Cliquer pour passer"
+  },
+  "common": {
+    "cursorView": "Voir"
   }
 }

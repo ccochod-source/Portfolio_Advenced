@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Space_Grotesk, Space_Mono } from "next/font/google";
 import { Nav } from "@/components/Nav";
+import { Cursor, Preloader } from "@/components/motion";
 import { SmoothScroll } from "@/components/SmoothScroll";
 import { locales } from "@/i18n";
 import { getDictionary, getLocale } from "./dictionaries";
@@ -31,12 +32,15 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function RootLayout({ children }: LayoutProps<"/[lang]">) {
+  const [lang, dict] = await Promise.all([getLocale(), getDictionary()]);
   return (
     <html
-      lang={await getLocale()}
+      lang={lang}
       className={`${grotesk.variable} ${mono.variable} h-full antialiased`}
     >
       <body className="grain min-h-full">
+        <Preloader greeting={dict.preloader.greeting} label={dict.preloader.label} skipHint={dict.preloader.skipHint} />
+        <Cursor label={dict.common.cursorView} />
         <SmoothScroll>
           <Nav />
           {children}

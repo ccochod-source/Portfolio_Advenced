@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { Dictionary } from "@/app/[lang]/dictionaries";
+import { Counter, Parallax, Reveal } from "@/components/motion";
 import { Badge } from "@/components/ui/Badge";
 import { Container } from "@/components/ui/Container";
 import { Eyebrow } from "@/components/ui/Eyebrow";
@@ -23,13 +24,25 @@ export function FeaturedProjects({ lang, copy, projects, id = "projets", index =
         <Eyebrow index={index}>{copy.eyebrow}</Eyebrow>
         <h2 className="mt-6 max-w-5xl text-h2 font-medium">{copy.title}</h2>
 
+        <Reveal as="ul" stagger className="mt-14 grid grid-cols-2 gap-x-6 gap-y-10 border-y border-ink/10 py-10 md:mt-20 lg:grid-cols-4" aria-label={copy.eyebrow}>
+          {copy.figures.map((figure) => (
+            <li key={figure.label}>
+              <p className="text-h2 font-medium tabular-nums">
+                <Counter value={figure.value} locale={lang} prefix={figure.prefix} suffix={figure.suffix} />
+              </p>
+              <p className="mt-2 max-w-[14rem] font-mono text-label uppercase text-ink-soft">{figure.label}</p>
+            </li>
+          ))}
+        </Reveal>
+
         <ol className="mt-16 flex flex-col gap-24 md:mt-24 md:gap-36">
           {projects.map((project, i) => {
             const cover = project.images[0];
             const reversed = i % 2 === 1;
             const href = `/${lang}/projets/${project.slug}`;
             return (
-              <li
+              <Reveal
+                as="li"
                 key={project.slug}
                 data-project={project.slug}
                 className="grid items-center gap-8 md:grid-cols-12 md:gap-12"
@@ -37,9 +50,11 @@ export function FeaturedProjects({ lang, copy, projects, id = "projets", index =
                 <Link
                   href={href}
                   aria-label={project.title}
+                  data-cursor="view"
                   className={`group relative block overflow-hidden rounded-[2rem] sunset-card md:col-span-7 ${reversed ? "md:order-2" : ""} ${i === 0 ? "aspect-[4/3]" : "aspect-[5/4] md:aspect-[4/3]"}`}
                 >
                   {cover && (
+                    <Parallax cover speed={0.1} className="absolute inset-0" innerClassName="relative size-full">
                     <Image
                       src={cover.src}
                       alt={t(cover.alt, lang)}
@@ -49,6 +64,7 @@ export function FeaturedProjects({ lang, copy, projects, id = "projets", index =
                       preload={i === 0}
                       className={`absolute inset-0 size-full transition-transform duration-700 ease-out-expo group-hover:scale-[1.03] ${project.slug === "brasserie-de-tahiti" ? "object-contain p-12 md:p-20" : "object-cover"}`}
                     />
+                    </Parallax>
                   )}
                   {project.award && (
                     <Badge tone="gold" className="absolute left-6 top-6">
@@ -59,7 +75,7 @@ export function FeaturedProjects({ lang, copy, projects, id = "projets", index =
 
                 <div className={`md:col-span-5 ${reversed ? "md:order-1" : ""}`}>
                   <p className="flex items-center gap-3 font-mono text-label uppercase text-ink-soft">
-                    <span className="text-sun">0{i + 1}</span>
+                    <span className="text-sun-deep">0{i + 1}</span>
                     <span>{t(project.category, lang)}</span>
                     <span aria-hidden>·</span>
                     <span>{project.year}</span>
@@ -84,7 +100,7 @@ export function FeaturedProjects({ lang, copy, projects, id = "projets", index =
                     </span>
                   </Link>
                 </div>
-              </li>
+              </Reveal>
             );
           })}
         </ol>

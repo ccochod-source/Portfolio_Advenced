@@ -1,7 +1,12 @@
-/** World-space position of the luminous "sun / neural" form where the avatar will sit. */
-export const HERO_FOCUS_POSITION = [0.85, -1.25, 0] as const;
-
 export type Vec3Tuple = readonly [number, number, number];
+
+/** World-space position of the luminous "sun / neural" form where the avatar sits (landscape viewports). */
+export const HERO_FOCUS_POSITION: Vec3Tuple = [1.35, -1.25, 0];
+
+/** Same form on portrait viewports, where the camera widens: lower and closer to the centre. */
+export const HERO_FOCUS_POSITION_PORTRAIT: Vec3Tuple = [0.9, -2.1, 0];
+
+export const heroFocusFor = (aspect: number): Vec3Tuple => (aspect < 1 ? HERO_FOCUS_POSITION_PORTRAIT : HERO_FOCUS_POSITION);
 
 export const HERO_CAMERA_Z = 6;
 

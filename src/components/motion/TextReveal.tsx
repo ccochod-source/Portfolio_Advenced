@@ -19,6 +19,8 @@ export type TextRevealProps = MotionBaseProps & {
   start?: string;
   /** Play only the first time it enters the viewport. */
   once?: boolean;
+  /** Hide the text until GSAP is ready (default). Set `false` for the LCP headline so the server-rendered text paints at once. */
+  pending?: boolean;
 };
 
 const splitTypes: Record<TextRevealType, string> = {
@@ -37,6 +39,7 @@ export function TextReveal({
   duration = DURATION.base,
   start = SCROLL_START,
   once = true,
+  pending = true,
   className,
   children,
   ...rest
@@ -121,7 +124,7 @@ export function TextReveal({
       {...rest}
       ref={ref}
       className={className}
-      data-motion-pending=""
+      data-motion-pending={pending ? "" : undefined}
       aria-label={isHeading && typeof children === "string" ? children : undefined}
     >
       {children}

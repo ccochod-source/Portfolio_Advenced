@@ -1,5 +1,6 @@
 import { Footer } from "@/components/Footer";
 import { FeaturedProjects } from "@/components/sections/FeaturedProjects";
+import { AvatarLayerLazy } from "@/components/three/avatar/AvatarLayerLazy";
 import { Hero } from "@/components/sections/Hero";
 import { Journey } from "@/components/sections/Journey";
 import { Manifesto } from "@/components/sections/Manifesto";
@@ -24,6 +25,7 @@ export default async function Home() {
         <Journey id="parcours" index="05" lang={lang} copy={dict.journey} steps={journey} />
       </main>
       <Footer />
+      <AvatarLayerLazy />
     </>
   );
 }

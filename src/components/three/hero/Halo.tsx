@@ -2,7 +2,8 @@
 
 import { useMemo, useRef } from "react";
 import { AdditiveBlending, Color, type ShaderMaterial } from "three";
-import { HERO_FOCUS_POSITION, PALETTE } from "./constants";
+import { useThree } from "@react-three/fiber";
+import { heroFocusFor, PALETTE } from "./constants";
 import { HALO_FRAGMENT, HALO_VERTEX } from "./shaders";
 import { useSceneTime } from "./useSceneTime";
 
@@ -25,7 +26,8 @@ export function Halo({ animate }: { animate: boolean }) {
   const padRef = useRef<ShaderMaterial>(null);
   const haloUniforms = useHaloUniforms(0.7);
   const padUniforms = useHaloUniforms(0.35);
-  const [x, y, z] = HERO_FOCUS_POSITION;
+  const size = useThree((s) => s.size);
+  const [x, y, z] = heroFocusFor(size.width / Math.max(1, size.height));
 
   useSceneTime((_, t) => {
     if (haloRef.current) haloRef.current.uniforms.uTime.value = t;

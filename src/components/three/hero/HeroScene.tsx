@@ -11,7 +11,7 @@ import { Particles, type MouseState } from "./Particles";
 import { Sky } from "./Sky";
 import { useCanHover, useIsMobile, usePrefersReducedMotion } from "./useHeroMotion";
 
-export { HERO_FOCUS_POSITION } from "./constants";
+export { HERO_FOCUS_POSITION, HERO_FOCUS_POSITION_PORTRAIT, heroFocusFor } from "./constants";
 export { HeroSceneFallback } from "./HeroSceneFallback";
 
 export type HeroSceneProps = {
