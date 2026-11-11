@@ -11,6 +11,7 @@ import { HeroSceneFallback } from "./HeroSceneFallback";
 import { Particles, type MouseState } from "./Particles";
 import { Sky } from "./Sky";
 import { useCanHover, useIsMobile, usePrefersReducedMotion } from "./useHeroMotion";
+import { useWebGL } from "../useWebGL";
 
 export { HERO_FOCUS_POSITION, HERO_FOCUS_POSITION_PORTRAIT, heroFocusFor } from "./constants";
 export { HeroSceneFallback } from "./HeroSceneFallback";
@@ -42,6 +43,7 @@ export function HeroScene({ className = "", reducedMotion, onReady }: HeroSceneP
 
   const [inView, setInView] = useState(true);
   const [tabVisible, setTabVisible] = useState(true);
+  const supported = useWebGL();
   const [webgl, setWebgl] = useState(true);
 
   const mouseRef = useRef<MouseState>({
@@ -97,7 +99,7 @@ export function HeroScene({ className = "", reducedMotion, onReady }: HeroSceneP
   return (
     <div ref={wrapper} aria-hidden className={`pointer-events-none absolute inset-0 overflow-hidden ${className}`}>
       <HeroSceneFallback />
-      {webgl && (
+      {supported && webgl && (
         <Canvas
           className="absolute inset-0"
           dpr={[1, 1.5]}
