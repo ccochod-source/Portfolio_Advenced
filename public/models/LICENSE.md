@@ -16,7 +16,7 @@
   - **Commercial use** — allowed only after notifying hello@avaturn.me with a link to the project.
     A personal portfolio used to find an apprenticeship is personal, non-commercial use; if the site ever becomes
     commercial, send that notification first.
-- **Modifications:** `assets/models-source/retexture.mjs` + `assets/models-source/retexture.py` recolour the base-colour textures (denim → dark indigo,
+- **Modifications (v3):** `assets/models-source/avatar-avaturn-scan.glb` is Clément's own Avaturn phone scan (head, hair, body); `assets/models-source/graft.mjs` keeps that head/hair and grafts the outfit meshes (turtleneck, jeans, sneakers, glasses) of the earlier export `avatar-avaturn-idle.glb` onto the same rig, taking the v2 body vertices below the collar so the clothes fit. `assets/models-source/retexture.mjs` + `assets/models-source/retexture.py` recolour the base-colour textures (denim → dark indigo,
   sneakers → brown suede with gum sole, hair → chestnut) and inpaint the glasses frames the photo scan baked into the skin;
   `assets/models-source/make-clips.mjs` keeps Avaturn's own `Idle` clip and procedurally keyframes `SitIdle`,
   `Walk`, `Wave`, `Celebrate` on the Mixamo-compatible rig; `assets/models-source/optimize.mjs` runs gltf-transform
