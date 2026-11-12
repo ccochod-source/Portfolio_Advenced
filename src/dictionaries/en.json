@@ -61,40 +61,17 @@
     ]
   },
   "projects": {
-    "eyebrow": "Selected work",
-    "title": "Five projects where AI answers a concrete need.",
+    "eyebrow": "Selected projects",
     "cta": "Read the case study",
+    "wordmark": "Selected Work",
+    "view": "View",
+    "yearLabel": "Year",
+    "roleLabel": "Role",
+    "mockupAria": "Project preview on a laptop",
     "otherEyebrow": "More work",
     "otherTitle": "Studies, prototypes and applications.",
     "featuredAria": "Featured projects",
     "otherAria": "Other projects",
-    "figures": [
-      {
-        "value": 16000,
-        "prefix": "",
-        "suffix": "+",
-        "label": "documentation pages searchable with RAG"
-      },
-      {
-        "value": 19,
-        "prefix": "",
-        "suffix": "",
-        "label": "dashboards delivered"
-      },
-      {
-        "value": 22000,
-        "prefix": "",
-        "suffix": "",
-        "label": "entries migrated"
-      },
-      {
-        "value": 400,
-        "prefix": "~",
-        "suffix": "",
-        "label": "anomalies detected"
-      }
-    ],
-    "figuresAria": "Key figures",
     "stackAria": "Technologies",
     "tagsAria": "Keywords"
   },

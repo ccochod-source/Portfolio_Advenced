@@ -104,7 +104,7 @@ export default async function ProjectPage({ params }: PageProps<"/[lang]/projets
                 sizes="(max-width: 1280px) calc(100vw - 2rem), 1200px"
                 quality={70}
                 preload
-                className={`absolute inset-0 size-full ${project.slug === "brasserie-de-tahiti" ? "object-contain p-16 md:p-28" : "object-cover"}`}
+                className="absolute inset-0 size-full object-cover"
               />
             </figure>
           )}
@@ -211,7 +211,7 @@ export default async function ProjectPage({ params }: PageProps<"/[lang]/projets
                   height={nextCover.height}
                   sizes="(max-width: 768px) calc(100vw - 4rem), 360px"
                   loading="lazy"
-                  className={`absolute inset-0 size-full transition-transform duration-700 ease-out-expo group-hover:scale-[1.04] ${next.slug === "brasserie-de-tahiti" ? "object-contain p-8" : "object-cover"}`}
+                  className="absolute inset-0 size-full object-cover transition-transform duration-700 ease-out-expo group-hover:scale-[1.04]"
                 />
               </div>
             )}

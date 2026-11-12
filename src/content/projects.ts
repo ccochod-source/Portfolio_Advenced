@@ -16,6 +16,8 @@ export type Project = {
   tags: string[];
   skills: SkillId[];
   role: Localized;
+  /** Two or three words for the Selected Work meta column (featured projects). */
+  roleShort?: Localized;
   context: Localized;
   approach: Localized[];
   results: Localized[];
@@ -36,6 +38,7 @@ export const projects: Project[] = [
     },
     tags: ["RAG", "LLM", "BI", "Dashboards", "ITSM", "Excel → App"],
     skills: ["rag", "llm", "recueil-besoins", "reprise-donnees", "gestion-droits", "tests-utilisateurs", "dashboards"],
+    roleShort: { fr: "Développeur applications & IA", en: "Apps & AI developer" },
     role: {
       fr: "Stagiaire développeur d'applications métiers : recueil des besoins, modélisation des données, développement, reprise des historiques, gestion des droits, contrôles de cohérence, tests utilisateurs et préparation du déploiement.",
       en: "Business-application developer intern: requirements gathering, data modelling, development, legacy data migration, access management, consistency checks, user testing and deployment preparation.",
@@ -76,6 +79,12 @@ export const projects: Project[] = [
     ],
     images: [
       {
+        src: "/projects/brasserie-de-tahiti/cover.webp",
+        alt: { fr: "Maquette d'un tableau de bord Brasserie de Tahiti : pages indexées, tableaux de bord, entrées reprises", en: "Mock-up of a Brasserie de Tahiti dashboard: indexed pages, dashboards, migrated entries" },
+        width: 1600,
+        height: 1000,
+      },
+      {
         src: "/projects/brasserie-de-tahiti/logo.webp",
         alt: { fr: "Logo de la Brasserie de Tahiti", en: "Brasserie de Tahiti logo" },
         width: 894,
@@ -95,6 +104,7 @@ export const projects: Project[] = [
     },
     tags: ["Next.js 16", "React 19", "TypeScript", "H Agents API", "CDP", "Gladia", "Linkup", "zod", "vitest"],
     skills: ["computer-use", "agents-ia", "prompt-engineering", "llm", "nextjs", "react"],
+    roleShort: { fr: "Lead agent computer use", en: "Computer-use agent lead" },
     role: {
       fr: "Responsable de l'agent H (computer use) dans une équipe de quatre : création et suivi des sessions, consignes et conditions d'arrêt, pont vers le navigateur local, module Vol et banc de démo sur mon Mac.",
       en: "Owner of the H (computer-use) agent in a team of four: session creation and tracking, instructions and stop conditions, bridge to the local browser, Flight module and the demo bench on my Mac.",
@@ -151,6 +161,7 @@ export const projects: Project[] = [
     },
     tags: ["Dust", "React", "Vercel", "LLM", "SEO", "MCP"],
     skills: ["dust", "agents-ia", "prompt-engineering", "llm", "react", "vercel"],
+    roleShort: { fr: "Agents IA & démo produit", en: "AI agents & product demo" },
     role: {
       fr: "Conception des parcours d'agents et des consignes, intégration par API, structuration de la démo produit et narration de la valeur : qualité et vitesse face à la rédaction manuelle.",
       en: "Design of the agent flows and instructions, API integration, structure of the product demo and value narrative: quality and speed versus manual writing.",
@@ -213,6 +224,7 @@ export const projects: Project[] = [
     },
     tags: ["n8n", "OpenAI API", "Brevo", "Slack", "Scraping", "Vercel"],
     skills: ["llm", "agents-ia", "openai-api", "n8n-make", "vercel", "dashboards"],
+    roleShort: { fr: "Pipeline data → IA", en: "Data → AI pipeline" },
     role: {
       fr: "Co-conception en équipe du pipeline données → texte, de la démo et du récit pour le jury, côté métier comme côté technique.",
       en: "Co-design, as a team, of the data → text pipeline, the demo and the story for the jury, on both the business and technical sides.",
@@ -267,7 +279,7 @@ export const projects: Project[] = [
     title: "Écrire son livre",
     category: { fr: "Application client · IA éditoriale", en: "Client app · Editorial AI" },
     year: "2026",
-    featured: true,
+    featured: false,
     summary: {
       fr: "Une application privée qui transforme des idées racontées à l'oral en manuscrit structuré : transcription, vérification factuelle, assistant contextualisé et export Word.",
       en: "A private app that turns spoken ideas into a structured manuscript: transcription, fact-checking, context-aware assistant and Word export.",
@@ -444,13 +456,14 @@ export const projects: Project[] = [
     title: "Auralife",
     category: { fr: "Site client · Administration & automatisation", en: "Client website · Admin & automation" },
     year: "2026",
-    featured: false,
+    featured: true,
     summary: {
       fr: "Un site en production pour une activité d'accompagnement : blog administrable, témoignages, messages, réglages centralisés et demande d'avis automatique après rendez-vous.",
       en: "A live website for a coaching business: editable blog, testimonials, messages, central settings and an automatic review request after each appointment.",
     },
     tags: ["CMS", "Make", "Webhooks"],
     skills: ["n8n-make", "recueil-besoins"],
+    roleShort: { fr: "Produit & développement", en: "Product & development" },
     role: {
       fr: "Cadrage du besoin, organisation des contenus, conception des parcours public et administrateur, développement, automatisations et mise en ligne.",
       en: "Scoping, content organisation, design of the public and admin flows, development, automations and launch.",
@@ -653,7 +666,10 @@ export const projects: Project[] = [
   },
 ];
 
-export const featuredProjects = projects.filter((p) => p.featured);
+/** Display order of the Selected Work section; featured projects missing here go last. */
+const FEATURED_ORDER = ["brasserie-de-tahiti", "nami", "hackathon-payfit", "hackathon-mirakl", "auralife"];
+const featuredRank = (slug: string) => (FEATURED_ORDER.includes(slug) ? FEATURED_ORDER.indexOf(slug) : FEATURED_ORDER.length);
+export const featuredProjects = projects.filter((p) => p.featured).sort((a, b) => featuredRank(a.slug) - featuredRank(b.slug));
 export const otherProjects = projects.filter((p) => !p.featured);
 export const getProject = (slug: string): Project | undefined => projects.find((p) => p.slug === slug);
 export const getNextProject = (slug: string): Project => {
