@@ -3,14 +3,13 @@
 import { useEffect, useRef } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
 import { CanvasTexture, LinearFilter, Mesh, NoColorSpace, ShaderMaterial, Vector4, type Material, type PerspectiveCamera } from "three";
-import { SCREEN_SIZE } from "./desk";
+import { SCREEN_SIZE, ZOOM_FACE_MESH_NAME } from "./desk";
 import { screenFraming } from "./zoomFraming";
 import { PALETTE } from "./constants";
 import { ScrollTrigger } from "@/lib/motion/gsap";
 import { ZOOM, ZOOM_PAGE_ATTR, getZoomProgress } from "@/lib/hero/zoom";
 import { paintPage } from "@/lib/hero/paintPage";
 
-export const SCREEN_MESH_NAME = "laptop-screen";
 const MAX_TEXTURE = 2048;
 
 const clamp01 = (v: number) => Math.min(1, Math.max(0, v));
@@ -32,6 +31,7 @@ const fragmentShader = /* glsl */ `
   precision highp float;
   uniform sampler2D uMap;
   uniform float uChrome;
+  uniform float uReveal;
   uniform float uTime;
   uniform float uShift;
   uniform float uAspect;
@@ -57,7 +57,7 @@ const fragmentShader = /* glsl */ `
       col = mix(col, vec3(1.0, 0.478, 0.102), inX * inY * blink * uChrome);
     }
 
-    gl_FragColor = vec4(col, 1.0);
+    gl_FragColor = vec4(col, uReveal);
   }
 `;
 
@@ -69,8 +69,9 @@ function pageElement() {
 }
 
 /**
- * Gives the `laptop-screen` mesh a live texture of "the next page": the manifesto block
- * (`[data-zoom-page]`) painted with its real layout, so that the DOM can take over invisibly at progress 1.
+ * Gives the lid-back quad of the MacBook (`laptop-lid-back`, see desk.ts) a live texture of "the next page": the
+ * manifesto block (`[data-zoom-page]`) painted with its real layout, revealed through the aluminium as the camera
+ * closes in, so that the DOM can take over invisibly at progress 1.
  * The page slides up on the screen as the real manifesto approaches the viewport top (read every frame).
  */
 export function ScreenContent() {
@@ -167,9 +168,12 @@ export function ScreenContent() {
     const material = new ShaderMaterial({
       vertexShader,
       fragmentShader,
+      transparent: true,
+      depthWrite: false,
       uniforms: {
         uMap: { value: texture },
         uChrome: { value: 1 },
+        uReveal: { value: 0 },
         uTime: { value: 0 },
         uShift: { value: 0 },
         uAspect: { value: SCREEN_SIZE.width / SCREEN_SIZE.height },
@@ -192,7 +196,7 @@ export function ScreenContent() {
     const { material } = gfx.current;
     // The screen mesh may come from a lazily loaded GLB: keep looking until it is there.
     if (!mesh.current || !mesh.current.target.parent) {
-      const found = scene.getObjectByName(SCREEN_MESH_NAME);
+      const found = scene.getObjectByName(ZOOM_FACE_MESH_NAME);
       if (found instanceof Mesh) {
         mesh.current = { target: found, original: found.material };
         found.material = material;
@@ -205,6 +209,7 @@ export function ScreenContent() {
     const u = material.uniforms;
     u.uTime.value += Math.min(delta, 0.05);
     u.uChrome.value = 1 - smoothstep(ZOOM.screenChromeFade.start, ZOOM.screenChromeFade.end, p);
+    u.uReveal.value = smoothstep(ZOOM.reveal.start, ZOOM.reveal.end, p);
 
     // Where the real page currently is: slide the painted page so the DOM takes over exactly at progress 1.
     if (stale.current && p < 1) repaintRef.current();

@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, type RefObject } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
 import { MathUtils, Vector3, type PerspectiveCamera } from "three";
 import { HERO_CAMERA_Z } from "./constants";
-import { getScreenWorld } from "./desk";
+import { getZoomFaceWorld } from "./desk";
 import type { MouseState } from "./mouse";
 import { screenFraming } from "./zoomFraming";
 import { ZOOM, getZoomProgress } from "@/lib/hero/zoom";
@@ -26,7 +26,8 @@ const clamp01 = (v: number) => Math.min(1, Math.max(0, v));
 /**
  * Applies the fov clamp for portrait screens, the lerped mouse parallax, and drives the camera along the
  * hero zoom (progress from `src/lib/hero/zoom.ts`): 0 = hero composition, 0→orbitEnd = dolly + orbit toward
- * the laptop screen along its normal, orbitEnd→handoverStart = straight zoom until the screen covers the viewport (held until 1).
+ * the back of the MacBook lid along its normal (the screen faces the avatar; the lid back is the face the camera can
+ * reach), orbitEnd→handoverStart = straight zoom until the lid covers the viewport (held until 1).
  */
 export function CameraRig({ parallax, mouseRef }: { parallax: boolean; mouseRef: RefObject<MouseState> }) {
   const get = useThree((s) => s.get);
@@ -44,9 +45,9 @@ export function CameraRig({ parallax, mouseRef }: { parallax: boolean; mouseRef:
 
   // Contract values are read at runtime (desk.ts), only cached per aspect.
   const screen = useMemo(() => {
-    const { center, normal } = getScreenWorld(aspect);
+    const { center, normal, scale } = getZoomFaceWorld(aspect);
     const up = Y_UP.clone().addScaledVector(normal, -normal.y).normalize();
-    return { center, normal, up };
+    return { center, normal, up, scale };
   }, [aspect]);
 
   const state = useRef({ progress: 0, parallax: new Vector3() });
@@ -72,9 +73,9 @@ export function CameraRig({ parallax, mouseRef }: { parallax: boolean; mouseRef:
     s.progress = MathUtils.lerp(s.progress, getZoomProgress(), 1 - Math.exp(-delta / PROGRESS_TAU));
     const p = s.progress < 0.0005 ? 0 : s.progress > 0.9995 ? 1 : s.progress;
 
-    const { center, normal, up } = screen;
-    const framing = screenFraming(aspect, cam.fov);
-    const dEnd = framing.distance;
+    const { center, normal, up, scale } = screen;
+    // The framing is computed for an unscaled SCREEN_SIZE quad: the desk set is scaled (desk.ts).
+    const dEnd = screenFraming(aspect, cam.fov).distance * scale;
     const dMid = dEnd * MID_DISTANCE_FACTOR;
 
     if (p <= ZOOM.orbitEnd) {

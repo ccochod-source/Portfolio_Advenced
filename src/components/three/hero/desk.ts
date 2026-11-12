@@ -30,11 +30,13 @@ export const LAPTOP_HINGE_LOCAL: Vec3Tuple = [0, DESK_TOP_HEIGHT + 0.006, 0.42];
 /** Lid opening: 110° from the base, i.e. the lid leans 20° back (towards the knees / +Z). */
 export const LAPTOP_LID_TILT = 0.349;
 
+/** Half the lid height (13" MacBook lid: 30.4 × 21.2 cm). */
+export const LAPTOP_LID_HALF_HEIGHT = 0.106;
 /** MacBook screen centre, set local space, origin = DESK_ORIGIN (hinge + half the lid height along the tilted lid). */
 export const SCREEN_CENTER_LOCAL: Vec3Tuple = [
   0,
-  LAPTOP_HINGE_LOCAL[1] + 0.1075 * Math.cos(LAPTOP_LID_TILT),
-  LAPTOP_HINGE_LOCAL[2] + 0.1075 * Math.sin(LAPTOP_LID_TILT),
+  LAPTOP_HINGE_LOCAL[1] + LAPTOP_LID_HALF_HEIGHT * Math.cos(LAPTOP_LID_TILT),
+  LAPTOP_HINGE_LOCAL[2] + LAPTOP_LID_HALF_HEIGHT * Math.sin(LAPTOP_LID_TILT),
 ];
 export const SCREEN_SIZE = { width: 0.3, height: 0.195 } as const;
 /**
@@ -43,7 +45,40 @@ export const SCREEN_SIZE = { width: 0.3, height: 0.195 } as const;
  */
 export const SCREEN_NORMAL_LOCAL: Vec3Tuple = [0, Math.sin(LAPTOP_LID_TILT), -Math.cos(LAPTOP_LID_TILT)];
 
-/** World-space screen centre and normal for a given viewport aspect — the camera dolly target. */
+/** Thickness of the MacBook lid (the screen face and the lid back are this far apart). */
+export const LAPTOP_LID_THICKNESS = 0.006;
+
+/**
+ * The face the camera zooms into: the BACK of the lid, the only side of the Mac the camera can reach without
+ * flying through the avatar (the screen itself faces him). ScreenContent paints the next page on it and reveals
+ * it through the aluminium as the camera approaches; its normal points at the viewer (+Z, tilted down 20°).
+ */
+export const ZOOM_FACE_NORMAL_LOCAL: Vec3Tuple = [0, -Math.sin(LAPTOP_LID_TILT), Math.cos(LAPTOP_LID_TILT)];
+export const ZOOM_FACE_CENTER_LOCAL: Vec3Tuple = [
+  SCREEN_CENTER_LOCAL[0] + ZOOM_FACE_NORMAL_LOCAL[0] * LAPTOP_LID_THICKNESS,
+  SCREEN_CENTER_LOCAL[1] + ZOOM_FACE_NORMAL_LOCAL[1] * LAPTOP_LID_THICKNESS,
+  SCREEN_CENTER_LOCAL[2] + ZOOM_FACE_NORMAL_LOCAL[2] * LAPTOP_LID_THICKNESS,
+];
+/** Name of the DeskScene mesh ScreenContent paints the next page on (SCREEN_SIZE quad, UV u right / v up, +Z = ZOOM_FACE_NORMAL). */
+export const ZOOM_FACE_MESH_NAME = "laptop-lid-back";
+
+function toWorld(local: Vec3Tuple, dir: Vec3Tuple, aspect: number) {
+  const origin = deskOriginFor(aspect);
+  const scale = deskScaleFor(aspect);
+  const center = new Vector3(...local)
+    .multiplyScalar(scale)
+    .applyAxisAngle(new Vector3(0, 1, 0), DESK_YAW)
+    .add(new Vector3(...origin));
+  const normal = new Vector3(...dir).normalize().applyAxisAngle(new Vector3(0, 1, 0), DESK_YAW);
+  return { center, normal, scale };
+}
+
+/** World-space centre and normal of the lid back for a given viewport aspect — the camera dolly target. */
+export function getZoomFaceWorld(aspect: number) {
+  return toWorld(ZOOM_FACE_CENTER_LOCAL, ZOOM_FACE_NORMAL_LOCAL, aspect);
+}
+
+/** World-space screen centre and normal for a given viewport aspect (the face the avatar looks at). */
 export function getScreenWorld(aspect: number) {
   const origin = deskOriginFor(aspect);
   const scale = deskScaleFor(aspect);

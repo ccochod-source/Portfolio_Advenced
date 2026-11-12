@@ -35,8 +35,8 @@ export const ZOOM = {
   orbitEnd: 0.6,
   /** Crossfade from the 3D screen to the real DOM (manifesto) over this range. */
   handoverStart: 0.85,
-  /** AvatarLayer: the seated avatar fades out over this range (the camera leaves its composition). */
-  avatarFade: { start: 0.12, end: 0.42 },
+  /** Lid back: the painted page is revealed through the aluminium over this range (the camera is closing in). */
+  reveal: { start: 0.42, end: 0.7 },
   /** Screen texture: the laptop grid/glare fade out over this range, leaving the plain page. */
   screenChromeFade: { start: 0.55, end: 0.85 },
   /**

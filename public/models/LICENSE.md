@@ -29,11 +29,12 @@ background) — same licence as above. Shown under `prefers-reduced-motion` and 
 
 ## `../textures/sky-golden-hour.webp`
 
-Equirectangular sky used as background and environment light of the hero Canvas. Source: **"Kloppenheim 06 (Pure Sky)"**
-by Greg Zaal / Poly Haven, https://polyhaven.com/a/kloppenheim_06_puresky — licence **CC0 1.0** (public domain, no
-attribution required; credit given anyway). Derived from Poly Haven's tonemapped JPG: downscaled to 2048×1024 and
-re-graded to the portfolio's warm palette (luminance gradient map cream → gold → orange → coral, see the grading
-notes in `assets/models-source/make-clips.mjs` neighbour scripts), saved as WebP (~40 KB).
+Equirectangular sunset sky sampled by the hero sky dome (`SkyDome.tsx`: drifting cloud layer + pointer ripples) and
+used as environment light. Source: **"Belfast Sunset (Pure Sky)"** by Greg Zaal / Poly Haven,
+https://polyhaven.com/a/belfast_sunset_puresky — licence **CC0 1.0** (public domain, no attribution required; credit
+given anyway). Derived from Poly Haven's 8k tonemapped JPG: downscaled to 2048×1024 and re-graded to the portfolio's
+warm palette (contrast-stretched luminance mapped through a coral → sun → gold → cream gradient, 40 % of the original
+chroma kept for the cloud detail), saved as WebP (~46 KB).
 
 ## `../textures/cloud-{1,2,3}.webp`
 
