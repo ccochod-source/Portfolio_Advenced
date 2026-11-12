@@ -45,7 +45,7 @@ export function AvatarLab({ labels, initialClip = "Idle" }: { labels: AvatarLabL
       </div>
 
       <figure className="relative mx-auto aspect-[3/4] w-full max-w-[520px] overflow-hidden rounded-[2rem] bg-[radial-gradient(ellipse_at_50%_70%,var(--color-cream-deep),var(--color-cream)_70%)]">
-        <AvatarStageLazy clip={clip} rotation={[0, 0.35, 0]} className="h-full w-full" />
+        <AvatarStageLazy clip={clip} rotation={[0, 0.35, 0]} cameraZ={4.7} className="h-full w-full" />
         <figcaption className="sr-only">
           {labels.figure} {labels.clips[clip]}
         </figcaption>
