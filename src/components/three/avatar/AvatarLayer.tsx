@@ -51,7 +51,8 @@ function readRects(): Rects {
   const rects: Rects = {};
   (Object.keys(AVATAR_TARGETS) as (keyof typeof AVATAR_TARGETS)[]).forEach((key) => {
     const el = document.querySelector<HTMLElement>(AVATAR_TARGETS[key]);
-    if (el && el.offsetParent !== null) rects[key] = el.getBoundingClientRect();
+    // `getClientRects` is empty for display:none (offsetParent is null inside a pinned, fixed section).
+    if (el && el.getClientRects().length > 0) rects[key] = el.getBoundingClientRect();
   });
   return rects;
 }
