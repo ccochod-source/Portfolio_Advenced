@@ -9,6 +9,7 @@ import { useCanHover, useIsMobile, usePrefersReducedMotion } from "../hero/useHe
 import { Avatar } from "./Avatar";
 import type { AvatarClip } from "./clips";
 import { AVATAR_TARGETS, STORY, getManifestoProgress, type AvatarSegment } from "@/lib/avatar/story";
+import { ZOOM, getZoomProgress } from "@/lib/hero/zoom";
 import { MEDIA } from "@/lib/motion/ease";
 import { useWebGL } from "../useWebGL";
 import { ActivityPause } from "../ActivityPause";
@@ -57,7 +58,8 @@ function readRects(): Rects {
   const rects: Rects = {};
   (Object.keys(AVATAR_TARGETS) as (keyof typeof AVATAR_TARGETS)[]).forEach((key) => {
     const el = document.querySelector<HTMLElement>(AVATAR_TARGETS[key]);
-    if (el && el.offsetParent !== null) rects[key] = el.getBoundingClientRect();
+    // `getClientRects` is empty for display:none (offsetParent would also be null for the pinned, fixed hero).
+    if (el && el.getClientRects().length > 0) rects[key] = el.getBoundingClientRect();
   });
   return rects;
 }
@@ -118,10 +120,15 @@ function computeTarget(r: Rects, env: Env): Target {
   const offLeft = (h: number) => -h * 0.5;
 
   // 1. Hero: sitting on the sun, then (desktop) walking down to the band / (narrow) fading out.
-  if (r.hero && r.hero.bottom > 0) {
+  //    While the hero is pinned for the zoom into the laptop screen, it fades out (the hero camera leaves this
+  //    composition); once the zoom has handed over to the manifesto (zoom = 1) the band branch takes over.
+  const zoom = getZoomProgress();
+  if (r.hero && r.hero.bottom > 0 && zoom < 1) {
     const focus = heroFocusOnScreen(r.hero);
     const exit = clamp01((H - r.hero.bottom) / H);
-    const sit: Target = { seg: "hero", x: focus.x, y: focus.y, h: focus.h, alpha: 1, idleYaw: -0.35, walkable: false, heroExit: exit };
+    const zoomAlpha = 1 - smooth(range(zoom, ZOOM.avatarFade.start, ZOOM.avatarFade.end));
+    const sit: Target = { seg: "hero", x: focus.x, y: focus.y, h: focus.h, alpha: zoomAlpha, idleYaw: -0.35, walkable: false, heroExit: exit };
+    if (zoom > 0) return sit;
     if (!r.band) return sit;
     if (narrow) {
       // Once faded out, hand over to the band branch so the walk starts from its first step instead of mid-band.

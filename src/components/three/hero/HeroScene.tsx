@@ -9,9 +9,12 @@ import { HERO_CAMERA_Z, PARTICLE_COUNT } from "./constants";
 import { Halo } from "./Halo";
 import { HeroSceneFallback } from "./HeroSceneFallback";
 import { Particles, type MouseState } from "./Particles";
+import { ScreenContent } from "./ScreenContent";
+import { ScreenPlaceholder } from "./ScreenPlaceholder";
 import { Sky } from "./Sky";
 import { useCanHover, useIsMobile, usePrefersReducedMotion } from "./useHeroMotion";
 import { useWebGL } from "../useWebGL";
+import { subscribeZoom, getZoomProgress } from "@/lib/hero/zoom";
 
 export { HERO_FOCUS_POSITION, HERO_FOCUS_POSITION_PORTRAIT, heroFocusFor } from "./constants";
 export { HeroSceneFallback } from "./HeroSceneFallback";
@@ -45,6 +48,9 @@ export function HeroScene({ className = "", reducedMotion, onReady }: HeroSceneP
   const [tabVisible, setTabVisible] = useState(true);
   const supported = useWebGL();
   const [webgl, setWebgl] = useState(true);
+  // Once the zoom has handed over to the DOM the (invisible) hero canvas stops rendering.
+  const [covered, setCovered] = useState(() => getZoomProgress() >= 1);
+  useEffect(() => subscribeZoom((p) => setCovered(p >= 1)), []);
 
   const mouseRef = useRef<MouseState>({
     target: new Vector2(10, 10),
@@ -92,7 +98,7 @@ export function HeroScene({ className = "", reducedMotion, onReady }: HeroSceneP
   }, []);
 
   const animate = !reduced;
-  const running = animate && inView && tabVisible;
+  const running = animate && inView && tabVisible && !covered;
   const frameloop = reduced ? "demand" : running ? "always" : "never";
   const count = isMobile ? PARTICLE_COUNT.mobile : PARTICLE_COUNT.desktop;
 
@@ -104,7 +110,7 @@ export function HeroScene({ className = "", reducedMotion, onReady }: HeroSceneP
           className="absolute inset-0"
           dpr={[1, 1.5]}
           frameloop={frameloop}
-          camera={{ position: [0, 0, HERO_CAMERA_Z], fov: 45, near: 0.1, far: 30 }}
+          camera={{ position: [0, 0, HERO_CAMERA_Z], fov: 45, near: 0.02, far: 30 }}
           gl={{ antialias: false, alpha: false, powerPreference: "high-performance" }}
           onCreated={handleCreated}
           fallback={null}
@@ -113,6 +119,8 @@ export function HeroScene({ className = "", reducedMotion, onReady }: HeroSceneP
           <Sky animate={animate} />
           <Halo animate={animate} />
           <Particles count={count} animate={animate} mouseRef={mouseRef} />
+          <ScreenPlaceholder />
+          <ScreenContent />
           <CameraRig parallax={animate && canHover} mouseRef={mouseRef} />
           <ReadySignal onReady={onReady} />
         </Canvas>

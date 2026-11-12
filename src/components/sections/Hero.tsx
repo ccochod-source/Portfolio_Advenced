@@ -3,20 +3,19 @@ import { Magnetic, Reveal } from "@/components/motion";
 import { HeroSceneLazy } from "@/components/three/hero/HeroSceneLazy";
 import { Button } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Container";
-import { Eyebrow } from "@/components/ui/Eyebrow";
 import type { Locale } from "@/i18n";
-import { HeroTitle } from "./HeroTitle";
 import { AVATAR_ANCHORS } from "@/lib/avatar/story";
 import { AVATAR_POSTER_URL } from "@/components/three/avatar/clips";
+import { HeroZoom } from "./HeroZoom";
 
 export type HeroProps = { lang: Locale; copy: Dictionary["hero"] };
 
 export function Hero({ lang, copy }: HeroProps) {
   return (
-    <section
+    <HeroZoom
       id="hero"
-      data-avatar-anchor={AVATAR_ANCHORS.hero}
-      className="golden-hour relative isolate flex min-h-svh flex-col justify-end overflow-hidden pb-10 pt-32 max-md:min-h-[120svh] max-md:justify-start md:pb-14"
+      anchor={AVATAR_ANCHORS.hero}
+      className="golden-hour relative isolate flex min-h-svh flex-col overflow-hidden pb-7 pt-28 md:pb-9 md:pt-32"
     >
       <div id="hero-visual" aria-hidden className="absolute inset-0 -z-10">
         <HeroSceneLazy />
@@ -28,34 +27,43 @@ export function Hero({ lang, copy }: HeroProps) {
           width={720}
           height={960}
           loading="lazy"
-          className="hidden motion-reduce:block absolute bottom-0 right-[6%] h-[70%] w-auto max-w-[45%] object-contain object-bottom md:right-[12%] md:h-[78%]"
+          className="hidden motion-reduce:block absolute bottom-0 right-[6%] h-[60%] w-auto max-w-[45%] object-contain object-bottom md:right-[12%] md:h-[66%]"
         />
       </div>
-      <Container className="relative z-10">
-        <Reveal as="div" y={0} delay={0.1} start="top bottom">
-          <Eyebrow className="mb-6 opacity-80">{copy.eyebrow}</Eyebrow>
-        </Reveal>
-        <HeroTitle title={copy.title} className="hero-title max-w-3xl text-h1 font-medium lg:max-w-[46rem]" />
-        <Reveal as="div" delay={0.5} start="top bottom" className="mt-10 flex flex-wrap items-center gap-3 md:mt-14">
-          <Magnetic>
-            <Button href={`/${lang}#projets`} arrow>
-              {copy.ctaProjects}
-            </Button>
-          </Magnetic>
-          <Magnetic>
-            <Button href={`/${lang}#contact`} variant="secondary">
-              {copy.ctaContact}
-            </Button>
-          </Magnetic>
-        </Reveal>
-        <Reveal as="div" delay={0.7} start="top bottom" className="mt-12 flex flex-wrap items-center justify-between gap-4 font-mono text-label uppercase md:mt-16">
+      <div data-hero-copy className="relative z-10 flex flex-1 flex-col">
+        <Container className="flex flex-col items-center text-center">
+          <Reveal as="h1" y={24} delay={0.15} start="top bottom" className="bg-gradient-to-b from-sun to-coral bg-clip-text pb-[0.08em] pt-[0.06em] text-[19vw] font-medium leading-[0.86] tracking-[-0.06em] text-transparent md:text-[min(12.5vw,13rem)]">
+            {copy.name}
+          </Reveal>
+          <Reveal as="p" delay={0.35} start="top bottom" className="mt-4 max-w-xl text-balance text-lead text-ink-soft md:mt-6">
+            {copy.title}
+          </Reveal>
+          <Reveal as="div" delay={0.5} start="top bottom" className="mt-7 flex flex-wrap items-center justify-center gap-3 md:mt-9">
+            <Magnetic>
+              <Button href={`/${lang}#projets`} arrow>
+                {copy.ctaProjects}
+              </Button>
+            </Magnetic>
+            <Magnetic>
+              <Button href={`/${lang}#contact`} variant="secondary">
+                {copy.ctaContact}
+              </Button>
+            </Magnetic>
+          </Reveal>
+        </Container>
+        <Reveal
+          as="div"
+          delay={0.7}
+          start="top bottom"
+          className="mt-auto flex w-full max-w-[1440px] flex-wrap items-center justify-between gap-4 self-center px-6 pt-10 font-mono text-label uppercase text-ink/70 md:px-12"
+        >
           <span className="flex items-center gap-2">
-            <span className="size-2 rounded-full bg-ink" aria-hidden />
+            <span className="size-2 rounded-full bg-sun" aria-hidden />
             {copy.status}
           </span>
-          <span className="hidden opacity-70 md:inline">Paris · FR / EN</span>
+          <span className="hidden md:inline">{copy.eyebrow}</span>
         </Reveal>
-      </Container>
-    </section>
+      </div>
+    </HeroZoom>
   );
 }
