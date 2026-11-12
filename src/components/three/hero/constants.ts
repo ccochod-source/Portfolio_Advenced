@@ -1,9 +1,9 @@
 export type Vec3Tuple = readonly [number, number, number];
 
-/** World-space position of the luminous "sun / neural" form where the avatar sits (landscape viewports). */
+/** World-space anchor of the hero set (cloud + avatar), landscape viewports — see desk.ts for the set itself. */
 export const HERO_FOCUS_POSITION: Vec3Tuple = [1.35, -1.25, 0];
 
-/** Same form on portrait viewports, where the camera widens: lower and closer to the centre. */
+/** Same anchor on portrait viewports, where the camera widens: lower and closer to the centre. */
 export const HERO_FOCUS_POSITION_PORTRAIT: Vec3Tuple = [0.9, -2.1, 0];
 
 export const heroFocusFor = (aspect: number): Vec3Tuple => (aspect < 1 ? HERO_FOCUS_POSITION_PORTRAIT : HERO_FOCUS_POSITION);
@@ -20,4 +20,8 @@ export const PALETTE = {
   ink: "#2b1a12",
 } as const;
 
-export const PARTICLE_COUNT = { desktop: 1500, mobile: 400 } as const;
+/** Drifting cloud billboards per layer (far, mid, near). */
+export const CLOUD_COUNT = { desktop: [5, 4, 3], mobile: [3, 2, 2] } as const;
+/** Equirectangular golden-hour sky (Poly Haven "Kloppenheim 06 (Pure Sky)", CC0, warm-graded — see public/models/LICENSE.md). */
+export const SKY_TEXTURE_URL = "/textures/sky-golden-hour.webp";
+export const CLOUD_TEXTURE_URLS = ["/textures/cloud-1.webp", "/textures/cloud-2.webp", "/textures/cloud-3.webp"] as const;

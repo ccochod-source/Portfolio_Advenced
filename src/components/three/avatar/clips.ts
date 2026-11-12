@@ -1,4 +1,4 @@
-export const AVATAR_CLIPS = ["Idle", "SitIdle", "Walk", "Wave", "Celebrate"] as const;
+export const AVATAR_CLIPS = ["Idle", "SitIdle", "Walk", "Wave", "Celebrate", "Typing"] as const;
 export type AvatarClip = (typeof AVATAR_CLIPS)[number];
 
 export const AVATAR_MODEL_URL = "/models/avatar.glb";

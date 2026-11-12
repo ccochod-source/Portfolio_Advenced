@@ -6,7 +6,6 @@ import { Container } from "@/components/ui/Container";
 import { Eyebrow } from "@/components/ui/Eyebrow";
 import type { Locale } from "@/i18n";
 import { HeroTitle } from "./HeroTitle";
-import { AVATAR_ANCHORS } from "@/lib/avatar/story";
 import { AVATAR_POSTER_URL } from "@/components/three/avatar/clips";
 
 export type HeroProps = { lang: Locale; copy: Dictionary["hero"] };
@@ -15,12 +14,11 @@ export function Hero({ lang, copy }: HeroProps) {
   return (
     <section
       id="hero"
-      data-avatar-anchor={AVATAR_ANCHORS.hero}
       className="golden-hour relative isolate flex min-h-svh flex-col justify-end overflow-hidden pb-10 pt-32 max-md:min-h-[120svh] max-md:justify-start md:pb-14"
     >
       <div id="hero-visual" aria-hidden className="absolute inset-0 -z-10">
         <HeroSceneLazy />
-        {/* Static avatar poster for prefers-reduced-motion; the animated AvatarLayer is skipped in that case. */}
+        {/* Static poster of the set (avatar on the cloud) for prefers-reduced-motion; the animated set is skipped in that case. */}
         {/* eslint-disable-next-line @next/next/no-img-element -- decorative poster, no layout shift (fixed box) */}
         <img
           src={AVATAR_POSTER_URL}
@@ -28,7 +26,7 @@ export function Hero({ lang, copy }: HeroProps) {
           width={720}
           height={960}
           loading="lazy"
-          className="hidden motion-reduce:block absolute bottom-0 right-[6%] h-[70%] w-auto max-w-[45%] object-contain object-bottom md:right-[12%] md:h-[78%]"
+          className="hidden motion-reduce:block absolute bottom-[4%] right-[8%] h-[46%] w-auto max-w-[60%] object-contain object-bottom md:right-[16%] md:h-[58%]"
         />
       </div>
       <Container className="relative z-10">

@@ -1,15 +1,15 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { Suspense, useCallback, useEffect, useRef, useState } from "react";
 import { ActivityPause } from "../ActivityPause";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { Vector2 } from "three";
 import { CameraRig } from "./CameraRig";
-import { HERO_CAMERA_Z, PARTICLE_COUNT } from "./constants";
-import { Halo } from "./Halo";
+import { CLOUD_COUNT, HERO_CAMERA_Z } from "./constants";
+import { DeskScene } from "./DeskScene";
 import { HeroSceneFallback } from "./HeroSceneFallback";
-import { Particles, type MouseState } from "./Particles";
-import { Sky } from "./Sky";
+import type { MouseState } from "./mouse";
+import { SkyDome } from "./SkyDome";
 import { useCanHover, useIsMobile, usePrefersReducedMotion } from "./useHeroMotion";
 import { useWebGL } from "../useWebGL";
 
@@ -94,7 +94,7 @@ export function HeroScene({ className = "", reducedMotion, onReady }: HeroSceneP
   const animate = !reduced;
   const running = animate && inView && tabVisible;
   const frameloop = reduced ? "demand" : running ? "always" : "never";
-  const count = isMobile ? PARTICLE_COUNT.mobile : PARTICLE_COUNT.desktop;
+  const counts = isMobile ? CLOUD_COUNT.mobile : CLOUD_COUNT.desktop;
 
   return (
     <div ref={wrapper} aria-hidden className={`pointer-events-none absolute inset-0 overflow-hidden ${className}`}>
@@ -104,15 +104,17 @@ export function HeroScene({ className = "", reducedMotion, onReady }: HeroSceneP
           className="absolute inset-0"
           dpr={[1, 1.5]}
           frameloop={frameloop}
-          camera={{ position: [0, 0, HERO_CAMERA_Z], fov: 45, near: 0.1, far: 30 }}
-          gl={{ antialias: false, alpha: false, powerPreference: "high-performance" }}
+          camera={{ position: [0, 0, HERO_CAMERA_Z], fov: 45, near: 0.1, far: 40 }}
+          gl={{ antialias: !isMobile, alpha: false, powerPreference: "high-performance" }}
           onCreated={handleCreated}
           fallback={null}
         >
           <ActivityPause frameloop={frameloop} />
-          <Sky animate={animate} />
-          <Halo animate={animate} />
-          <Particles count={count} animate={animate} mouseRef={mouseRef} />
+          <Suspense fallback={null}>
+            <SkyDome animate={animate} mouseRef={mouseRef} counts={counts} />
+            {/* Under reduced motion the hero shows the static poster of the set instead (see Hero.tsx). */}
+            {!reduced && <DeskScene />}
+          </Suspense>
           <CameraRig parallax={animate && canHover} mouseRef={mouseRef} />
           <ReadySignal onReady={onReady} />
         </Canvas>

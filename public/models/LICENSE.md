@@ -24,11 +24,26 @@
 
 ## `avatar-poster.webp`
 
-Static render of `avatar.glb` (Idle pose) taken from the `/[lang]/lab/avatar` page — same licence as above.
+Static render of the hero set (`avatar.glb` in the `Typing` pose on the procedural cloud, MacBook on the lap, transparent
+background) — same licence as above. Shown under `prefers-reduced-motion` and while the 3D bundle loads.
+
+## `../textures/sky-golden-hour.webp`
+
+Equirectangular sky used as background and environment light of the hero Canvas. Source: **"Kloppenheim 06 (Pure Sky)"**
+by Greg Zaal / Poly Haven, https://polyhaven.com/a/kloppenheim_06_puresky — licence **CC0 1.0** (public domain, no
+attribution required; credit given anyway). Derived from Poly Haven's tonemapped JPG: downscaled to 2048×1024 and
+re-graded to the portfolio's warm palette (luminance gradient map cream → gold → orange → coral, see the grading
+notes in `assets/models-source/make-clips.mjs` neighbour scripts), saved as WebP (~40 KB).
+
+## `../textures/cloud-{1,2,3}.webp`
+
+Soft-alpha cloud billboards (drifting layers of the hero sky and the CSS fallback). Procedurally generated for this
+project (fractal value noise shaped into cumulus silhouettes, warm shading) — no third-party asset, same licence as the
+site code.
 
 ## Animation clips
 
-The five clips baked into `avatar.glb` are real humanoid motion-capture / keyframed animations from two
+The six clips baked into `avatar.glb` are real humanoid motion-capture / keyframed animations from two
 third-party libraries, retargeted onto the Avaturn rig by `assets/models-source/make-clips.mjs`
 (world-space rotation retargeting onto the rig's T-pose bind pose, hips translation scaled to the rig,
 feet snapped to the floor, loops closed, root motion stripped on `Walk`, `Wave`/`Celebrate` eased from/to
@@ -41,6 +56,7 @@ the `Idle` first frame). No Avaturn, Mixamo or Ready Player Me animation data is
 | `Walk` | `Walk_Loop` (non-root-motion variant, Hips XZ stripped) | Quaternius UAL 1 |
 | `Wave` | `dataset-2_wave-right-hand_normal_001.bvh` (0–2.2 s + 5.0 s–end spliced) | Bandai Namco Research Motiondataset-2 |
 | `Celebrate` | `dataset-2_raise-up-both-hands_active_002.bvh` | Bandai Namco Research Motiondataset-2 |
+| `Typing` | `Sitting_Idle_Loop` + procedural overlay (torso/head pitched towards the lap, two-bone IK placing both hands over the keyboard, alternating key taps; `TYPING` in `make-clips.mjs`) | Quaternius UAL 1 |
 
 - **Quaternius — Universal Animation Library (UAL 1), Standard edition.** File used:
   `Universal Animation Library[Standard]/Unreal-Godot/UAL1_Standard.glb` (UE5-Mannequin-named skeleton),

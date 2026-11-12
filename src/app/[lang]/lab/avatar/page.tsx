@@ -8,25 +8,25 @@ const copy: Record<Locale, { eyebrow: string; title: string; lead: string; label
   fr: {
     eyebrow: "Lab · Avatar 3D",
     title: "Mon double numérique, en golden hour.",
-    lead: "Avatar riggé et animé utilisé dans la narration au scroll : assis dans le hero, il se lève et marche dans le manifeste, puis salue au contact.",
+    lead: "Avatar riggé et animé utilisé dans la narration au scroll : il tape sur son Mac assis sur un nuage dans le hero, marche dans le manifeste, puis salue au contact.",
     labels: {
       clipGroup: "Choisir une animation",
       current: "Animation :",
       reducedMotion: "Mouvement réduit activé : l'avatar est affiché en pose fixe.",
       figure: "Avatar 3D de Clément Cochod, animation",
-      clips: { Idle: "Debout", SitIdle: "Assis", Walk: "Marche", Wave: "Salut", Celebrate: "Célébration" },
+      clips: { Idle: "Debout", SitIdle: "Assis", Walk: "Marche", Wave: "Salut", Celebrate: "Célébration", Typing: "Au clavier" },
     },
   },
   en: {
     eyebrow: "Lab · 3D avatar",
     title: "My digital twin, at golden hour.",
-    lead: "Rigged, animated avatar used in the scroll story: sitting in the hero, standing up and walking in the manifesto, then waving at contact.",
+    lead: "Rigged, animated avatar used in the scroll story: typing on his Mac on a cloud in the hero, walking in the manifesto, then waving at contact.",
     labels: {
       clipGroup: "Choose an animation",
       current: "Animation:",
       reducedMotion: "Reduced motion is on: the avatar is shown in a still pose.",
       figure: "3D avatar of Clément Cochod, animation",
-      clips: { Idle: "Idle", SitIdle: "Sitting", Walk: "Walk", Wave: "Wave", Celebrate: "Celebrate" },
+      clips: { Idle: "Idle", SitIdle: "Sitting", Walk: "Walk", Wave: "Wave", Celebrate: "Celebrate", Typing: "Typing" },
     },
   },
 };

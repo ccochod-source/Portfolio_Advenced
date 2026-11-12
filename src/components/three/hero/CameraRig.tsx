@@ -4,7 +4,7 @@ import { useEffect, type RefObject } from "react";
 import { useThree } from "@react-three/fiber";
 import { MathUtils, type PerspectiveCamera } from "three";
 import { HERO_CAMERA_Z } from "./constants";
-import type { MouseState } from "./Particles";
+import type { MouseState } from "./mouse";
 import { useSceneTime } from "./useSceneTime";
 
 const BASE_FOV = 45;

@@ -4,7 +4,6 @@ import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "rea
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { ContactShadows } from "@react-three/drei";
 import { Group, MathUtils, Mesh, type Material } from "three";
-import { HERO_CAMERA_Z, heroFocusFor } from "../hero/constants";
 import { useCanHover, useIsMobile, usePrefersReducedMotion } from "../hero/useHeroMotion";
 import { Avatar } from "./Avatar";
 import type { AvatarClip } from "./clips";
@@ -19,9 +18,6 @@ const LAYER_FOV = 30;
 const LAYER_HALF_H = LAYER_Z * Math.tan(MathUtils.degToRad(LAYER_FOV / 2));
 /** Height of the standing model in world units (feet at the group origin). */
 const MODEL_HEIGHT = 1.8;
-/** Hero scene camera (see hero/CameraRig.tsx): used to project the focus point to the screen. */
-const HERO_BASE_FOV = 45;
-const HERO_MIN_HALF_WIDTH = 2.3;
 /** Facing while walking: ±90° would be a pure profile, this keeps a readable three-quarter view. */
 const WALK_YAW = Math.PI / 2 - 0.5;
 const SHADOW_OPACITY = 0.35;
@@ -39,8 +35,6 @@ type Target = {
   idleYaw: number;
   /** Whether horizontal motion along this segment should read as walking. */
   walkable: boolean;
-  /** Hero only: exit progress used for the sit / stand decision. */
-  heroExit: number;
 };
 
 type Rects = Partial<Record<keyof typeof AVATAR_TARGETS, DOMRect>>;
@@ -62,30 +56,11 @@ function readRects(): Rects {
   return rects;
 }
 
-/** Screen position (px) of the hero focus point for the current hero rect, mirroring CameraRig's fov clamp. */
-function heroFocusOnScreen(rect: DOMRect) {
-  const aspect = rect.width / Math.max(1, rect.height);
-  let halfH = HERO_CAMERA_Z * Math.tan(MathUtils.degToRad(HERO_BASE_FOV / 2));
-  let halfW = halfH * aspect;
-  if (halfW < HERO_MIN_HALF_WIDTH) {
-    halfW = HERO_MIN_HALF_WIDTH;
-    halfH = halfW / aspect;
-  }
-  const [fx, fy] = heroFocusFor(aspect);
-  const h = (MODEL_HEIGHT / (2 * halfH)) * rect.height;
-  return {
-    x: rect.left + rect.width * (0.5 + fx / (2 * halfW)),
-    // The focus point is the light pad on the ground under the sun: the feet rest on it.
-    y: rect.top + rect.height * (0.5 - fy / (2 * halfH)) + h * 0.02,
-    h,
-  };
-}
-
-const hidden = (seg: AvatarSegment = "none"): Target => ({ seg, x: 0, y: 0, h: 1, alpha: 0, idleYaw: 0, walkable: false, heroExit: 0 });
+const hidden = (seg: AvatarSegment = "none"): Target => ({ seg, x: 0, y: 0, h: 1, alpha: 0, idleYaw: 0, walkable: false });
 
 /**
  * Pose along the manifesto band: feet on the band's bottom rule, walking right → left as `t` goes 0 → 1
- * (it comes down from the sun on the right, where the manifesto has no copy, and ends under the intro text).
+ * (it walks in from beyond the band's right edge, where the manifesto has no copy, and ends under the intro text).
  * The model shrinks along the way so that it never overlaps the intro copy above the band's left half.
  */
 function bandPose(band: DOMRect, t: number, H: number, narrow: boolean) {
@@ -93,7 +68,7 @@ function bandPose(band: DOMRect, t: number, H: number, narrow: boolean) {
   const hEnd = Math.min(band.height * 0.95, H * 0.28);
   const h = lerp(hStart, hEnd, t);
   const inset = Math.min(band.width * 0.05, 56) + h * 0.22;
-  return { x: lerp(band.right - inset, band.left + inset, t), y: band.bottom, h };
+  return { x: lerp(band.right + h * 0.6, band.left + inset, t), y: band.bottom, h };
 }
 
 /** Standing spot next to the journey timeline: centred on the anchor, feet on the timeline's top rule. */
@@ -117,34 +92,7 @@ function computeTarget(r: Rects, env: Env): Target {
   const offRight = (h: number) => W + h * 0.5;
   const offLeft = (h: number) => -h * 0.5;
 
-  // 1. Hero: sitting on the sun, then (desktop) walking down to the band / (narrow) fading out.
-  if (r.hero && r.hero.bottom > 0) {
-    const focus = heroFocusOnScreen(r.hero);
-    const exit = clamp01((H - r.hero.bottom) / H);
-    const sit: Target = { seg: "hero", x: focus.x, y: focus.y, h: focus.h, alpha: 1, idleYaw: -0.35, walkable: false, heroExit: exit };
-    if (!r.band) return sit;
-    if (narrow) {
-      // Once faded out, hand over to the band branch so the walk starts from its first step instead of mid-band.
-      const fade = range(exit, STORY.hero.fadeStart, STORY.hero.fadeEnd);
-      if (fade < 1) return { ...sit, alpha: 1 - smooth(fade) };
-    } else {
-      const u = smooth(range(exit, STORY.hero.walkStart, STORY.hero.walkEnd));
-      if (u <= 0) return sit;
-      const start = bandPose(r.band, 0, H, narrow);
-      return {
-        seg: "heroExit",
-        x: lerp(sit.x, start.x, u),
-        y: lerp(sit.y, start.y, u),
-        h: lerp(sit.h, start.h, u),
-        alpha: 1,
-        idleYaw: -0.35,
-        walkable: true,
-        heroExit: exit,
-      };
-    }
-  }
-
-  // 2. Manifesto band: walk across while pinned (desktop) or while the band scrolls through (narrow), then walk off right.
+  // 1. Manifesto band: walk across while pinned (desktop) or while the band scrolls through (narrow), then walk off right.
   if (r.band) {
     const band = r.band;
     if (narrow) {
@@ -154,7 +102,7 @@ function computeTarget(r: Rects, env: Env): Target {
       const pose = bandPose(band, t, H, narrow);
       const alphaIn = range(band.bottom / H, STORY.band.narrowFrom, STORY.band.narrowFrom - 0.08);
       if (exit < 1) {
-        return { seg: exit > 0 ? "bandExit" : "band", x: lerp(pose.x, offLeft(pose.h), exit), y: pose.y, h: pose.h, alpha: alphaIn, idleYaw: -0.35, walkable: true, heroExit: 1 };
+        return { seg: exit > 0 ? "bandExit" : "band", x: lerp(pose.x, offLeft(pose.h), exit), y: pose.y, h: pose.h, alpha: alphaIn, idleYaw: -0.35, walkable: true };
       }
     } else {
       const p = getManifestoProgress();
@@ -163,12 +111,12 @@ function computeTarget(r: Rects, env: Env): Target {
       const pinnedTop = env.pinnedBandTop ?? Math.min(band.top, H * 0.45);
       const exit = p >= 1 ? smooth(range(band.top, pinnedTop - 2, pinnedTop - H * STORY.band.exitTravel)) : 0;
       if (exit < 1 && band.bottom > -H * 0.1) {
-        return { seg: exit > 0 ? "bandExit" : "band", x: lerp(pose.x, offLeft(pose.h), exit), y: pose.y, h: pose.h, alpha: 1, idleYaw: -0.35, walkable: true, heroExit: 1 };
+        return { seg: exit > 0 ? "bandExit" : "band", x: lerp(pose.x, offLeft(pose.h), exit), y: pose.y, h: pose.h, alpha: 1, idleYaw: -0.35, walkable: true };
       }
     }
   }
 
-  // 4. Contact (checked before the journey so the two never overlap): walk in from the right of the headline.
+  // 3. Contact (checked before the journey so the two never overlap): walk in from the right of the headline.
   if (r.contact) {
     const footerTop = r.contact.top / H;
     const spot = contactSpot(r.contact, W, H);
@@ -176,14 +124,14 @@ function computeTarget(r: Rects, env: Env): Target {
       // Stacked layout: the headline spans the full width, so the avatar fades in beside the contact details below it.
       const alpha = smooth(range(footerTop, STORY.contact.narrowFadeFrom, STORY.contact.narrowFadeTo));
       const h = Math.min(H * 0.22, W * 0.45);
-      if (alpha > 0) return { seg: "contact", x: W - 24 - h * 0.3, y: r.contact.bottom + H * 0.3, h, alpha, idleYaw: -0.15, walkable: false, heroExit: 1 };
+      if (alpha > 0) return { seg: "contact", x: W - 24 - h * 0.3, y: r.contact.bottom + H * 0.3, h, alpha, idleYaw: -0.15, walkable: false };
     } else if (spot.ok && footerTop < STORY.contact.enterFrom) {
       const enter = smooth(range(footerTop, STORY.contact.enterFrom, STORY.contact.enterTo));
-      return { seg: enter < 1 ? "contactEnter" : "contact", x: lerp(offRight(spot.h), spot.x, enter), y: spot.y, h: spot.h, alpha: 1, idleYaw: -0.15, walkable: true, heroExit: 1 };
+      return { seg: enter < 1 ? "contactEnter" : "contact", x: lerp(offRight(spot.h), spot.x, enter), y: spot.y, h: spot.h, alpha: 1, idleYaw: -0.15, walkable: true };
     }
   }
 
-  // 3. Journey (desktop only, the anchor is hidden on narrow screens): walk in from the right to the timeline rule,
+  // 2. Journey (desktop only, the anchor is hidden on narrow screens): walk in from the right to the timeline rule,
   //    stand there, walk back off the right edge before the footer arrives.
   if (r.journey && r.journeyTrack && !narrow) {
     const ruleY = r.journeyTrack.top / H;
@@ -193,7 +141,7 @@ function computeTarget(r: Rects, env: Env): Target {
       const exit = smooth(range(ruleY, STORY.journey.exitFrom, STORY.journey.exitTo));
       const x = exit > 0 ? lerp(spot.x, offRight(spot.h), exit) : lerp(offRight(spot.h), spot.x, enter);
       const seg: AvatarSegment = exit > 0 ? "journeyExit" : enter < 1 ? "journeyEnter" : "journey";
-      return { seg, x, y: spot.y, h: spot.h, alpha: 1, idleYaw: -0.25, walkable: true, heroExit: 1 };
+      return { seg, x, y: spot.y, h: spot.h, alpha: 1, idleYaw: -0.25, walkable: true };
     }
   }
 
@@ -229,11 +177,13 @@ type Motion = {
 
 function Rig({ mobile, narrow }: { mobile: boolean; narrow: boolean }) {
   const group = useRef<Group>(null);
+  /** The avatar model alone (never the contact shadow): its materials are cloned to drive the fade. */
+  const body = useRef<Group>(null);
   const shadow = useRef<Group>(null);
   const { size } = useThree();
-  const [play, setPlay] = useState<{ clip: AvatarClip; fade: number }>({ clip: "SitIdle", fade: CROSS_FADE });
+  const [play, setPlay] = useState<{ clip: AvatarClip; fade: number }>({ clip: "Idle", fade: CROSS_FADE });
   const clip = play.clip;
-  const clipRef = useRef<AvatarClip>("SitIdle");
+  const clipRef = useRef<AvatarClip>("Idle");
   const walkSpeed = useRef(1);
   const materials = useRef<Material[] | null>(null);
   useEffect(
@@ -277,9 +227,8 @@ function Rig({ mobile, narrow }: { mobile: boolean; narrow: boolean }) {
     }
     if (!immediate && now - s.pendingSince < 120) return;
     s.pendingClip = null;
-    const fade = next === "SitIdle" || clipRef.current === "SitIdle" ? 0.6 : CROSS_FADE;
     clipRef.current = next;
-    setPlay({ clip: next, fade });
+    setPlay({ clip: next, fade: CROSS_FADE });
   };
 
   useFrame((_, delta) => {
@@ -322,10 +271,7 @@ function Rig({ mobile, narrow }: { mobile: boolean; narrow: boolean }) {
     // Clip choice: hysteretic along the scroll, one-shots play once.
     let next: AvatarClip = "Idle";
     const settled = now - s.settledSince > 250;
-    if (target.seg === "hero") {
-      const standing = clipRef.current !== "SitIdle";
-      next = (standing ? target.heroExit > STORY.hero.sitDown : target.heroExit > STORY.hero.standUp) ? "Idle" : "SitIdle";
-    } else if (s.walking) {
+    if (s.walking) {
       next = "Walk";
     } else if (target.seg === "journey") {
       if (clipRef.current === "Wave") {
@@ -356,10 +302,10 @@ function Rig({ mobile, narrow }: { mobile: boolean; narrow: boolean }) {
     g.visible = a > 0.01 && onScreen;
     if (!g.visible) return;
 
-    if (!materials.current) {
+    if (!materials.current && body.current) {
       const list: Material[] = [];
-      g.traverse((child) => {
-        if (child instanceof Mesh && child.material && !(child.parent && child.parent === shadow.current)) {
+      body.current.traverse((child) => {
+        if (child instanceof Mesh && child.material) {
           const mat = (child.material as Material).clone();
           child.material = mat;
           list.push(mat);
@@ -388,7 +334,9 @@ function Rig({ mobile, narrow }: { mobile: boolean; narrow: boolean }) {
 
   return (
     <group ref={group} visible={false}>
-      <Avatar clip={clip} timeScaleRef={clip === "Walk" ? walkSpeed : undefined} crossFade={play.fade} playOnce={clip === "Wave" || clip === "Celebrate"} onFinished={onFinished} />
+      <group ref={body}>
+        <Avatar clip={clip} timeScaleRef={clip === "Walk" ? walkSpeed : undefined} crossFade={play.fade} playOnce={clip === "Wave" || clip === "Celebrate"} onFinished={onFinished} />
+      </group>
       {!mobile && (
         <group ref={shadow}>
           <ContactShadows position={[0, 0.002, 0]} opacity={SHADOW_OPACITY} scale={3.2} blur={2.4} far={1.6} color="#6B4A3A" frames={Infinity} />
@@ -400,8 +348,9 @@ function Rig({ mobile, narrow }: { mobile: boolean; narrow: boolean }) {
 
 /**
  * One fixed, transparent, pointer-transparent canvas that holds the only avatar instance on the page.
- * Each frame it reads the storyline's DOM rects (hero focus, manifesto band, journey timeline, contact headline)
- * and moves/scales the model so it appears to sit, walk, wave and celebrate inside the DOM layout.
+ * Each frame it reads the storyline's DOM rects (manifesto band, journey timeline, contact headline)
+ * and moves/scales the model so it appears to walk, wave and celebrate inside the DOM layout.
+ * (In the hero the avatar is part of the hero Canvas itself: see hero/DeskScene.tsx.)
  */
 export function AvatarLayer() {
   const reduced = usePrefersReducedMotion();

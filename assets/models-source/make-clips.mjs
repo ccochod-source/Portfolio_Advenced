@@ -1,5 +1,5 @@
 // make-clips.mjs — retargets REAL motion-capture clips onto the Avaturn rig and writes a GLB
-// with exactly the 5 named clips the app plays: Idle, SitIdle, Walk, Wave, Celebrate.
+// with exactly the 6 named clips the app plays: Idle, SitIdle, Walk, Wave, Celebrate, Typing.
 //
 //   node make-clips.mjs <in.glb> <out.glb> [--ual <UAL1_Standard.glb>] [--mocap <dir>]
 //
@@ -53,7 +53,19 @@ const CLIPS = [
   { name: 'Walk', src: 'ual', clip: 'Walk_Loop', loop: true, inPlace: true },
   { name: 'Wave', src: 'bvh', file: 'dataset-2_wave-right-hand_normal_001.bvh', segments: [[0, 2.2], [5.0, Infinity]], splice: 0.3, ease: [0.3, 0.4] },
   { name: 'Celebrate', src: 'bvh', file: 'dataset-2_raise-up-both-hands_active_002.bvh', ease: [0.3, 0.3] },
+  // Seated typing on a laptop resting on the lap: Sitting_Idle_Loop (torso sway, breathing) + a procedural overlay
+  // (torso/head pitched towards the screen, two-bone IK bringing both hands over the keyboard, alternating key taps).
+  { name: 'Typing', src: 'ual', clip: 'Sitting_Idle_Loop', loop: true, overlay: 'typing' },
 ];
+
+/** Laptop on the lap (character space: facing +Z, feet at y=0): where the hands hover and how far the body leans in. */
+export const TYPING = {
+  hands: { y: 0.655, z: 0.30, x: 0.09 },
+  tapHz: 3.2,
+  tapAmp: 0.012,
+  pitch: { Spine1: 0.1, Spine2: 0.12, Neck: 0.16, Head: 0.32 },
+  elbowPole: [1.0, -0.7, -0.35],
+};
 
 const SIDES = [['Left', 'l', 'L'], ['Right', 'r', 'R']];
 const UAL_MAP = { Hips: 'pelvis', Spine: 'spine_01', Spine1: 'spine_02', Spine2: 'spine_03', Neck: 'neck_01', Head: 'Head' };
@@ -316,6 +328,56 @@ function easeToPose(frames, pose, [inSec, outSec]) {
   });
 }
 
+// ---------- procedural overlays ----------
+const clampUnit = (x) => Math.min(1, Math.max(-1, x));
+/** Re-orients `bone` so its direction to `child` matches `dir` (minimal rotation, twist preserved); FK must be refreshed afterwards. */
+function aimBone(frame, world, bone, child, dir) {
+  const w = world.get(bone); const par = world.get(tParent.get(bone)) ?? armatureWorld;
+  const cur = world.get(child).p.clone().sub(w.p).normalize();
+  const q = new THREE.Quaternion().setFromUnitVectors(cur, dir.clone().normalize()).multiply(w.q);
+  frame.rot.set(bone, par.q.clone().invert().multiply(q));
+}
+/** Rotates `bone` by `rad` about the world X axis (character pitch: + = forward/down). */
+function pitchBone(frame, bone, rad) {
+  const world = fkTarget(frame); const w = world.get(bone); const par = world.get(tParent.get(bone)) ?? armatureWorld;
+  const q = new THREE.Quaternion().setFromAxisAngle(V(1, 0, 0), rad).multiply(w.q);
+  frame.rot.set(bone, par.q.clone().invert().multiply(q));
+}
+/** Two-bone IK: places `${side}Hand` at `target`, elbow pushed towards `pole`. */
+function reachArm(frame, side, target, pole) {
+  let world = fkTarget(frame);
+  const S = world.get(`${side}Arm`).p, E0 = world.get(`${side}ForeArm`).p, H0 = world.get(`${side}Hand`).p;
+  const L1 = E0.distanceTo(S), L2 = H0.distanceTo(E0);
+  const toT = target.clone().sub(S); const d = Math.min(toT.length(), (L1 + L2) * 0.985); const dir = toT.normalize();
+  const a = Math.acos(clampUnit((L1 * L1 + d * d - L2 * L2) / (2 * L1 * d)));
+  const side90 = pole.clone().sub(dir.clone().multiplyScalar(pole.dot(dir))).normalize();
+  const elbow = S.clone().add(dir.clone().multiplyScalar(Math.cos(a) * L1)).add(side90.multiplyScalar(Math.sin(a) * L1));
+  aimBone(frame, world, `${side}Arm`, `${side}ForeArm`, elbow.clone().sub(S));
+  world = fkTarget(frame);
+  aimBone(frame, world, `${side}ForeArm`, `${side}Hand`, target.clone().sub(world.get(`${side}ForeArm`).p));
+}
+function typingOverlay(frames) {
+  const n = frames.length; const out = [];
+  const cycles = Math.max(1, Math.round(((n - 1) / FPS) * TYPING.tapHz));
+  for (let i = 0; i < n; i++) {
+    const f = { rot: new Map(frames[i].rot), hips: frames[i].hips.clone() };
+    const ph = (i / (n - 1)) * Math.PI * 2 * cycles;
+    for (const [b, r] of Object.entries(TYPING.pitch)) pitchBone(f, b, r);
+    for (const [side, sx, phase] of [['Left', 1, 0], ['Right', -1, Math.PI]]) {
+      const tap = Math.max(0, Math.sin(ph + phase));
+      const drift = Math.sin(ph * 0.5 + phase) * 0.012;
+      const target = V(sx * TYPING.hands.x + drift * sx, TYPING.hands.y + tap * TYPING.tapAmp, TYPING.hands.z + Math.cos(ph * 0.5 + phase) * 0.01);
+      const pole = V(TYPING.elbowPole[0] * sx, TYPING.elbowPole[1], TYPING.elbowPole[2]);
+      reachArm(f, side, target, pole);
+      // Hands flat over the keys, fingers pointing forward and slightly inward.
+      const world = fkTarget(f);
+      aimBone(f, world, `${side}Hand`, `${side}HandMiddle1`, V(-0.25 * sx, -0.35 - tap * 0.25, 1));
+    }
+    out.push(f);
+  }
+  return out;
+}
+
 // ---------- build ----------
 const ual = await loadGltfSource(ualPath);
 const bvhRef = CLIPS.find((c) => c.src === 'bvh' && c.name === 'Wave').file;
@@ -343,6 +405,7 @@ for (const c of CLIPS) {
   if (c.ease && idlePose) frames = easeToPose(frames, idlePose, c.ease);
   let seam = null;
   if (c.loop) seam = closeLoop(frames);
+  if (c.overlay === 'typing') frames = typingOverlay(frames);
   if (c.name === 'Idle') idlePose = frames[0];
 
   // write tracks
