@@ -28,6 +28,8 @@ export function Hero({ lang, copy }: HeroProps) {
           className="hidden motion-reduce:block absolute bottom-[4%] right-[8%] h-[46%] w-auto max-w-[60%] object-contain object-bottom md:right-[16%] md:h-[58%]"
         />
       </div>
+      {/* Golden-hour haze behind the copy: keeps the coral wordmark legible over the bright sunset band. */}
+      <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 z-[5] h-[62%] bg-gradient-to-b from-cream/60 via-cream/30 to-transparent motion-reduce:hidden" />
       <div data-hero-copy className="relative z-10 flex flex-1 flex-col">
         <Container className="flex flex-col items-center text-center">
           <Reveal as="h1" y={24} delay={0.15} start="top bottom" className="bg-gradient-to-b from-sun to-coral bg-clip-text pb-[0.08em] pt-[0.06em] text-[19vw] font-medium leading-[0.86] tracking-[-0.06em] text-transparent md:text-[min(12.5vw,13rem)]">
