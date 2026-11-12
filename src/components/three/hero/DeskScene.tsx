@@ -1,11 +1,11 @@
 "use client";
 
-import { useLayoutEffect, useMemo, useRef } from "react";
+import { useLayoutEffect, useMemo, useRef, type RefObject } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
 import { RoundedBox, useGLTF } from "@react-three/drei";
-import { AdditiveBlending, Color, type InstancedMesh, Matrix4, Vector3 } from "three";
+import { AdditiveBlending, Color, type Group, type InstancedMesh, Matrix4, Quaternion, Vector3 } from "three";
 import { AVATAR_MODEL_URL, Avatar } from "../avatar/Avatar";
-import { HAND_LIFT, dampTypingClip, findArms, offsetHand } from "./typingPose";
+import { HAND_PITCH, HAND_REST, dampTypingClip, findArms, offsetHand, rotateWorld } from "./typingPose";
 import { PALETTE } from "./constants";
 import {
   DESK_TOP_HEIGHT,
@@ -16,6 +16,7 @@ import {
   LAPTOP_LID_TILT,
   SCREEN_SIZE,
   ZOOM_FACE_MESH_NAME,
+  ZOOM_FACE_OFFSET,
   deskOriginFor,
   deskScaleFor,
 } from "./desk";
@@ -161,7 +162,7 @@ function Laptop() {
           <planeGeometry args={[SCREEN_SIZE.width, SCREEN_SIZE.height]} />
           <meshStandardMaterial color={PALETTE.cream} emissive={PALETTE.creamDeep} emissiveIntensity={1.4} roughness={0.4} metalness={0} />
         </mesh>
-        <mesh name={ZOOM_FACE_MESH_NAME} position={[0, lidH / 2, LAPTOP_LID_THICKNESS / 2 + 0.0004]}>
+        <mesh name={ZOOM_FACE_MESH_NAME} position={[0, lidH / 2, ZOOM_FACE_OFFSET]}>
           <planeGeometry args={[SCREEN_SIZE.width, SCREEN_SIZE.height]} />
           <meshBasicMaterial color={ALU.color} transparent opacity={0} depthWrite={false} />
         </mesh>
@@ -171,7 +172,7 @@ function Laptop() {
 }
 
 /** Post-animation pass on the hero avatar: calm shoulders (clip damping) and hands lifted over the keyboard (IK). */
-function TypingPose({ scale }: { scale: number }) {
+function TypingPose({ scale, set }: { scale: number; set: RefObject<Group | null> }) {
   const scene = useThree((s) => s.scene);
   const { animations } = useGLTF(AVATAR_MODEL_URL, false, true);
   useLayoutEffect(() => {
@@ -180,14 +181,22 @@ function TypingPose({ scale }: { scale: number }) {
   }, [animations]);
   const arms = useRef<ReturnType<typeof findArms>>([]);
   const lift = useMemo(() => new Vector3(), []);
+  const pitch = useMemo(() => new Quaternion().setFromAxisAngle(new Vector3(1, 0, 0).applyAxisAngle(Y_AXIS, DESK_YAW), HAND_PITCH), []);
   useFrame(() => {
+    const group = set.current;
+    if (!group) return;
     if (arms.current.length === 0 || !arms.current[0].upper.parent) {
       arms.current = findArms(scene);
       if (arms.current.length === 0) return;
     }
-    // HAND_LIFT is expressed in the set frame: the set is yawed and scaled (desk.ts).
-    lift.copy(HAND_LIFT).applyAxisAngle(Y_AXIS, DESK_YAW).multiplyScalar(scale);
-    for (const arm of arms.current) offsetHand(arm, lift);
+    for (const arm of arms.current) {
+      // Wrist → HAND_REST height/depth in the set frame (the clip keeps its lateral motion); the set is yawed and scaled.
+      arm.hand.getWorldPosition(lift);
+      group.worldToLocal(lift);
+      lift.set(0, HAND_REST.y - lift.y, HAND_REST.z - lift.z).applyAxisAngle(Y_AXIS, DESK_YAW).multiplyScalar(scale);
+      offsetHand(arm, lift);
+      rotateWorld(arm.hand, pitch);
+    }
   });
   return null;
 }
@@ -201,15 +210,16 @@ export function DeskScene() {
   const aspect = size.width / Math.max(1, size.height);
   const origin = deskOriginFor(aspect);
   const scale = deskScaleFor(aspect);
+  const set = useRef<Group>(null);
 
   return (
-    <group position={[...origin]} rotation={[0, DESK_YAW, 0]} scale={scale}>
+    <group ref={set} position={[...origin]} rotation={[0, DESK_YAW, 0]} scale={scale}>
       <directionalLight position={[2.5, 3.5, 3]} intensity={1.9} color={PALETTE.gold} />
       <directionalLight position={[-3, 1.2, -2.5]} intensity={1.1} color={PALETTE.sun} />
       <hemisphereLight intensity={0.45} color={PALETTE.cream} groundColor={PALETTE.inkSoft} />
       <Cloud />
       <Avatar clip="Typing" />
-      <TypingPose scale={scale} />
+      <TypingPose scale={scale} set={set} />
       <Laptop />
     </group>
   );

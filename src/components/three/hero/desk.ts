@@ -54,10 +54,16 @@ export const LAPTOP_LID_THICKNESS = 0.006;
  * it through the aluminium as the camera approaches; its normal points at the viewer (+Z, tilted down 20°).
  */
 export const ZOOM_FACE_NORMAL_LOCAL: Vec3Tuple = [0, -Math.sin(LAPTOP_LID_TILT), Math.cos(LAPTOP_LID_TILT)];
+/**
+ * Distance of the lid-back quad from the lid mid-plane (SCREEN_CENTER_LOCAL): half the lid thickness + 0.4 mm so it
+ * sits just over the aluminium. DeskScene MUST place the quad exactly here: the camera dolly ends at a distance
+ * computed for this point, and 1 mm of error along the normal is ~0.4 % of scale, i.e. several px at handover.
+ */
+export const ZOOM_FACE_OFFSET = LAPTOP_LID_THICKNESS / 2 + 0.0004;
 export const ZOOM_FACE_CENTER_LOCAL: Vec3Tuple = [
-  SCREEN_CENTER_LOCAL[0] + ZOOM_FACE_NORMAL_LOCAL[0] * LAPTOP_LID_THICKNESS,
-  SCREEN_CENTER_LOCAL[1] + ZOOM_FACE_NORMAL_LOCAL[1] * LAPTOP_LID_THICKNESS,
-  SCREEN_CENTER_LOCAL[2] + ZOOM_FACE_NORMAL_LOCAL[2] * LAPTOP_LID_THICKNESS,
+  SCREEN_CENTER_LOCAL[0] + ZOOM_FACE_NORMAL_LOCAL[0] * ZOOM_FACE_OFFSET,
+  SCREEN_CENTER_LOCAL[1] + ZOOM_FACE_NORMAL_LOCAL[1] * ZOOM_FACE_OFFSET,
+  SCREEN_CENTER_LOCAL[2] + ZOOM_FACE_NORMAL_LOCAL[2] * ZOOM_FACE_OFFSET,
 ];
 /** Name of the DeskScene mesh ScreenContent paints the next page on (SCREEN_SIZE quad, UV u right / v up, +Z = ZOOM_FACE_NORMAL). */
 export const ZOOM_FACE_MESH_NAME = "laptop-lid-back";

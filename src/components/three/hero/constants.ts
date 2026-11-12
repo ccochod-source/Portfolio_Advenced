@@ -21,7 +21,7 @@ export const PALETTE = {
 } as const;
 
 /** Drifting cloud billboards per layer (far, mid, near). */
-export const CLOUD_COUNT = { desktop: [5, 4, 3], mobile: [3, 2, 2] } as const;
+export const CLOUD_COUNT = { desktop: [7, 6, 6, 5, 3], mobile: [4, 3, 3, 3, 2] } as const;
 /** Equirectangular golden-hour sky (Poly Haven "Kloppenheim 06 (Pure Sky)", CC0, warm-graded — see public/models/LICENSE.md). */
 export const SKY_TEXTURE_URL = "/textures/sky-golden-hour.webp";
 export const CLOUD_TEXTURE_URLS = ["/textures/cloud-1.webp", "/textures/cloud-2.webp", "/textures/cloud-3.webp"] as const;

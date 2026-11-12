@@ -32,8 +32,13 @@ export function dampTypingClip(clip: AnimationClip) {
   }
 }
 
-/** Hand target offset, set-local space (metres): fingers rest just above the key caps instead of through the base. */
-export const HAND_LIFT = new Vector3(0, 0.045, -0.055);
+/**
+ * Where the wrists (Hand bones) rest, set-local space (metres), whatever the clip does: the clip rests the hands on
+ * the knees, out of reach of the keys; the wrists are brought to the front edge of the base (lap height + 4 cm, z just
+ * in front of the trackpad) every frame; the clip keeps the lateral wrist motion and the finger taps.
+ */
+export const HAND_REST = { y: 0.655, z: 0.225 } as const;
+export const HAND_PITCH = -0.42;
 
 type Arm = { upper: Bone; fore: Bone; hand: Bone; tip: Object3D };
 
@@ -61,7 +66,7 @@ const qParent = new Quaternion();
 const qTmp = new Quaternion();
 
 /** Applies a world-space rotation to a bone (premultiplied in its parent's frame). */
-function rotateWorld(bone: Object3D, q: Quaternion) {
+export function rotateWorld(bone: Object3D, q: Quaternion) {
   bone.parent?.getWorldQuaternion(qParent);
   qTmp.copy(qParent).invert().multiply(q).multiply(qParent);
   bone.quaternion.premultiply(qTmp);
@@ -93,8 +98,10 @@ export function offsetHand(arm: Arm, offset: Vector3) {
   axis.normalize();
   const cosCur = (l1 * l1 + l2 * l2 - dCur * dCur) / (2 * l1 * l2);
   const cosNew = (l1 * l1 + l2 * l2 - d * d) / (2 * l1 * l2);
+  // Interior elbow angle (π = straight): a smaller angle means the forearm turns further away from the upper arm,
+  // i.e. a negative rotation about upper × fore.
   const delta = Math.acos(Math.max(-1, Math.min(1, cosNew))) - Math.acos(Math.max(-1, Math.min(1, cosCur)));
-  rotateWorld(fore, qWorld.setFromAxisAngle(axis, delta));
+  rotateWorld(fore, qWorld.setFromAxisAngle(axis, -delta));
 
   // Swing the whole arm so the hand lands on the target.
   hand.getWorldPosition(H);
