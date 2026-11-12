@@ -236,6 +236,13 @@ function Rig({ mobile, narrow }: { mobile: boolean; narrow: boolean }) {
   const clipRef = useRef<AvatarClip>("SitIdle");
   const walkSpeed = useRef(1);
   const materials = useRef<Material[] | null>(null);
+  useEffect(
+    () => () => {
+      materials.current?.forEach((mat) => mat.dispose());
+      materials.current = null;
+    },
+    [],
+  );
   const yaw = useRef(-0.35);
   const alpha = useRef(0);
   const m = useRef<Motion>({
