@@ -37,7 +37,10 @@ export type SceneProps = {
   onSelect: (index: number) => void;
   autoRotate: boolean;
   animate: boolean;
+  /** Narrow viewport: vertical layout, lighter geometry, fewer labels. */
   mobile: boolean;
+  /** Coarse pointer: drag-to-rotate that leaves vertical page scrolling to the browser. */
+  touch: boolean;
   labelRefs: RefObject<(HTMLElement | null)[]>;
   onInteractStart: () => void;
   onInteractEnd: () => void;
@@ -47,11 +50,12 @@ type NodeProps = {
   node: LayoutNode;
   state: "active" | "linked" | "dimmed" | "idle";
   segments: number;
+  animate: boolean;
   onHover: (index: number | null) => void;
   onSelect: (index: number) => void;
 };
 
-function SkillNode({ node, state, segments, onHover, onSelect }: NodeProps) {
+function SkillNode({ node, state, segments, animate, onHover, onSelect }: NodeProps) {
   const group = useRef<THREE.Group>(null);
   const material = useRef<THREE.MeshStandardMaterial>(null);
   const glow = useRef<THREE.Sprite>(null);
@@ -61,7 +65,7 @@ function SkillNode({ node, state, segments, onHover, onSelect }: NodeProps) {
   useFrame((_, delta) => {
     const g = group.current;
     if (!g) return;
-    const k = 1 - Math.exp(-delta * 10);
+    const k = animate ? 1 - Math.exp(-delta * 10) : 1;
     const targetScale = state === "active" ? 1.45 : state === "linked" ? 1.15 : state === "dimmed" ? 0.85 : 1;
     g.scale.setScalar(THREE.MathUtils.lerp(g.scale.x, targetScale, k));
 
@@ -103,7 +107,7 @@ function SkillNode({ node, state, segments, onHover, onSelect }: NodeProps) {
   );
 }
 
-function Edges({ nodes, edges, activeIndex }: { nodes: LayoutNode[]; edges: LayoutEdge[]; activeIndex: number | null }) {
+function Edges({ nodes, edges, activeIndex, animate }: { nodes: LayoutNode[]; edges: LayoutEdge[]; activeIndex: number | null; animate: boolean }) {
   const colors = useRef<THREE.BufferAttribute>(null);
   const strength = useRef<Float32Array>(new Float32Array(edges.length));
 
@@ -125,7 +129,7 @@ function Edges({ nodes, edges, activeIndex }: { nodes: LayoutNode[]; edges: Layo
   useFrame((_, delta) => {
     const attr = colors.current;
     if (!attr) return;
-    const k = 1 - Math.exp(-delta * 8);
+    const k = animate ? 1 - Math.exp(-delta * 8) : 1;
     const s = strength.current;
     let dirty = false;
     edges.forEach((e, i) => {
@@ -194,10 +198,82 @@ function CameraRig({ mobile }: { mobile: boolean }) {
   const { camera, size } = useThree();
   useEffect(() => {
     const aspect = size.width / Math.max(size.height, 1);
-    const distance = mobile ? 12.5 : aspect < 1.2 ? 11 : 9.2;
+    const distance = mobile ? 11.6 : aspect < 1.2 ? 11 : 9.2;
     camera.position.setLength(distance);
     camera.updateProjectionMatrix();
   }, [camera, size.width, size.height, mobile]);
+  return null;
+}
+
+/** Re-renders a `frameloop="demand"` canvas when the highlighted skill changes (reduced motion). */
+function InvalidateOn({ value }: { value: unknown }) {
+  const invalidate = useThree((s) => s.invalidate);
+  useEffect(() => {
+    invalidate();
+  }, [value, invalidate]);
+  return null;
+}
+
+type TouchRotateProps = {
+  onRotate: (dx: number, dy: number) => void;
+  onInteractStart: () => void;
+  onInteractEnd: () => void;
+};
+
+const TOUCH_PITCH_LIMIT = 0.45;
+
+/**
+ * Finger drag rotates the constellation. The canvas keeps `touch-action: pan-y`, so a vertical swipe scrolls the
+ * page (the browser then cancels the pointer) and only horizontal / diagonal drags rotate; taps still select.
+ */
+function TouchRotate({ onRotate, onInteractStart, onInteractEnd }: TouchRotateProps) {
+  const gl = useThree((s) => s.gl);
+  const invalidate = useThree((s) => s.invalidate);
+  const gesture = useRef<{ id: number; x: number; y: number; mode: "pending" | "rotate" | "scroll" } | null>(null);
+
+  useEffect(() => {
+    const el = gl.domElement;
+    const down = (e: PointerEvent) => {
+      if (!e.isPrimary || gesture.current) return;
+      gesture.current = { id: e.pointerId, x: e.clientX, y: e.clientY, mode: "pending" };
+    };
+    const move = (e: PointerEvent) => {
+      const g = gesture.current;
+      if (!g || e.pointerId !== g.id) return;
+      const dx = e.clientX - g.x;
+      const dy = e.clientY - g.y;
+      if (g.mode === "pending") {
+        if (Math.hypot(dx, dy) < 8) return;
+        if (Math.abs(dy) > Math.abs(dx) * 1.4) {
+          g.mode = "scroll";
+          return;
+        }
+        g.mode = "rotate";
+        onInteractStart();
+      }
+      if (g.mode !== "rotate") return;
+      g.x = e.clientX;
+      g.y = e.clientY;
+      onRotate(dx, dy);
+      invalidate();
+    };
+    const up = (e: PointerEvent) => {
+      const g = gesture.current;
+      if (!g || e.pointerId !== g.id) return;
+      if (g.mode === "rotate") onInteractEnd();
+      gesture.current = null;
+    };
+    el.addEventListener("pointerdown", down);
+    el.addEventListener("pointermove", move);
+    el.addEventListener("pointerup", up);
+    el.addEventListener("pointercancel", up);
+    return () => {
+      el.removeEventListener("pointerdown", down);
+      el.removeEventListener("pointermove", move);
+      el.removeEventListener("pointerup", up);
+      el.removeEventListener("pointercancel", up);
+    };
+  }, [gl, invalidate, onRotate, onInteractStart, onInteractEnd]);
   return null;
 }
 
@@ -211,19 +287,37 @@ export function ConstellationScene({
   autoRotate,
   animate,
   mobile,
+  touch,
   labelRefs,
   onInteractStart,
   onInteractEnd,
 }: SceneProps) {
   const world = useRef<THREE.Group>(null);
+  const touchTarget = useRef({ yaw: 0, pitch: 0 });
   const segments = mobile ? 16 : 28;
 
-  useFrame(({ clock }) => {
-    if (!animate || !world.current) return;
-    const t = clock.getElapsedTime();
-    world.current.position.y = Math.sin(t * 0.5) * 0.12;
-    world.current.rotation.z = Math.sin(t * 0.3) * 0.03;
+  useFrame(({ clock }, delta) => {
+    const g = world.current;
+    if (!g) return;
+    if (animate) {
+      const t = clock.getElapsedTime();
+      g.position.y = Math.sin(t * 0.5) * 0.12;
+      g.rotation.z = Math.sin(t * 0.3) * 0.03;
+    }
+    if (touch) {
+      const target = touchTarget.current;
+      if (autoRotate) target.yaw += delta * 0.12;
+      const k = animate ? 1 - Math.exp(-delta * 6) : 1;
+      g.rotation.y = THREE.MathUtils.lerp(g.rotation.y, target.yaw, k);
+      g.rotation.x = THREE.MathUtils.lerp(g.rotation.x, target.pitch, k);
+    }
   });
+
+  const onTouchRotate = (dx: number, dy: number) => {
+    const target = touchTarget.current;
+    target.yaw += dx * 0.008;
+    target.pitch = THREE.MathUtils.clamp(target.pitch + dy * 0.005, -TOUCH_PITCH_LIMIT, TOUCH_PITCH_LIMIT);
+  };
 
   return (
     <>
@@ -232,27 +326,34 @@ export function ConstellationScene({
       <directionalLight position={[4, 6, 5]} intensity={1.6} color="#ffe7c2" />
       <directionalLight position={[-5, -2, -4]} intensity={0.5} color="#ffb36b" />
       <LabelProjector nodes={nodes} world={world} labelRefs={labelRefs} activeIndex={activeIndex} linked={linked} mobile={mobile} />
+      <InvalidateOn value={activeIndex} />
       <group ref={world}>
-        <Edges nodes={nodes} edges={edges} activeIndex={activeIndex} />
+        <Edges nodes={nodes} edges={edges} activeIndex={activeIndex} animate={animate} />
         {nodes.map((node) => {
           const state =
             activeIndex === null ? "idle" : activeIndex === node.index ? "active" : linked.has(node.index) ? "linked" : "dimmed";
-          return <SkillNode key={node.skill.id} node={node} state={state} segments={segments} onHover={onHover} onSelect={onSelect} />;
+          return (
+            <SkillNode key={node.skill.id} node={node} state={state} segments={segments} animate={animate} onHover={onHover} onSelect={onSelect} />
+          );
         })}
       </group>
-      <OrbitControls
-        enableZoom={false}
-        enablePan={false}
-        enableDamping
-        dampingFactor={0.08}
-        rotateSpeed={0.55}
-        autoRotate={autoRotate}
-        autoRotateSpeed={0.5}
-        minPolarAngle={Math.PI * 0.3}
-        maxPolarAngle={Math.PI * 0.7}
-        onStart={onInteractStart}
-        onEnd={onInteractEnd}
-      />
+      {touch ? (
+        <TouchRotate onRotate={onTouchRotate} onInteractStart={onInteractStart} onInteractEnd={onInteractEnd} />
+      ) : (
+        <OrbitControls
+          enableZoom={false}
+          enablePan={false}
+          enableDamping
+          dampingFactor={0.08}
+          rotateSpeed={0.55}
+          autoRotate={autoRotate}
+          autoRotateSpeed={0.5}
+          minPolarAngle={Math.PI * 0.3}
+          maxPolarAngle={Math.PI * 0.7}
+          onStart={onInteractStart}
+          onEnd={onInteractEnd}
+        />
+      )}
     </>
   );
 }

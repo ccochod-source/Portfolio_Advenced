@@ -6,6 +6,7 @@ import { ActivityPause } from "../ActivityPause";
 import { Canvas } from "@react-three/fiber";
 import { ConstellationScene } from "./ConstellationScene";
 import { GROUP_TAILWIND, layoutSkills } from "./layout";
+import { CANVAS_HEIGHT } from "./sizes";
 import { SkillsConstellationFallback } from "./SkillsConstellationFallback";
 import { resolveProjectHref, type SkillsConstellationProps } from "./types";
 
@@ -21,6 +22,7 @@ function useMediaQuery(query: string, fallback = false) {
   return matches;
 }
 
+const noopHover = () => {};
 
 export function SkillsConstellation({
   skills,
@@ -43,6 +45,7 @@ export function SkillsConstellation({
 
   const prefersReduced = useMediaQuery("(prefers-reduced-motion: reduce)");
   const mobile = useMediaQuery("(max-width: 767px)");
+  const touch = useMediaQuery("(pointer: coarse)");
   const reduced = reducedMotion ?? prefersReduced;
 
   const { nodes, edges } = useMemo(() => layoutSkills(skills, { vertical: mobile }), [skills, mobile]);
@@ -101,36 +104,39 @@ export function SkillsConstellation({
   }, []);
   const onSelect = useCallback((index: number) => setPinned((p) => (p === index ? null : index)), []);
 
-  if (!webgl) {
+  if (!webgl || (reduced && mobile)) {
     return <SkillsConstellationFallback skills={skills} labels={labels} projectHref={href} className={className} />;
   }
 
   const autoRotate = !reduced && !interacting && activeIndex === null;
+  const frameloop = !visible ? "never" : reduced ? "demand" : "always";
+  const hint = (touch && labels.hintTouch) || labels.hint;
 
   return (
     <div ref={container} className={`grid gap-6 lg:grid-cols-[minmax(0,1fr)_20rem] lg:items-stretch xl:grid-cols-[minmax(0,1fr)_22rem] ${className}`}>
-      <div className="relative h-[115vw] min-h-[24rem] max-h-[42rem] md:h-[60vw] lg:h-[36rem] xl:h-[40rem]">
-        <div aria-hidden className="absolute inset-0 touch-none">
+      <div className={`relative ${CANVAS_HEIGHT}`}>
+        <div aria-hidden className="absolute inset-0 touch-pan-y">
           {webgl && (
             <Canvas
               dpr={[1, 1.5]}
               gl={{ alpha: true, antialias: !mobile, powerPreference: "low-power" }}
               camera={{ position: [0, 0.8, 8.6], fov: 40 }}
-              frameloop={visible ? "always" : "never"}
+              frameloop={frameloop}
               onPointerMissed={() => setPinned(null)}
               style={{ background: "transparent" }}
             >
-              <ActivityPause frameloop={visible ? "always" : "never"} />
+              <ActivityPause frameloop={frameloop} />
               <ConstellationScene
                 nodes={nodes}
                 edges={edges}
                 activeIndex={activeIndex}
                 linked={linked}
-                onHover={setHovered}
+                onHover={touch ? noopHover : setHovered}
                 onSelect={onSelect}
                 autoRotate={autoRotate}
                 animate={!reduced}
                 mobile={mobile}
+                touch={touch}
                 labelRefs={labelRefs}
                 onInteractStart={onInteractStart}
                 onInteractEnd={onInteractEnd}
@@ -186,6 +192,7 @@ export function SkillsConstellation({
               {labels.groups[active.group]}
             </span>
             <h3 className="mt-4 text-h3 font-medium">{active.label}</h3>
+            {active.description ? <p className="mt-2 max-w-md text-sm text-ink-soft">{active.description}</p> : null}
             {active.weight ? (
               <div className="mt-4 flex gap-1" aria-hidden>
                 {Array.from({ length: 5 }, (_, i) => (
@@ -215,7 +222,7 @@ export function SkillsConstellation({
             ) : null}
           </div>
         ) : (
-          <p className="max-w-xs text-lead text-ink-soft">{labels.hint}</p>
+          <p className="max-w-xs text-lead text-ink-soft">{hint}</p>
         )}
 
         <ul className="mt-10 flex flex-wrap gap-x-5 gap-y-2 font-mono text-label uppercase text-ink-soft">

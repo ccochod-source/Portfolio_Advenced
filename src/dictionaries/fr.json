@@ -108,6 +108,7 @@
       "business": "Métier"
     },
     "hint": "Survolez une étoile pour voir les projets liés. Tab pour naviguer au clavier.",
+    "hintTouch": "Touchez une étoile pour voir les projets liés. Glissez pour faire tourner la constellation.",
     "fullList": "Voir la liste complète des compétences",
     "status": "{skill} — {group}"
   },

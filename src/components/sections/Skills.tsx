@@ -22,13 +22,14 @@ export function Skills({ lang, copy, skills, id = "stack", index = "04" }: Skill
     id: skill.id,
     label: t(skill.label, lang),
     group: skill.group,
+    description: t(skill.description, lang),
     weight: Math.min(5, Math.max(2, skill.relatedProjects.length + 1)),
     relatedProjects: skill.relatedProjects.flatMap((slug) => {
       const project = getProject(slug);
       return project ? [{ slug, title: project.title }] : [];
     }),
   }));
-  const labels = { groups: copy.groups, relatedProjects: copy.related, hint: copy.hint, status: copy.status };
+  const labels = { groups: copy.groups, relatedProjects: copy.related, hint: copy.hint, hintTouch: copy.hintTouch, status: copy.status };
 
   return (
     <section id={id} className="py-24 md:py-36">
