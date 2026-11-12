@@ -19,22 +19,22 @@ export type FeaturedProjectsProps = {
   index?: string;
 };
 
-/** « Selected Work »: a viewport-tall header with the gradient wordmark, then one full-bleed laptop card per featured project. */
+/** « Selected Work »: a half-viewport header with the gradient wordmark, then one laptop card per featured project (mock-up beside the copy from lg up, alternating sides). */
 export function FeaturedProjects({ lang, copy, projects, id = "projets", index = "02" }: FeaturedProjectsProps) {
   return (
-    <section id={id} aria-label={copy.featuredAria} className="pt-24 md:pt-36">
-      <Container className="flex min-h-[60svh] flex-col md:min-h-[72svh]">
+    <section id={id} aria-label={copy.featuredAria} className="pt-20 md:pt-28">
+      <Container className="flex min-h-[48svh] flex-col md:min-h-[52svh]">
         <Eyebrow index={index}>{copy.eyebrow}</Eyebrow>
         <TextReveal
           as="h2"
           type="words"
-          className="selected-work-wordmark mt-auto w-full pt-16 font-medium md:pt-24"
+          className="selected-work-wordmark mt-auto w-full pt-14 font-medium md:pt-20"
         >
           {copy.wordmark}
         </TextReveal>
       </Container>
 
-      <ol className="mt-16 md:mt-24">
+      <ol className="mt-10 md:mt-12">
         {projects.map((project, i) => {
           const cover = project.images[0];
           const href = `/${lang}/projets/${project.slug}`;
@@ -42,8 +42,8 @@ export function FeaturedProjects({ lang, copy, projects, id = "projets", index =
           const portrait = cover ? cover.height > cover.width : false;
           return (
             <li key={project.slug} data-project={project.slug} className={i % 2 === 1 ? "bg-cream-deep/40" : ""}>
-              <Container className="flex min-h-[80svh] flex-col justify-center py-16 md:py-28">
-                <MockupMotion className="mx-auto w-full max-w-[1120px]">
+              <Container className="grid min-h-[70svh] content-center items-center gap-10 py-14 md:gap-12 md:py-16 lg:grid-cols-12 lg:gap-16">
+                <MockupMotion className={`mx-auto w-full max-w-[880px] lg:col-span-7 ${i % 2 === 1 ? "lg:order-2" : ""}`}>
                   <Link
                     href={href}
                     aria-label={`${copy.view} : ${project.title}`}
@@ -57,7 +57,7 @@ export function FeaturedProjects({ lang, copy, projects, id = "projets", index =
                           alt={t(cover.alt, lang)}
                           width={cover.width}
                           height={cover.height}
-                          sizes="(max-width: 768px) calc(100vw - 3rem), (max-width: 1280px) 78vw, 960px"
+                          sizes="(max-width: 768px) calc(100vw - 3rem), (max-width: 1024px) 880px, (max-width: 1280px) 54vw, 700px"
                           preload={i === 0}
                           loading={i === 0 ? "eager" : "lazy"}
                           className={`absolute inset-0 size-full object-cover transition-transform duration-700 ease-out-expo group-hover:scale-[1.03] ${portrait ? "object-[50%_58%]" : "object-top"}`}
@@ -75,7 +75,7 @@ export function FeaturedProjects({ lang, copy, projects, id = "projets", index =
                   </Link>
                 </MockupMotion>
 
-                <Reveal className="mt-14 grid gap-8 md:mt-20 md:grid-cols-12 md:gap-12">
+                <Reveal className="grid gap-8 md:grid-cols-12 md:gap-12 lg:col-span-5 lg:block">
                   <div className="md:col-span-7">
                     <p className="flex flex-wrap items-center gap-3 font-mono text-label uppercase text-ink-soft">
                       <span className="text-sun-deep">0{i + 1}</span>
@@ -92,7 +92,7 @@ export function FeaturedProjects({ lang, copy, projects, id = "projets", index =
                       </Badge>
                     )}
                   </div>
-                  <div className="md:col-span-5">
+                  <div className="md:col-span-5 lg:mt-6">
                     <p className="text-lead text-ink-soft">{t(project.summary, lang)}</p>
                     <dl className="mt-8 grid grid-cols-2 gap-6 border-t border-ink/10 pt-6">
                       <div>
