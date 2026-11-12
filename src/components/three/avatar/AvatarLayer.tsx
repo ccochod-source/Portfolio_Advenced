@@ -3,10 +3,10 @@
 import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { ContactShadows } from "@react-three/drei";
-import { Group, MathUtils, Mesh, type Material } from "three";
+import { Group, MathUtils } from "three";
 import { useCanHover, useIsMobile, usePrefersReducedMotion } from "../hero/useHeroMotion";
 import { Avatar } from "./Avatar";
-import type { AvatarClip } from "./clips";
+import { WALK_CYCLE_S, WALK_STRIDE_M, type AvatarClip } from "./clips";
 import { AVATAR_TARGETS, STORY, getManifestoProgress, type AvatarSegment } from "@/lib/avatar/story";
 import { MEDIA } from "@/lib/motion/ease";
 import { useWebGL } from "../useWebGL";
@@ -19,9 +19,21 @@ const LAYER_HALF_H = LAYER_Z * Math.tan(MathUtils.degToRad(LAYER_FOV / 2));
 /** Height of the standing model in world units (feet at the group origin). */
 const MODEL_HEIGHT = 1.8;
 /** Facing while walking: ±90° would be a pure profile, this keeps a readable three-quarter view. */
-const WALK_YAW = Math.PI / 2 - 0.5;
+const WALK_YAW = Math.PI / 2 - 0.4;
 const SHADOW_OPACITY = 0.35;
 const CROSS_FADE = 0.5;
+/** Marks the canvas wrapper whose CSS opacity fades the whole layer. */
+const FADE_ATTR = "data-avatar-fade";
+/** Walk ⇄ Idle blends are quick so the character stops with the scroll instead of walking in place. */
+const WALK_FADE = 0.25;
+/** Ground speed (m/s, model units) above which horizontal motion reads as walking, and below which it stops. */
+const WALK_START_SPEED = 0.14;
+const WALK_STOP_SPEED = 0.06;
+/** Ground speed covered by the Walk clip at time scale 1. */
+const WALK_CLIP_SPEED = WALK_STRIDE_M / WALK_CYCLE_S;
+/** Playback range of the Walk clip: below, the feet slide a little rather than creep in slow motion. */
+const WALK_TIME_SCALE_MIN = 0.6;
+const WALK_TIME_SCALE_MAX = 2.4;
 
 /** Where the avatar should be this frame, in CSS pixels of the viewport (y = ground line under the feet). */
 type Target = {
@@ -174,26 +186,27 @@ type Motion = {
   pendingClip: AvatarClip | null;
   pendingSince: number;
   pinnedBandTop: number | null;
+  /** Last opacity written to the wrapper element. */
+  appliedAlpha: number;
 };
 
+/**
+ * The whole layer fades through the CSS opacity of the canvas wrapper (`FADE_ATTR`), so the model's own materials are
+ * never touched. (Cloning them and toggling `transparent` broke the head: the hair cap is an alpha-blended material, and
+ * forcing it opaque wrote its transparent fringe into the premultiplied canvas as alpha ≈ 0 — a hole showing the cream
+ * page as a white band along the hairline — and turned the glasses' 10 % lenses into solid white.)
+ */
 function Rig({ mobile, narrow }: { mobile: boolean; narrow: boolean }) {
   const group = useRef<Group>(null);
-  /** The avatar model alone (never the contact shadow): its materials are cloned to drive the fade. */
-  const body = useRef<Group>(null);
-  const shadow = useRef<Group>(null);
-  const { size } = useThree();
+  const { size, gl } = useThree();
+  const fade = useRef<HTMLElement | null>(null);
+  useEffect(() => {
+    fade.current = gl.domElement.closest<HTMLElement>(`[${FADE_ATTR}]`);
+  }, [gl]);
   const [play, setPlay] = useState<{ clip: AvatarClip; fade: number }>({ clip: "Idle", fade: CROSS_FADE });
   const clip = play.clip;
   const clipRef = useRef<AvatarClip>("Idle");
   const walkSpeed = useRef(1);
-  const materials = useRef<Material[] | null>(null);
-  useEffect(
-    () => () => {
-      materials.current?.forEach((mat) => mat.dispose());
-      materials.current = null;
-    },
-    [],
-  );
   const yaw = useRef(-0.35);
   const alpha = useRef(0);
   const m = useRef<Motion>({
@@ -209,6 +222,7 @@ function Rig({ mobile, narrow }: { mobile: boolean; narrow: boolean }) {
     pendingClip: null,
     pendingSince: 0,
     pinnedBandTop: null,
+    appliedAlpha: -1,
   });
 
   const onFinished = useCallback(() => {
@@ -216,7 +230,7 @@ function Rig({ mobile, narrow }: { mobile: boolean; narrow: boolean }) {
   }, []);
 
   /** Switches clip only once the request has held for a short dwell, so the storyline never flickers. */
-  const requestClip = (next: AvatarClip, now: number, immediate = false) => {
+  const requestClip = (next: AvatarClip, now: number, immediate = false, fadeSec = CROSS_FADE) => {
     const s = m.current;
     if (next === clipRef.current) {
       s.pendingClip = null;
@@ -229,7 +243,7 @@ function Rig({ mobile, narrow }: { mobile: boolean; narrow: boolean }) {
     if (!immediate && now - s.pendingSince < 120) return;
     s.pendingClip = null;
     clipRef.current = next;
-    setPlay({ clip: next, fade: CROSS_FADE });
+    setPlay({ clip: next, fade: fadeSec });
   };
 
   useFrame((_, delta) => {
@@ -259,15 +273,15 @@ function Rig({ mobile, narrow }: { mobile: boolean; narrow: boolean }) {
       s.oneShotDone = false;
       if (target.seg === "journeyEnter" || target.seg === "journeyExit") s.waved = false;
     }
-    const speed = Math.abs(s.vx);
-    if (target.walkable && speed > target.h * 0.07) {
+    // Ground speed in model metres per second (the model is MODEL_HEIGHT tall and target.h px high on screen).
+    const speed = (Math.abs(s.vx) / Math.max(1, target.h)) * MODEL_HEIGHT;
+    if (target.walkable && speed > WALK_START_SPEED) {
       s.walking = true;
       s.lastMoving = now;
-    } else if (!target.walkable || (speed < target.h * 0.025 && now - s.lastMoving > 200)) {
+    } else if (!target.walkable || (speed < WALK_STOP_SPEED && now - s.lastMoving > 120)) {
       s.walking = false;
     }
     if (s.walking) s.settledSince = now;
-    walkSpeed.current = MathUtils.clamp(speed / (target.h * 0.8), 0.75, 1.5);
 
     // Clip choice: hysteretic along the scroll, one-shots play once.
     let next: AvatarClip = "Idle";
@@ -290,38 +304,32 @@ function Rig({ mobile, narrow }: { mobile: boolean; narrow: boolean }) {
         next = s.celebrated ? "Idle" : "Celebrate";
       } else next = !s.celebrated && settled && target.alpha > 0.9 ? "Celebrate" : "Idle";
     }
-    requestClip(next, now, next === "Walk" || clipRef.current === "Walk" || s.oneShotDone);
+    const walkSwitch = next === "Walk" || clipRef.current === "Walk";
+    requestClip(next, now, walkSwitch || s.oneShotDone, walkSwitch ? WALK_FADE : CROSS_FADE);
 
     // Facing follows the walk direction, otherwise the segment's idle yaw; always turned smoothly.
-    const yawTarget = s.walking && speed > 1 ? Math.sign(s.vx) * WALK_YAW : target.idleYaw;
-    yaw.current = damp(yaw.current, yawTarget, 0.22, dt);
+    const yawTarget = s.walking ? Math.sign(s.vx) * WALK_YAW : target.idleYaw;
+    yaw.current = damp(yaw.current, yawTarget, 0.18, dt);
 
-    // Visibility: fade, and fully skip rendering when invisible or entirely outside the viewport.
+    // Walk playback locked to the ground speed (stride / cycle = distance covered per second at time scale 1),
+    // played backwards whenever the body still faces away from the direction of travel (mid-turn) so the planted
+    // foot always moves against the ground instead of moonwalking. Facing x = sin(yaw): yaw 0 faces the camera.
+    const facingX = Math.sin(yaw.current);
+    const forward = facingX * Math.sign(s.vx || 1) >= 0 ? 1 : -1;
+    walkSpeed.current = forward * MathUtils.clamp(speed / WALK_CLIP_SPEED, WALK_TIME_SCALE_MIN, WALK_TIME_SCALE_MAX);
+
+    // Visibility: the whole layer fades through the wrapper's CSS opacity (model and contact shadow together, materials
+    // untouched so the hair/glasses keep their alpha blending), and rendering is skipped entirely when invisible or
+    // outside the viewport.
     alpha.current = damp(alpha.current, target.alpha, 0.12, dt);
     const a = alpha.current;
+    if (fade.current && Math.abs(a - s.appliedAlpha) > 0.002) {
+      s.appliedAlpha = a;
+      fade.current.style.opacity = a >= 0.995 ? "1" : a.toFixed(3);
+    }
     const onScreen = target.x + target.h * 0.5 > 0 && target.x - target.h * 0.5 < W && target.y > -target.h * 0.1 && target.y - target.h < H * 1.1;
     g.visible = a > 0.01 && onScreen;
     if (!g.visible) return;
-
-    if (!materials.current && body.current) {
-      const list: Material[] = [];
-      body.current.traverse((child) => {
-        if (child instanceof Mesh && child.material) {
-          const mat = (child.material as Material).clone();
-          child.material = mat;
-          list.push(mat);
-        }
-      });
-      if (list.length) materials.current = list;
-    }
-    materials.current?.forEach((mat) => {
-      const translucent = a < 0.995;
-      if (mat.transparent !== translucent) mat.transparent = translucent;
-      mat.opacity = a;
-    });
-    shadow.current?.traverse((child) => {
-      if (child instanceof Mesh) (child.material as Material).opacity = SHADOW_OPACITY * a;
-    });
 
     // Screen px → world units: the pose is applied directly (scroll-anchored, no lag) — the scroll itself is smoothed by Lenis.
     const halfW = LAYER_HALF_H * (W / Math.max(1, H));
@@ -335,14 +343,8 @@ function Rig({ mobile, narrow }: { mobile: boolean; narrow: boolean }) {
 
   return (
     <group ref={group} visible={false}>
-      <group ref={body}>
-        <Avatar clip={clip} timeScaleRef={clip === "Walk" ? walkSpeed : undefined} crossFade={play.fade} playOnce={clip === "Wave" || clip === "Celebrate"} onFinished={onFinished} />
-      </group>
-      {!mobile && (
-        <group ref={shadow}>
-          <ContactShadows position={[0, 0.002, 0]} opacity={SHADOW_OPACITY} scale={3.2} blur={2.4} far={1.6} color="#6B4A3A" frames={Infinity} />
-        </group>
-      )}
+      <Avatar clip={clip} timeScaleRef={clip === "Walk" ? walkSpeed : undefined} crossFade={play.fade} playOnce={clip === "Wave" || clip === "Celebrate"} onFinished={onFinished} />
+      {!mobile && <ContactShadows position={[0, 0.002, 0]} opacity={SHADOW_OPACITY} scale={3.2} blur={2.4} far={1.6} color="#6B4A3A" frames={Infinity} />}
     </group>
   );
 }
@@ -390,7 +392,7 @@ export function AvatarLayer() {
   if (!webgl || reduced) return null;
 
   return (
-    <div aria-hidden className="pointer-events-none fixed inset-0 z-40">
+    <div {...{ [FADE_ATTR]: "" }} aria-hidden className="pointer-events-none fixed inset-0 z-40" style={{ opacity: 0 }}>
       <Canvas
         dpr={[1, mobile ? 1.25 : 1.5]}
         frameloop={frameloop}

@@ -54,7 +54,7 @@ the `Idle` first frame). No Avaturn, Mixamo or Ready Player Me animation data is
 |---|---|---|
 | `Idle` | `Idle_Loop` | Quaternius UAL 1 |
 | `SitIdle` | `Sitting_Idle_Loop` | Quaternius UAL 1 |
-| `Walk` | `Walk_Loop` (non-root-motion variant, Hips XZ stripped) | Quaternius UAL 1 |
+| `Walk` | `Walk_Formal_Loop` (upright relaxed walk; non-root-motion variant, Hips XZ stripped; ground speed 0.99 m/s measured from the planted foot and used by the app to lock playback to the scroll speed) | Quaternius UAL 1 |
 | `Wave` | `dataset-2_wave-right-hand_normal_001.bvh` (0–2.2 s + 5.0 s–end spliced) | Bandai Namco Research Motiondataset-2 |
 | `Celebrate` | `dataset-2_raise-up-both-hands_active_002.bvh` | Bandai Namco Research Motiondataset-2 |
 | `Typing` | `Sitting_Idle_Loop` + procedural overlay (torso/head pitched towards the lap, two-bone IK placing both hands over the keyboard, alternating key taps; `TYPING` in `make-clips.mjs`) | Quaternius UAL 1 |

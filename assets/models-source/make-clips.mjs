@@ -11,7 +11,8 @@
 //   --ual      Quaternius "Universal Animation Library" (CC0 1.0), file
 //              `Universal Animation Library[Standard]/Unreal-Godot/UAL1_Standard.glb`
 //              (https://quaternius.itch.io/universal-animation-library, ~16 MB, not committed).
-//              Clips used: Idle_Loop -> Idle, Sitting_Idle_Loop -> SitIdle, Walk_Loop -> Walk.
+//              Clips used: Idle_Loop -> Idle, Sitting_Idle_Loop -> SitIdle, Walk_Formal_Loop -> Walk
+//              (upright, relaxed arm swing; Walk_Loop is the hunched variant, --walk <clip> overrides).
 //   --mocap    Directory with the Bandai Namco Research Motiondataset-2 BVH files (CC BY-NC 4.0,
 //              https://github.com/BandaiNamcoResearchInc/Bandai-Namco-Research-Motiondataset),
 //              default ./mocap: dataset-2_wave-right-hand_normal_001.bvh -> Wave,
@@ -50,7 +51,7 @@ const mocapDir = opt('--mocap', path.join(here, 'mocap'));
 const CLIPS = [
   { name: 'Idle', src: 'ual', clip: 'Idle_Loop', loop: true },
   { name: 'SitIdle', src: 'ual', clip: 'Sitting_Idle_Loop', loop: true },
-  { name: 'Walk', src: 'ual', clip: 'Walk_Loop', loop: true, inPlace: true },
+  { name: 'Walk', src: 'ual', clip: opt('--walk', 'Walk_Formal_Loop'), loop: true, inPlace: true, stride: true },
   { name: 'Wave', src: 'bvh', file: 'dataset-2_wave-right-hand_normal_001.bvh', segments: [[0, 2.2], [5.0, Infinity]], splice: 0.3, ease: [0.3, 0.4] },
   { name: 'Celebrate', src: 'bvh', file: 'dataset-2_raise-up-both-hands_active_002.bvh', ease: [0.3, 0.3] },
   // Seated typing on a laptop resting on the lap: Sitting_Idle_Loop (torso sway, breathing) + a procedural overlay
@@ -426,6 +427,16 @@ for (const c of CLIPS) {
 
   // QA numbers
   const worlds = frames.map(fkTarget);
+  if (c.stride) {
+    // Ground speed of an in-place walk = speed of the planted foot sliding under the body (toe within 3 cm of the floor).
+    const speeds = [];
+    for (let i = 1; i < n; i++) for (const [nm, y0] of FOOT.slice(2)) {
+      if (worlds[i].get(nm).p.y - y0 < 0.03 && worlds[i - 1].get(nm).p.y - y0 < 0.03) speeds.push(Math.abs(worlds[i].get(nm).p.z - worlds[i - 1].get(nm).p.z) * FPS);
+    }
+    speeds.sort((a, b) => a - b);
+    const speed = speeds[Math.floor(speeds.length / 2)];
+    report.push(`${c.name}: ground speed ${speed.toFixed(3)} m/s -> stride ${(speed * (n - 1) / FPS).toFixed(3)} m per ${((n - 1) / FPS).toFixed(3)} s cycle (WALK_STRIDE_M / WALK_CYCLE_S in src/components/three/avatar/clips.ts)`);
+  }
   const footY = worlds.flatMap((w) => FOOT.map(([nm, y0]) => w.get(nm).p.y - y0));
   const hipsXZ = Math.max(...frames.map((f) => Math.hypot(f.hips.x - frames[0].hips.x, f.hips.z - frames[0].hips.z)));
   report.push(`${c.name.padEnd(9)} ${((n - 1) / FPS).toFixed(2)}s ${String(n).padStart(3)}f  feet Δy [${(Math.min(...footY) * 100).toFixed(1)}, ${(Math.max(...footY) * 100).toFixed(1)}] cm  hips y ${Math.min(...frames.map((f) => f.hips.y)).toFixed(2)}–${Math.max(...frames.map((f) => f.hips.y)).toFixed(2)}  xz drift ${(hipsXZ * 100).toFixed(1)} cm  floor fix ${(floor * 100).toFixed(1)} cm${seam ? `  seam ${seam.deg.toFixed(1)}° / ${seam.cm.toFixed(1)} cm` : ''}${idlePose && c.name !== 'Idle' ? `  vs Idle start ${poseDistance(frames[0], idlePose).deg.toFixed(1)}° end ${poseDistance(frames.at(-1), idlePose).deg.toFixed(1)}°` : ''}`);
