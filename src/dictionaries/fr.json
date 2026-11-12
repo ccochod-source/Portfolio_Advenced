@@ -72,6 +72,11 @@
     "otherTitle": "Études, prototypes et applications.",
     "featuredAria": "Projets mis en avant",
     "otherAria": "Autres projets",
+    "otherCount": "{count} projets",
+    "otherShow": "Voir les {count} projets",
+    "otherHide": "Masquer",
+    "otherTeaser": "Dont",
+    "otherMore": "+{count} autres",
     "stackAria": "Technologies",
     "tagsAria": "Mots-clés"
   },
