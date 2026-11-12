@@ -68,6 +68,11 @@
     "otherTitle": "Studies, prototypes and applications.",
     "featuredAria": "Featured projects",
     "otherAria": "Other projects",
+    "otherCount": "{count} projects",
+    "otherShow": "Show the {count} projects",
+    "otherHide": "Hide",
+    "otherTeaser": "Including",
+    "otherMore": "+{count} more",
     "figures": [
       {
         "value": 16000,
