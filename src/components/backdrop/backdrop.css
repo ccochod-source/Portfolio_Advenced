@@ -1,0 +1,153 @@
+/*
+ * Ambient golden-hour backdrop: a few large, very soft light blobs drifting slowly behind the cream
+ * sections, plus a faint haze / light-ray drift. Transform + opacity only, every layer promoted, so a
+ * frame costs one composite of a handful of layers and nothing else (no blur filter, no mask, no layout).
+ * Plain global CSS: the Turbopack `*.css` Tailwind rule in next.config.ts bypasses CSS modules.
+ */
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+  contain: strict;
+  /* Driven from JS: hero handoff (opacity) and page depth (warmth). */
+  --bd-fade: 0;
+  --bd-warmth: 0;
+  opacity: var(--bd-fade);
+}
+
+.backdrop[data-paused="true"] * {
+  animation-play-state: paused;
+}
+
+.backdrop-layer {
+  position: absolute;
+  will-change: transform;
+}
+
+/* Haze + light rays: a cream-deep / gold wash and faint oblique streaks, like late sun through a window. */
+.backdrop-haze {
+  inset: -14% -16%;
+  background:
+    repeating-linear-gradient(
+      112deg,
+      transparent 0px,
+      transparent 200px,
+      rgb(255 244 230 / 0.35) 280px,
+      rgb(255 193 69 / 0.05) 350px,
+      transparent 440px
+    ),
+    linear-gradient(115deg, transparent 0%, rgb(255 228 196 / 0.5) 30%, rgb(255 193 69 / 0.12) 50%, rgb(255 228 196 / 0.45) 70%, transparent 100%);
+  animation: backdrop-haze 140s ease-in-out infinite alternate;
+}
+
+/* Blobs: radial gradients instead of filter: blur() (same softness, no blur pass each frame). */
+.backdrop-blob {
+  border-radius: 50%;
+  width: var(--size);
+  height: var(--size);
+  background: radial-gradient(circle at center, var(--tint) 0%, transparent 68%);
+  animation: var(--anim) var(--dur) ease-in-out infinite alternate;
+}
+
+.backdrop-gold {
+  --size: min(80vw, 70rem);
+  --tint: rgb(255 193 69 / 0.22);
+  --anim: backdrop-drift-a;
+  --dur: 95s;
+  left: -22vw;
+  top: -18vh;
+}
+
+.backdrop-peach {
+  --size: min(72vw, 64rem);
+  --tint: rgb(255 170 100 / 0.2);
+  --anim: backdrop-drift-b;
+  --dur: 110s;
+  right: -24vw;
+  top: 10vh;
+}
+
+.backdrop-coral {
+  --size: min(64vw, 56rem);
+  --tint: rgb(255 90 78 / 0.12);
+  --anim: backdrop-drift-c;
+  --dur: 125s;
+  left: 18vw;
+  bottom: -32vh;
+}
+
+/* Warmer toward the end of the page (journey / contact): a sunset glow rising from the bottom. */
+.backdrop-warm {
+  inset: auto -10% -30% -10%;
+  height: 90vh;
+  background:
+    radial-gradient(60% 70% at 20% 100%, rgb(255 122 26 / 0.16) 0%, transparent 70%),
+    radial-gradient(60% 70% at 85% 100%, rgb(255 90 78 / 0.12) 0%, transparent 70%),
+    linear-gradient(180deg, transparent 0%, rgb(255 193 69 / 0.1) 100%);
+  opacity: var(--bd-warmth);
+  transition: opacity 0.6s linear;
+}
+
+/* Veil: keeps the brightest light at the margins, so the text column only gets a soft wash (WCAG AA). */
+.backdrop-veil {
+  inset: 0;
+  background: radial-gradient(60% 55% at 50% 45%, rgb(255 244 230 / 0.5) 0%, rgb(255 244 230 / 0.2) 60%, transparent 100%);
+  will-change: auto;
+}
+
+@keyframes backdrop-haze {
+  to {
+    transform: translate3d(10%, 8%, 0);
+  }
+}
+
+@keyframes backdrop-drift-a {
+  to {
+    transform: translate3d(22vw, 16vh, 0) scale(1.15);
+  }
+}
+
+@keyframes backdrop-drift-b {
+  to {
+    transform: translate3d(-20vw, 24vh, 0) scale(0.9);
+  }
+}
+
+@keyframes backdrop-drift-c {
+  to {
+    transform: translate3d(-16vw, -22vh, 0) scale(1.2);
+  }
+}
+
+/* Mobile: two blobs, no coral, bigger so they still fill the narrow viewport. */
+@media (max-width: 767px) {
+  .backdrop-gold {
+    --size: 130vw;
+    left: -45vw;
+    top: -25vh;
+  }
+
+  .backdrop-peach {
+    --size: 120vw;
+    right: -55vw;
+    top: 30vh;
+  }
+
+  .backdrop-coral {
+    display: none;
+  }
+}
+
+/* Reduced motion: the same soft light, still. */
+@media (prefers-reduced-motion: reduce) {
+  .backdrop-layer {
+    animation: none;
+    will-change: auto;
+  }
+
+  .backdrop-warm {
+    transition: none;
+  }
+}
