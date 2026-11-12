@@ -62,7 +62,7 @@ export function layoutSkills(skills: ConstellationSkill[], { vertical = false }:
       nodes.push({
         skill,
         index: skills.indexOf(skill),
-        position: vertical ? [py * 1.05, px * 0.9, pz] : [px, py, pz],
+        position: vertical ? [py * 1.12, px * 0.82, pz] : [px, py, pz],
         radius: nodeRadius(skill.weight),
         color: GROUP_COLORS[group],
       });

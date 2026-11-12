@@ -4,6 +4,8 @@ export type ConstellationSkill = {
   id: string;
   label: string;
   group: SkillGroup;
+  /** One-line description shown in the detail card when the skill is selected. */
+  description?: string;
   weight?: number;
   relatedProjects?: { slug: string; title: string }[];
 };
@@ -12,6 +14,8 @@ export type ConstellationLabels = {
   groups: Record<SkillGroup, string>;
   relatedProjects: string;
   hint: string;
+  /** Hint shown instead of `hint` on touch devices (no hover), e.g. "Touchez une étoile…". */
+  hintTouch?: string;
   /** Live-region template, e.g. "{skill} — {group}" (optional for labs). */
   status?: string;
 };

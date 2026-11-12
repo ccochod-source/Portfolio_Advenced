@@ -3,11 +3,12 @@
 import dynamic from "next/dynamic";
 import { useEffect, useRef, useState } from "react";
 import { SkillsConstellationFallback } from "./SkillsConstellationFallback";
+import { CANVAS_HEIGHT } from "./sizes";
 import type { SkillsConstellationProps } from "./types";
 
 const SkillsConstellation = dynamic(() => import("./SkillsConstellation").then((m) => m.SkillsConstellation), {
   ssr: false,
-  loading: () => <div className="h-[115vw] min-h-[24rem] max-h-[42rem] md:h-[60vw] lg:h-[36rem] xl:h-[40rem]" aria-hidden />,
+  loading: () => <div className={CANVAS_HEIGHT} aria-hidden />,
 });
 
 /**
@@ -37,7 +38,7 @@ export function SkillsConstellationLazy(props: SkillsConstellationProps) {
 
   if (!near) {
     return (
-      <div ref={ref} className="min-h-[24rem] md:min-h-[min(60vw,42rem)] lg:min-h-[36rem] xl:min-h-[40rem]">
+      <div ref={ref} className="min-h-[min(100vw,70svh)] md:min-h-[min(60vw,42rem)] lg:min-h-[36rem] xl:min-h-[40rem]">
         <SkillsConstellationFallback
           skills={props.skills}
           labels={props.labels}

@@ -90,6 +90,7 @@
       "business": "Business"
     },
     "hint": "Hover a star to see related projects. Tab to navigate with the keyboard.",
+    "hintTouch": "Tap a star to see related projects. Drag to rotate the constellation.",
     "fullList": "See the full list of skills",
     "status": "{skill} — {group}"
   },
