@@ -52,8 +52,23 @@ export function scrollTo(target: ScrollTarget, options: ScrollToOptions = {}) {
   };
 
   if (lenis) {
-    lenis.resize();
-    lenis.scrollTo(resolved, { offset, immediate, duration, force: true, onComplete: done });
+    const instance = lenis;
+    instance.resize();
+    // Lenis resolves the element to a y position up front; a lazy chunk mounting below the fold during the scroll
+    // (e.g. the skills constellation) shifts the target, so correct the residual drift once the scroll settles.
+    const anchor = resolved instanceof HTMLElement ? resolved : null;
+    const anchorTop = anchor ? anchor.getBoundingClientRect().top + window.scrollY : 0;
+    const settle = () => {
+      if (anchor && !immediate) {
+        const drift = anchor.getBoundingClientRect().top + window.scrollY - anchorTop;
+        if (Math.abs(drift) > 1) {
+          instance.scrollTo(instance.scroll + drift, { duration: 0.5, force: true, onComplete: done });
+          return;
+        }
+      }
+      done();
+    };
+    instance.scrollTo(resolved, { offset, immediate, duration, force: true, onComplete: settle });
     return true;
   }
 
