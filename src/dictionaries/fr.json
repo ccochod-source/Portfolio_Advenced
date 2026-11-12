@@ -62,39 +62,16 @@
   },
   "projects": {
     "eyebrow": "Projets sélectionnés",
-    "title": "Cinq projets où l'IA répond à un besoin concret.",
     "cta": "Lire l'étude de cas",
+    "wordmark": "Selected Work",
+    "view": "Voir le projet",
+    "yearLabel": "Année",
+    "roleLabel": "Rôle",
+    "mockupAria": "Aperçu du projet sur un ordinateur portable",
     "otherEyebrow": "Autres projets",
     "otherTitle": "Études, prototypes et applications.",
     "featuredAria": "Projets mis en avant",
     "otherAria": "Autres projets",
-    "figures": [
-      {
-        "value": 16000,
-        "prefix": "",
-        "suffix": "+",
-        "label": "pages de documentation interrogeables par RAG"
-      },
-      {
-        "value": 19,
-        "prefix": "",
-        "suffix": "",
-        "label": "tableaux de bord livrés"
-      },
-      {
-        "value": 22000,
-        "prefix": "",
-        "suffix": "",
-        "label": "entrées reprises"
-      },
-      {
-        "value": 400,
-        "prefix": "~",
-        "suffix": "",
-        "label": "anomalies détectées"
-      }
-    ],
-    "figuresAria": "Chiffres clés",
     "stackAria": "Technologies",
     "tagsAria": "Mots-clés"
   },

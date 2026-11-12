@@ -297,3 +297,104 @@ html.has-custom-cursor [data-cursor="view"] * {
     transform: translateY(calc((1 - var(--reveal)) * 28px));
   }
 }
+
+/* Selected Work — wordmark and CSS laptop mock-up (append-only block) */
+
+/* The split words are composited on their own, so the parent's text clip misses them: the gradient is repeated per word. */
+.selected-work-wordmark,
+.selected-work-wordmark .motion-line > * {
+  background-image: linear-gradient(to bottom, var(--color-sun), var(--color-coral));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.selected-work-wordmark {
+  font-size: clamp(4rem, 14vw, 13rem);
+  line-height: 0.86;
+  letter-spacing: -0.06em;
+  padding-bottom: 0.08em;
+  overflow-wrap: anywhere;
+}
+
+.macbook {
+  container-type: inline-size;
+  position: relative;
+  isolation: isolate;
+  width: 100%;
+  padding-bottom: 2cqw;
+}
+
+.macbook-lid {
+  position: relative;
+  margin: 0 auto;
+  width: 86%;
+  border-radius: 2.2cqw 2.2cqw 0 0;
+  padding: 1cqw 1cqw 0;
+  background: linear-gradient(180deg, #eef0f3 0%, #d5d8de 100%);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.7),
+    inset 0 -1px 0 rgba(43, 26, 18, 0.18);
+}
+
+.macbook-bezel {
+  position: relative;
+  border-radius: 1.4cqw 1.4cqw 0 0;
+  padding: 1.5cqw 1.1cqw 1.6cqw;
+  background: #0b0b0d;
+}
+
+.macbook-camera {
+  position: absolute;
+  top: 0.55cqw;
+  left: 50%;
+  width: 0.5cqw;
+  height: 0.5cqw;
+  margin-left: -0.25cqw;
+  border-radius: 50%;
+  background: #1c1e23;
+  box-shadow: inset 0 0 0 0.12cqw #353840;
+}
+
+.macbook-screen {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  border-radius: 0.5cqw 0.5cqw 0.2cqw 0.2cqw;
+  background: var(--color-cream-deep);
+}
+
+.macbook-base {
+  position: relative;
+  height: 2.3cqw;
+  width: 100%;
+  border-radius: 0.4cqw 0.4cqw 1.8cqw 1.8cqw;
+  background: linear-gradient(180deg, #f3f4f6 0%, #d9dce1 40%, #b7bcc4 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    0 1px 0 rgba(43, 26, 18, 0.3),
+    0 2cqw 3cqw -1.5cqw rgba(43, 26, 18, 0.35);
+}
+
+.macbook-notch {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 14cqw;
+  height: 0.8cqw;
+  transform: translateX(-50%);
+  border-radius: 0 0 1cqw 1cqw;
+  background: linear-gradient(180deg, #a3a8b1, #c9cdd4);
+}
+
+.macbook-shadow {
+  position: absolute;
+  z-index: -1;
+  left: 4%;
+  right: 4%;
+  bottom: -1.5cqw;
+  height: 6cqw;
+  border-radius: 50%;
+  background: radial-gradient(50% 50% at 50% 50%, rgba(43, 26, 18, 0.32), transparent 72%);
+  filter: blur(1.5cqw);
+}
