@@ -62,9 +62,9 @@ export const STORY = {
     /** Pin progress range covered by the walk across the band (the rest is settling time). */
     walkFrom: 0.04,
     walkTo: 0.94,
-    /** Narrow screens (no pin): the walk is driven by the band's bottom edge moving from 0.98H up to 0.38H. */
-    narrowFrom: 0.98,
-    narrowTo: 0.38,
+    /** Narrow screens (no pin): the walk is driven by the band's bottom edge moving from 0.78H up to 0.32H (the hero has faded out by then). */
+    narrowFrom: 0.78,
+    narrowTo: 0.32,
     /** Vertical distance (in H) the band travels after the pin while the avatar walks off the right edge. */
     exitTravel: 0.3,
     narrowExitTo: 0.13,
@@ -72,10 +72,10 @@ export const STORY = {
   journey: {
     /** Timeline rule position (in H) where the avatar starts / finishes walking in from the right. */
     enterFrom: 1.02,
-    enterTo: 0.58,
-    /** Rule position (in H) where it walks back off the right edge. */
-    exitFrom: 0.4,
-    exitTo: 0.18,
+    enterTo: 0.68,
+    /** Rule position (in H) where it walks back off the right edge (long enough a stay for the wave to play out). */
+    exitFrom: 0.3,
+    exitTo: 0.12,
   },
   contact: {
     /** Footer top (in H) where the avatar walks in from the right / is settled next to the headline. */

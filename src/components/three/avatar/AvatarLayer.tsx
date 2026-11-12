@@ -124,22 +124,24 @@ function computeTarget(r: Rects, env: Env): Target {
     const sit: Target = { seg: "hero", x: focus.x, y: focus.y, h: focus.h, alpha: 1, idleYaw: -0.35, walkable: false, heroExit: exit };
     if (!r.band) return sit;
     if (narrow) {
+      // Once faded out, hand over to the band branch so the walk starts from its first step instead of mid-band.
       const fade = range(exit, STORY.hero.fadeStart, STORY.hero.fadeEnd);
-      return { ...sit, alpha: 1 - smooth(fade) };
+      if (fade < 1) return { ...sit, alpha: 1 - smooth(fade) };
+    } else {
+      const u = smooth(range(exit, STORY.hero.walkStart, STORY.hero.walkEnd));
+      if (u <= 0) return sit;
+      const start = bandPose(r.band, 0, H, narrow);
+      return {
+        seg: "heroExit",
+        x: lerp(sit.x, start.x, u),
+        y: lerp(sit.y, start.y, u),
+        h: lerp(sit.h, start.h, u),
+        alpha: 1,
+        idleYaw: -0.35,
+        walkable: true,
+        heroExit: exit,
+      };
     }
-    const u = smooth(range(exit, STORY.hero.walkStart, STORY.hero.walkEnd));
-    if (u <= 0) return sit;
-    const start = bandPose(r.band, 0, H, narrow);
-    return {
-      seg: "heroExit",
-      x: lerp(sit.x, start.x, u),
-      y: lerp(sit.y, start.y, u),
-      h: lerp(sit.h, start.h, u),
-      alpha: 1,
-      idleYaw: -0.35,
-      walkable: true,
-      heroExit: exit,
-    };
   }
 
   // 2. Manifesto band: walk across while pinned (desktop) or while the band scrolls through (narrow), then walk off right.

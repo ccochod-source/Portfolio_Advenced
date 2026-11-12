@@ -189,7 +189,7 @@ export function AvatarStage({
       {webgl && (
         <Canvas
           dpr={[1, 1.5]}
-          shadows
+          shadows="percentage"
           camera={{ position: [0, 0.15, cameraZ], fov: 32 }}
           gl={{
             antialias: true,
