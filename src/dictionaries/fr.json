@@ -1,13 +1,16 @@
 {
   "meta": {
     "title": "Clément Cochod — IA × Business",
-    "description": "Étudiant à Eugenia School en IA, Data & Business. Je transforme des besoins métier en outils IA. En recherche d'une alternance IA pour septembre 2027."
+    "description": "Étudiant à Eugenia School en IA, Data & Business. Je transforme des besoins métier en outils IA. En recherche d'une alternance IA pour septembre 2027.",
+    "ogAlt": "Clément Cochod — IA × Business, portfolio",
+    "siteName": "Clément Cochod"
   },
   "hero": {
     "eyebrow": "Eugenia School · IA, Data & Business",
-    "title": "Je transforme des besoins métier en outils IA.",
+    "title": "Je transforme des besoins métier en outils IA.",
     "status": "Alternance IA · septembre 2027",
-    "wip": "Site en construction"
+    "ctaProjects": "Voir mes projets",
+    "ctaContact": "Me contacter"
   },
   "langSwitch": {
     "label": "EN",
@@ -18,7 +21,10 @@
     "projects": "Projets",
     "journey": "Parcours",
     "contact": "Contact",
-    "cta": "Me contacter"
+    "cta": "Me contacter",
+    "menu": "Menu",
+    "close": "Fermer le menu",
+    "skip": "Aller au contenu"
   },
   "footer": {
     "eyebrow": "Contact",
@@ -26,7 +32,119 @@
     "emailPersonal": "Email perso",
     "emailPro": "Email pro",
     "phone": "Téléphone",
-    "cv": "Télécharger mon CV",
-    "made": "Conçu et codé à Paris"
+    "cv": "Télécharger mon CV (PDF)",
+    "made": "Conçu et codé à Paris",
+    "phoneDisplay": "07 43 70 05 96"
+  },
+  "manifesto": {
+    "eyebrow": "Manifeste",
+    "headline": "IA × Business.",
+    "intro": "Je ne construis pas des démos : je pars d'un besoin métier réel et je livre un outil que des équipes utilisent le lendemain.",
+    "promises": [
+      {
+        "title": "Comprendre le besoin",
+        "text": "Avant la première ligne de code : entretiens, processus réel, cas limites. Huit entretiens pour AR Plate, cinq périmètres cadrés avec les équipes de la Brasserie de Tahiti."
+      },
+      {
+        "title": "Construire vite avec l'IA",
+        "text": "RAG, agents, extraction de documents : l'IA est une étape contrôlée du produit, pas un gadget. Cinq applications en huit semaines, un agent computer use en 36 heures."
+      },
+      {
+        "title": "Mesurer",
+        "text": "22 000 entrées reprises, environ 400 anomalies détectées, 19 tableaux de bord, 1 018 tests : ce qui n'est pas mesuré n'est pas livré."
+      },
+      {
+        "title": "Livrer à de vrais utilisateurs",
+        "text": "Tests utilisateurs, droits, exports, documentation. Un site en production chez Auralife, des outils en service à Tahiti, un agent qui agit sous les yeux de l'utilisateur."
+      }
+    ]
+  },
+  "projects": {
+    "eyebrow": "Projets sélectionnés",
+    "title": "Cinq projets où l'IA répond à un besoin concret.",
+    "cta": "Lire l'étude de cas",
+    "otherEyebrow": "Autres projets",
+    "otherTitle": "Études, prototypes et applications.",
+    "featuredAria": "Projets mis en avant",
+    "otherAria": "Autres projets",
+    "figures": [
+      {
+        "value": 16000,
+        "prefix": "",
+        "suffix": "+",
+        "label": "pages de documentation interrogeables par RAG"
+      },
+      {
+        "value": 19,
+        "prefix": "",
+        "suffix": "",
+        "label": "tableaux de bord livrés"
+      },
+      {
+        "value": 22000,
+        "prefix": "",
+        "suffix": "",
+        "label": "entrées reprises"
+      },
+      {
+        "value": 400,
+        "prefix": "~",
+        "suffix": "",
+        "label": "anomalies détectées"
+      }
+    ],
+    "figuresAria": "Chiffres clés",
+    "stackAria": "Technologies",
+    "tagsAria": "Mots-clés"
+  },
+  "skills": {
+    "eyebrow": "Stack",
+    "title": "L'IA d'abord, le code pour la livrer, le métier pour la rendre utile.",
+    "related": "Projets liés",
+    "groups": {
+      "ai": "Intelligence artificielle",
+      "build": "Construire",
+      "business": "Métier"
+    },
+    "hint": "Survolez une étoile pour voir les projets liés. Tab pour naviguer au clavier.",
+    "fullList": "Voir la liste complète des compétences",
+    "status": "{skill} — {group}"
+  },
+  "journey": {
+    "eyebrow": "Parcours",
+    "title": "D'Annecy à Tahiti, et retour à Paris.",
+    "cta": "Parlons-en",
+    "open": "Étape ouverte"
+  },
+  "project": {
+    "eyebrow": "Étude de cas",
+    "back": "Tous les projets",
+    "context": "Contexte",
+    "role": "Mon rôle",
+    "approach": "Démarche",
+    "stack": "Stack",
+    "skills": "Compétences",
+    "results": "Résultats",
+    "gallery": "En images",
+    "links": "Liens",
+    "next": "Projet suivant",
+    "year": "Année",
+    "category": "Catégorie",
+    "contact": "Me contacter"
+  },
+  "preloader": {
+    "greeting": "Bonjour.",
+    "label": "Clément Cochod — Portfolio",
+    "skipHint": "Cliquer ou Échap pour passer"
+  },
+  "common": {
+    "cursorView": "Voir"
+  },
+  "notFound": {
+    "eyebrow": "Erreur 404",
+    "title": "Cette page n'existe pas.",
+    "text": "Le lien est peut-être ancien, ou l'adresse mal saisie. Les projets et le contact sont à un clic.",
+    "home": "Retour à l'accueil",
+    "projects": "Voir les projets"
   }
 }

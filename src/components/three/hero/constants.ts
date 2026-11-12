@@ -1,0 +1,23 @@
+export type Vec3Tuple = readonly [number, number, number];
+
+/** World-space position of the luminous "sun / neural" form where the avatar sits (landscape viewports). */
+export const HERO_FOCUS_POSITION: Vec3Tuple = [1.35, -1.25, 0];
+
+/** Same form on portrait viewports, where the camera widens: lower and closer to the centre. */
+export const HERO_FOCUS_POSITION_PORTRAIT: Vec3Tuple = [0.9, -2.1, 0];
+
+export const heroFocusFor = (aspect: number): Vec3Tuple => (aspect < 1 ? HERO_FOCUS_POSITION_PORTRAIT : HERO_FOCUS_POSITION);
+
+export const HERO_CAMERA_Z = 6;
+
+export const PALETTE = {
+  cream: "#fff4e6",
+  creamDeep: "#ffe4c4",
+  gold: "#ffc145",
+  sun: "#ff7a1a",
+  coral: "#ff5a4e",
+  inkSoft: "#6b4a3a",
+  ink: "#2b1a12",
+} as const;
+
+export const PARTICLE_COUNT = { desktop: 1500, mobile: 400 } as const;

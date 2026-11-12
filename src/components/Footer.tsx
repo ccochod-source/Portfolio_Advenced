@@ -3,13 +3,14 @@ import { profile } from "@/content/profile";
 import { Button } from "./ui/Button";
 import { Container } from "./ui/Container";
 import { Eyebrow } from "./ui/Eyebrow";
+import { Year } from "./ui/Year";
 
 export async function Footer() {
   const { footer } = await getDictionary();
   const contacts = [
     { label: footer.emailPersonal, value: profile.emailPersonal, href: `mailto:${profile.emailPersonal}` },
     { label: footer.emailPro, value: profile.emailPro, href: `mailto:${profile.emailPro}` },
-    { label: footer.phone, value: profile.phone, href: profile.phoneHref },
+    { label: footer.phone, value: footer.phoneDisplay, href: profile.phoneHref },
   ];
 
   return (
@@ -22,9 +23,9 @@ export async function Footer() {
           <dl className="grid gap-6 md:grid-cols-3">
             {contacts.map((c) => (
               <div key={c.href}>
-                <dt className="font-mono text-label uppercase text-cream/50">{c.label}</dt>
+                <dt className="font-mono text-label uppercase text-cream/60">{c.label}</dt>
                 <dd className="mt-2">
-                  <a href={c.href} className="whitespace-nowrap text-lg underline-offset-4 hover:text-gold hover:underline">
+                  <a href={c.href} className="touch-target whitespace-nowrap text-lg underline decoration-cream/30 underline-offset-4 hover:text-gold hover:decoration-current">
                     {c.value}
                   </a>
                 </dd>
@@ -44,8 +45,10 @@ export async function Footer() {
           </div>
         </div>
 
-        <div className="mt-20 flex flex-wrap justify-between gap-4 border-t border-cream/15 py-6 font-mono text-label uppercase text-cream/50">
-          <span>© 2026 Clément Cochod</span>
+        <div className="mt-20 flex flex-wrap justify-between gap-4 border-t border-cream/15 py-6 font-mono text-label uppercase text-cream/60">
+          <span>
+            © <Year /> Clément Cochod
+          </span>
           <span>{footer.made}</span>
         </div>
       </Container>
