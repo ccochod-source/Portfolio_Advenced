@@ -1,3 +1,4 @@
+import { Backdrop } from "@/components/backdrop/Backdrop";
 import { Footer } from "@/components/Footer";
 import { FeaturedProjects } from "@/components/sections/FeaturedProjects";
 import { AvatarLayerLazy } from "@/components/three/avatar/AvatarLayerLazy";
@@ -16,6 +17,7 @@ export default async function Home() {
 
   return (
     <>
+      <Backdrop />
       <main id="main" tabIndex={-1} className="outline-none">
         <Hero lang={lang} copy={dict.hero} />
         <Manifesto copy={dict.manifesto} index="01" />
