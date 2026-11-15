@@ -40,6 +40,8 @@ export function FeaturedProjects({ lang, copy, projects, id = "projets", index =
           const href = `/${lang}/projets/${project.slug}`;
           const role = project.roleShort ?? project.role;
           const portrait = cover ? cover.height > cover.width : false;
+          // Landscape captures keep their own ratio (16:10 to 16:9) so `object-cover` never trims their sides.
+          const aspect = cover && !portrait ? Math.min(16 / 9, Math.max(16 / 10, cover.width / cover.height)) : undefined;
           return (
             <li key={project.slug} data-project={project.slug} className={i % 2 === 1 ? "bg-cream-deep/40" : ""}>
               <Container className="grid min-h-[70svh] content-center items-center gap-10 py-14 md:gap-12 md:py-16 lg:grid-cols-12 lg:gap-16">
@@ -50,7 +52,7 @@ export function FeaturedProjects({ lang, copy, projects, id = "projets", index =
                     data-cursor="view"
                     className="group relative block rounded-[2rem] outline-offset-8"
                   >
-                    <MacBook>
+                    <MacBook aspect={aspect}>
                       {cover && (
                         <Image
                           src={cover.src}
@@ -65,9 +67,10 @@ export function FeaturedProjects({ lang, copy, projects, id = "projets", index =
                       )}
                       <span aria-hidden className="absolute inset-0 bg-ink/0 transition-colors duration-500 group-hover:bg-ink/10" />
                     </MacBook>
+                    {/* Under md the pill sits below the laptop so it never covers the capture. */}
                     <span
                       aria-hidden
-                      className="absolute left-1/2 top-[44%] inline-flex -translate-x-1/2 -translate-y-1/2 items-center gap-2 whitespace-nowrap rounded-full bg-cream/90 px-5 py-3 text-sm font-medium text-ink shadow-[0_12px_40px_-12px_rgba(43,26,18,0.45)] backdrop-blur transition-transform duration-500 ease-out-expo group-hover:scale-105 md:px-6 md:py-3.5 md:text-base"
+                      className="mx-auto mt-4 flex w-fit items-center gap-2 whitespace-nowrap rounded-full bg-cream/90 px-5 py-3 text-sm font-medium text-ink shadow-[0_12px_40px_-12px_rgba(43,26,18,0.45)] backdrop-blur transition-transform duration-500 ease-out-expo group-hover:scale-105 md:absolute md:left-1/2 md:top-[44%] md:mt-0 md:-translate-x-1/2 md:-translate-y-1/2 md:px-6 md:py-3.5 md:text-base"
                     >
                       {copy.view}
                       <span className="transition-transform duration-300 ease-out-expo group-hover:translate-x-1">→</span>

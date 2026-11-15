@@ -166,12 +166,22 @@ type LabelProjectorProps = {
   mobile: boolean;
 };
 
+type Queued = { el: HTMLElement; rank: number; x: number; y: number; scale: number; keep: boolean };
+/** Per-frame scratch lists of the mobile label layout (one constellation on the page). */
+const labelQueue: Queued[] = [];
+const labelBoxes: Box[] = [];
+type Box = { x0: number; y0: number; x1: number; y1: number };
+const LABEL_GAP = 3;
+const overlaps = (a: Box, b: Box) => a.x0 < b.x1 + LABEL_GAP && a.x1 + LABEL_GAP > b.x0 && a.y0 < b.y1 + LABEL_GAP && a.y1 + LABEL_GAP > b.y0;
+
 function LabelProjector({ nodes, world, labelRefs, activeIndex, linked, mobile }: LabelProjectorProps) {
   useFrame(({ camera, size }) => {
     const parent = world.current;
     const els = labelRefs.current;
     if (!parent || !els) return;
     const camDist = camera.position.length();
+    const queue = labelQueue;
+    queue.length = 0;
     nodes.forEach((node, i) => {
       const el = els[i];
       if (!el) return;
@@ -189,7 +199,44 @@ function LabelProjector({ nodes, world, labelRefs, activeIndex, linked, mobile }
       el.style.transform = `translate(-50%, 0) translate(${x.toFixed(1)}px, ${y.toFixed(1)}px) scale(${scale.toFixed(3)})`;
       el.style.opacity = opacity.toFixed(3);
       el.style.zIndex = String(Math.round((camDist * 2 - dist) * 10) + (state === "active" ? 1000 : 0));
+      if (mobile && opacity > 0) {
+        // Nearest first within a state; the pinned skill, then its links, keep their place before the others.
+        const keep = state === "active" || state === "linked";
+        queue.push({ el, rank: (state === "active" ? 0 : state === "linked" ? 100 : 200) + dist, x, y, scale, keep });
+      }
     });
+    if (!mobile) return;
+
+    // Narrow screens: labels of a dense cluster would print over each other. In priority order, a label that collides
+    // slides under the ones already placed; if there is no room nearby it is dropped,
+    // except the pinned skill and its links, which always stay readable.
+    const boxes = labelBoxes;
+    boxes.length = 0;
+    queue.sort((a, b) => a.rank - b.rank);
+    for (const { el, x, y, scale, keep } of queue) {
+      const w = el.offsetWidth * scale;
+      const h = el.offsetHeight * scale;
+      // The label scales around its centre: `inset` is how far its drawn top sits below the translated top.
+      const inset = (el.offsetHeight - h) / 2;
+      const box: Box = { x0: x - w / 2, x1: x + w / 2, y0: y + inset, y1: y + inset + h };
+      const limit = box.y0 + h * (keep ? 6 : 1.6);
+      let free = false;
+      for (let pass = 0; pass < 12 && !free; pass++) {
+        const hit = boxes.find((other) => overlaps(box, other));
+        if (!hit) free = true;
+        else {
+          box.y0 = hit.y1 + LABEL_GAP + 0.5;
+          box.y1 = box.y0 + h;
+          if (box.y0 > limit) break;
+        }
+      }
+      if (!free && !keep) {
+        el.style.opacity = "0";
+        continue;
+      }
+      boxes.push(box);
+      if (box.y0 !== y + inset) el.style.transform = `translate(-50%, 0) translate(${x.toFixed(1)}px, ${(box.y0 - inset).toFixed(1)}px) scale(${scale.toFixed(3)})`;
+    }
   });
   return null;
 }

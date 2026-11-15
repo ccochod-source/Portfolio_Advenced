@@ -2,7 +2,6 @@
 
 import { useEffect, useRef } from "react";
 import { ZOOM, getZoomProgress, subscribeZoom } from "@/lib/hero/zoom";
-import "./backdrop.css";
 
 const clamp01 = (value: number) => Math.min(1, Math.max(0, value));
 

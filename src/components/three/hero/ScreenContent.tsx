@@ -114,6 +114,10 @@ export function ScreenContent() {
       if (canvas.width !== tw || canvas.height !== th) {
         canvas.width = tw;
         canvas.height = th;
+        // three allocates immutable GPU storage (texStorage2D) on the first upload: a canvas of another size would be
+        // written into the old allocation, i.e. the page drawn at the wrong scale (doubled text at handover whenever the
+        // viewport changed after the first paint, e.g. the scrollbar appearing once the preloader unlocks the page).
+        texture.dispose();
       }
       const ctx = canvas.getContext("2d");
       if (!ctx) return;

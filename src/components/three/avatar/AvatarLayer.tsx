@@ -26,14 +26,20 @@ const CROSS_FADE = 0.5;
 const FADE_ATTR = "data-avatar-fade";
 /** Walk ⇄ Idle blends are quick so the character stops with the scroll instead of walking in place. */
 const WALK_FADE = 0.25;
-/** Ground speed (m/s, model units) above which horizontal motion reads as walking, and below which it stops. */
-const WALK_START_SPEED = 0.14;
-const WALK_STOP_SPEED = 0.06;
 /** Ground speed covered by the Walk clip at time scale 1. */
 const WALK_CLIP_SPEED = WALK_STRIDE_M / WALK_CYCLE_S;
-/** Playback range of the Walk clip: below, the feet slide a little rather than creep in slow motion. */
-const WALK_TIME_SCALE_MIN = 0.6;
-const WALK_TIME_SCALE_MAX = 2.4;
+/**
+ * Walking speed range (m/s, model units): the avatar chases its scroll-driven spot at a speed kept inside it, and the
+ * Walk clip plays at exactly that speed, so the feet stay planted however fast or slow the page is scrolled.
+ */
+const WALK_SPEED_MIN = 0.35 * WALK_CLIP_SPEED;
+const WALK_SPEED_MAX = 2.4 * WALK_CLIP_SPEED;
+/** Time (s) in which the avatar would close its gap to the spot: gap / CHASE_TAU is the speed it asks for. */
+const CHASE_TAU = 0.3;
+/** Time constant (s) of the speed changes (acceleration / braking / turning round). */
+const ACCEL_TAU = 0.12;
+/** Gap (m) below which a standing avatar does not bother to take a step. */
+const STEP_DEADZONE = 0.05;
 
 /** Where the avatar should be this frame, in CSS pixels of the viewport (y = ground line under the feet). */
 type Target = {
@@ -173,9 +179,14 @@ function useNarrow() {
   return narrow;
 }
 
+/** Segments that follow each other along one continuous walk share a path; the avatar is re-placed between paths. */
+const pathOf = (seg: AvatarSegment) => (seg === "none" ? "none" : seg.startsWith("band") ? "band" : seg.startsWith("journey") ? "journey" : "contact");
+
 type Motion = {
-  prevX: number | null;
+  /** Where the avatar actually stands (CSS px), chasing the target at walking speed; null = not placed yet. */
+  x: number | null;
   prevSeg: AvatarSegment;
+  /** Ground velocity actually applied (CSS px / s, signed). */
   vx: number;
   walking: boolean;
   lastMoving: number;
@@ -210,7 +221,7 @@ function Rig({ mobile, narrow }: { mobile: boolean; narrow: boolean }) {
   const yaw = useRef(-0.35);
   const alpha = useRef(0);
   const m = useRef<Motion>({
-    prevX: null,
+    x: null,
     prevSeg: "none",
     vx: 0,
     walking: false,
@@ -262,23 +273,42 @@ function Rig({ mobile, narrow }: { mobile: boolean; narrow: boolean }) {
     }
     const target = computeTarget(rects, { W, H, narrow, pinnedBandTop: s.pinnedBandTop });
 
-    // Horizontal speed of the target along its path (scroll only moves things vertically) → walking state.
-    const continuous = s.prevX !== null && target.seg === s.prevSeg;
-    const vx = continuous ? (target.x - (s.prevX as number)) / dt : 0;
-    s.vx = continuous ? damp(s.vx, vx, 0.08, dt) : 0;
-    s.prevX = target.x;
+    // The scroll decides where the avatar should be; it gets there on foot. Its x chases the target at a speed kept
+    // inside the walking range (a fast scroll leaves it behind, striding; a slow one is followed step by step), and the
+    // velocity actually applied drives the Walk clip, so the planted foot never slides.
+    const pxPerM = Math.max(1, target.h) / MODEL_HEIGHT;
+    const samePath = pathOf(target.seg) === pathOf(s.prevSeg);
     if (target.seg !== s.prevSeg) {
       s.prevSeg = target.seg;
       s.settledSince = now;
       s.oneShotDone = false;
       if (target.seg === "journeyEnter" || target.seg === "journeyExit") s.waved = false;
     }
+    // Re-placed without walking when it could not be seen doing it (another path, faded out) or may not walk at all.
+    if (s.x === null || !samePath || !target.walkable || alpha.current < 0.02) {
+      s.x = target.x;
+      s.vx = 0;
+    } else {
+      const gap = target.x - s.x;
+      const dist = Math.abs(gap) / pxPerM;
+      const moving = Math.abs(s.vx) / pxPerM > 0.02;
+      let wanted = 0;
+      if (dist > (moving ? 0 : STEP_DEADZONE)) wanted = Math.sign(gap) * MathUtils.clamp(dist / CHASE_TAU, WALK_SPEED_MIN, WALK_SPEED_MAX) * pxPerM;
+      s.vx = damp(s.vx, wanted, ACCEL_TAU, dt);
+      const step = s.vx * dt;
+      if (wanted !== 0 && Math.sign(step) === Math.sign(gap) && Math.abs(step) >= Math.abs(gap)) {
+        // Arrived: stand exactly on the spot.
+        s.x = target.x;
+        s.vx = 0;
+      } else s.x += step;
+    }
+    const x = s.x;
     // Ground speed in model metres per second (the model is MODEL_HEIGHT tall and target.h px high on screen).
-    const speed = (Math.abs(s.vx) / Math.max(1, target.h)) * MODEL_HEIGHT;
-    if (target.walkable && speed > WALK_START_SPEED) {
+    const speed = Math.abs(s.vx) / pxPerM;
+    if (speed > 0.02) {
       s.walking = true;
       s.lastMoving = now;
-    } else if (!target.walkable || (speed < WALK_STOP_SPEED && now - s.lastMoving > 120)) {
+    } else if (!target.walkable || now - s.lastMoving > 120) {
       s.walking = false;
     }
     if (s.walking) s.settledSince = now;
@@ -316,7 +346,7 @@ function Rig({ mobile, narrow }: { mobile: boolean; narrow: boolean }) {
     // foot always moves against the ground instead of moonwalking. Facing x = sin(yaw): yaw 0 faces the camera.
     const facingX = Math.sin(yaw.current);
     const forward = facingX * Math.sign(s.vx || 1) >= 0 ? 1 : -1;
-    walkSpeed.current = forward * MathUtils.clamp(speed / WALK_CLIP_SPEED, WALK_TIME_SCALE_MIN, WALK_TIME_SCALE_MAX);
+    walkSpeed.current = (forward * speed) / WALK_CLIP_SPEED;
 
     // Visibility: the whole layer fades through the wrapper's CSS opacity (model and contact shadow together, materials
     // untouched so the hair/glasses keep their alpha blending), and rendering is skipped entirely when invisible or
@@ -327,13 +357,13 @@ function Rig({ mobile, narrow }: { mobile: boolean; narrow: boolean }) {
       s.appliedAlpha = a;
       fade.current.style.opacity = a >= 0.995 ? "1" : a.toFixed(3);
     }
-    const onScreen = target.x + target.h * 0.5 > 0 && target.x - target.h * 0.5 < W && target.y > -target.h * 0.1 && target.y - target.h < H * 1.1;
+    const onScreen = x + target.h * 0.5 > 0 && x - target.h * 0.5 < W && target.y > -target.h * 0.1 && target.y - target.h < H * 1.1;
     g.visible = a > 0.01 && onScreen;
     if (!g.visible) return;
 
-    // Screen px → world units: the pose is applied directly (scroll-anchored, no lag) — the scroll itself is smoothed by Lenis.
+    // Screen px → world units: the ground line and size follow the scroll directly, x is the walked position.
     const halfW = LAYER_HALF_H * (W / Math.max(1, H));
-    const wx = ((target.x / W) * 2 - 1) * halfW;
+    const wx = ((x / W) * 2 - 1) * halfW;
     const wy = -((target.y / H) * 2 - 1) * LAYER_HALF_H;
     const scale = ((target.h / H) * 2 * LAYER_HALF_H) / MODEL_HEIGHT;
     g.position.set(wx, wy, 0);
