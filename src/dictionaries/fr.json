@@ -78,7 +78,18 @@
     "otherTeaser": "Dont",
     "otherMore": "+{count} autres",
     "stackAria": "Technologies",
-    "tagsAria": "Mots-clés"
+    "tagsAria": "Mots-clés",
+    "galleryAria": "Galerie des projets sélectionnés",
+    "galleryHud": "SELECTED WORK 2024 — 2026",
+    "galleryDrag": "Glisser",
+    "galleryOpen": "Voir",
+    "galleryHint": "Glisser · Défiler · ← →",
+    "gallerySwipe": "Balayer pour explorer",
+    "galleryIntro": "Cinq projets où l'IA rencontre le terrain : un stage, trois hackathons et un site client.",
+    "galleryListLabel": "Choisir un projet",
+    "galleryCategoryLabel": "Catégorie",
+    "galleryOpening": "Ouverture du projet {title}",
+    "galleryCurrent": "Projet {index} sur {count} : {title}"
   },
   "skills": {
     "eyebrow": "Stack",
