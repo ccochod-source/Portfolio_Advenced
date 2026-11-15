@@ -89,7 +89,17 @@
     "otherTeaser": "Including",
     "otherMore": "+{count} more",
     "stackAria": "Technologies",
-    "tagsAria": "Keywords"
+    "tagsAria": "Keywords",
+    "galleryAria": "Selected projects gallery",
+    "galleryDrag": "Drag",
+    "galleryOpen": "View",
+    "galleryHint": "Drag · Scroll · ← →",
+    "gallerySwipe": "Swipe to explore",
+    "galleryIntro": "Five projects where AI meets the real world: an internship, three hackathons and a client website.",
+    "galleryListLabel": "Choose a project",
+    "galleryCategoryLabel": "Category",
+    "galleryOpening": "Opening {title}",
+    "galleryCurrent": "Project {index} of {count}: {title}"
   },
   "skills": {
     "eyebrow": "Stack",
