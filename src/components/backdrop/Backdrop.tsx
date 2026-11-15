@@ -77,6 +77,7 @@ export function Backdrop() {
   return (
     <div ref={root} aria-hidden className="backdrop" data-backdrop>
       <div className="backdrop-layer backdrop-haze" />
+      <div className="backdrop-layer backdrop-texture" />
       <div className="backdrop-layer backdrop-blob backdrop-gold" />
       <div className="backdrop-layer backdrop-blob backdrop-peach" />
       <div className="backdrop-layer backdrop-blob backdrop-coral" />

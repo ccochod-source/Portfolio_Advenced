@@ -1,6 +1,6 @@
 /*
- * Ambient golden-hour backdrop: a few large, very soft light blobs drifting slowly behind the cream
- * sections, plus a faint haze / light-ray drift. Transform + opacity only, every layer promoted, so a
+ * Ambient golden-hour backdrop: a Gemini paper texture and a few large, very soft light blobs drifting slowly
+ * behind the cream sections, plus a faint haze / light-ray drift. Transform + opacity only, every layer promoted, so a
  * frame costs one composite of a handful of layers and nothing else (no blur filter, no mask, no layout).
  * Plain global CSS: the Turbopack `*.css` Tailwind rule in next.config.ts bypasses CSS modules.
  */
@@ -40,6 +40,16 @@
     ),
     linear-gradient(115deg, transparent 0%, rgb(255 228 196 / 0.5) 30%, rgb(255 193 69 / 0.12) 50%, rgb(255 228 196 / 0.45) 70%, transparent 100%);
   animation: backdrop-haze 140s ease-in-out infinite alternate;
+}
+
+/* The photo texture is the main ambient layer; the gradients above and blobs below stay secondary. */
+.backdrop-texture {
+  inset: -10%;
+  background-image: url("/textures/cream-glow.webp");
+  background-size: cover;
+  background-position: center;
+  opacity: 0.55;
+  animation: backdrop-texture-drift 72s ease-in-out infinite alternate;
 }
 
 /* Blobs: radial gradients instead of filter: blur() (same softness, no blur pass each frame). */
@@ -93,13 +103,25 @@
 /* Veil: keeps the brightest light at the margins, so the text column only gets a soft wash (WCAG AA). */
 .backdrop-veil {
   inset: 0;
-  background: radial-gradient(60% 55% at 50% 45%, rgb(255 244 230 / 0.5) 0%, rgb(255 244 230 / 0.2) 60%, transparent 100%);
+  background:
+    linear-gradient(rgb(255 244 230 / 0.18), rgb(255 244 230 / 0.18)),
+    radial-gradient(60% 55% at 50% 45%, rgb(255 244 230 / 0.62) 0%, rgb(255 244 230 / 0.35) 60%, rgb(255 244 230 / 0.18) 100%);
   will-change: auto;
 }
 
 @keyframes backdrop-haze {
   to {
     transform: translate3d(10%, 8%, 0);
+  }
+}
+
+@keyframes backdrop-texture-drift {
+  from {
+    transform: translate3d(-3%, -2%, 0) scale(1);
+  }
+
+  to {
+    transform: translate3d(3%, 2%, 0) scale(1.06);
   }
 }
 
