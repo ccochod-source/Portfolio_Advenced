@@ -2,6 +2,7 @@ import type { SkillId } from "./skills";
 import type { Localized } from "./types";
 
 export type ProjectImage = { src: string; alt: Localized; width: number; height: number };
+export type CinematicCover = { src: string; width: number; height: number };
 export type ProjectLink = { label: Localized; href: string; kind: "github" | "demo" | "video" | "data" };
 
 export type Project = {
@@ -21,9 +22,14 @@ export type Project = {
   context: Localized;
   approach: Localized[];
   results: Localized[];
+  cinematic?: CinematicCover;
   images: ProjectImage[];
   links?: ProjectLink[];
 };
+
+export function projectCover(p: Project) {
+  return p.cinematic ?? p.images[0];
+}
 
 export const projects: Project[] = [
   {

@@ -27,6 +27,17 @@
     "close": "Close menu",
     "skip": "Skip to content"
   },
+  "hud": {
+    "sections": {
+      "manifesto": { "left": "MANIFESTO", "center": "AI × BUSINESS", "right": "01 / 06" },
+      "selectedWork": { "left": "PROJECTS", "center": "SELECTED WORK 2024 — 2026", "right": "02 / 06" },
+      "projectGrid": { "left": "MORE PROJECTS", "center": "MORE WORK 2024 — 2026", "right": "03 / 06" },
+      "stack": { "left": "STACK", "center": "TOOLS & SYSTEMS", "right": "04 / 06" },
+      "journey": { "left": "JOURNEY", "center": "ANNECY — TAHITI — PARIS", "right": "05 / 06" },
+      "contact": { "left": "CONTACT", "center": "LET’S BUILD SOMETHING", "right": "06 / 06" }
+    },
+    "projectPage": { "left": "CASE STUDY", "right": "01 / 05" }
+  },
   "footer": {
     "eyebrow": "Contact",
     "title": "An AI project, an apprenticeship? Let's talk.",

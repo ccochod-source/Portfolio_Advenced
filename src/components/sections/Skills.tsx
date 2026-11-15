@@ -12,12 +12,13 @@ import { SkillsVisual } from "./SkillsVisual";
 export type SkillsProps = {
   lang: Locale;
   copy: Dictionary["skills"];
+  hud: Dictionary["hud"]["sections"]["stack"];
   skills: Skill[];
   id?: string;
   index?: string;
 };
 
-export function Skills({ lang, copy, skills, id = "stack", index = "04" }: SkillsProps) {
+export function Skills({ lang, copy, hud, skills, id = "stack", index = "04" }: SkillsProps) {
   const constellationSkills: ConstellationSkill[] = skills.map((skill) => ({
     id: skill.id,
     label: t(skill.label, lang),
@@ -34,8 +35,10 @@ export function Skills({ lang, copy, skills, id = "stack", index = "04" }: Skill
   return (
     <section id={id} className="pt-14 pb-24 md:pt-20 md:pb-36">
       <Container>
-        <Eyebrow index={index}>{copy.eyebrow}</Eyebrow>
-        <h2 className="mt-6 max-w-5xl text-h2 font-medium">{copy.title}</h2>
+        <div data-hud-left={hud.left} data-hud-center={hud.center} data-hud-right={hud.right}>
+          <Eyebrow index={index}>{copy.eyebrow}</Eyebrow>
+          <h2 className="mt-6 max-w-5xl text-h2 font-medium">{copy.title}</h2>
+        </div>
 
         <SkillsVisual skills={constellationSkills} labels={labels} projectBasePath={`/${lang}/projets`} listLabel={copy.fullList}>
           <div id="skills-visual" className="grid gap-16 lg:grid-cols-3 lg:gap-10">
@@ -43,21 +46,21 @@ export function Skills({ lang, copy, skills, id = "stack", index = "04" }: Skill
               const items = skills.filter((s) => s.group === group.id);
               return (
                 <div key={group.id} data-skill-group={group.id}>
-                  <h3 className="flex items-center gap-3 font-mono text-label uppercase text-ink-soft">
-                    <span className="text-sun-deep">{String(gi + 1).padStart(2, "0")}</span>
+                  <h3 className="flex items-center gap-3 font-mono text-label uppercase text-cream-dim">
+                    <span className="text-cream-dim">{String(gi + 1).padStart(2, "0")}</span>
                     {t(group.label, lang)}
                   </h3>
-                  <ul className="mt-6 divide-y divide-ink/10 border-y border-ink/10">
+                  <ul className="mt-6 divide-y divide-cream-muted/15 border-y border-cream-muted/15">
                     {items.map((skill) => (
                       <li key={skill.id} data-skill={skill.id} className="py-5">
                         <p className={gi === 0 ? "text-h3 font-medium" : "text-xl font-medium tracking-tight"}>{t(skill.label, lang)}</p>
-                        <p className="mt-1 max-w-md text-sm text-ink-soft">{t(skill.description, lang)}</p>
-                        <ul className="mt-3 flex flex-wrap gap-x-3 gap-y-1 font-mono text-label text-ink-soft" aria-label={copy.related}>
+                        <p className="mt-1 max-w-md text-sm text-cream-muted">{t(skill.description, lang)}</p>
+                        <ul className="mt-3 flex flex-wrap gap-x-3 gap-y-1 font-mono text-label text-cream-dim" aria-label={copy.related}>
                           {skill.relatedProjects.map((slug) => {
                             const project = getProject(slug);
                             return project ? (
                               <li key={slug}>
-                                <Link href={`/${lang}/projets/${slug}`} className="touch-target inline-block py-1 underline decoration-ink/30 underline-offset-4 hover:text-sun-deep hover:decoration-current">
+                                  <Link href={`/${lang}/projets/${slug}`} className="touch-target inline-block py-1 underline decoration-cream/30 underline-offset-4 hover:text-gold hover:decoration-current">
                                   {project.title}
                                 </Link>
                               </li>

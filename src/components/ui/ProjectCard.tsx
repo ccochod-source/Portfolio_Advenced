@@ -34,7 +34,7 @@ export function ProjectCard({ href, title, category, year, summary, award, tags 
           />
         ) : (
           <div className="absolute inset-0 flex items-end p-6 transition-transform duration-700 ease-out-expo group-hover:scale-[1.04]">
-            <span className="text-h2 font-medium text-cream/90">{title}</span>
+            <span className="text-h2 font-medium text-cream">{title}</span>
           </div>
         )}
         {award && (
@@ -46,11 +46,11 @@ export function ProjectCard({ href, title, category, year, summary, award, tags 
       <div className="mt-5 flex items-start justify-between gap-6">
         <div>
           <h3 className={compact ? "text-xl font-medium tracking-tight" : "text-h3 font-medium"}>{title}</h3>
-          <p className="mt-1 font-mono text-label uppercase text-ink-soft">{category}</p>
+          <p className="mt-1 font-mono text-label uppercase text-cream-dim">{category}</p>
         </div>
-        <span className="font-mono text-label text-ink-soft">{year}</span>
+        <span className="font-mono text-label text-cream-dim">{year}</span>
       </div>
-      <p className={compact ? "mt-3 line-clamp-2 text-sm text-ink-soft" : "mt-3 max-w-xl text-ink-soft"}>{summary}</p>
+      <p className={compact ? "mt-3 line-clamp-2 text-sm text-cream-muted" : "mt-3 max-w-xl text-cream-muted"}>{summary}</p>
       {tags.length > 0 && (
         <div className="mt-4 flex flex-wrap gap-2">
           {tags.map((tag) => (

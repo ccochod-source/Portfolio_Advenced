@@ -36,12 +36,12 @@ export function PreloaderDemo({ greeting, label, skipHint, replayLabel, doneLabe
             <button
               type="button"
               onClick={() => setRun((count) => count + 1)}
-              className="inline-flex cursor-pointer items-center gap-2 rounded-full bg-ink px-5 py-3 text-sm font-medium text-cream transition-colors duration-300 hover:bg-sun"
+              className="inline-flex cursor-pointer items-center gap-2 rounded-full bg-silk px-5 py-3 text-sm font-medium text-cream transition-colors duration-300 hover:bg-ember"
             >
               {replayLabel}
             </button>
           </Magnetic>
-          <p className="font-mono text-label uppercase text-ink-soft" aria-live="polite">
+          <p className="font-mono text-label uppercase text-cream-dim" aria-live="polite">
             onComplete × {completed} {completed > 0 && `· ${doneLabel}`}
           </p>
         </div>

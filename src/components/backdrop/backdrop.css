@@ -1,9 +1,3 @@
-/*
- * Ambient golden-hour backdrop: a Gemini paper texture and a few large, very soft light blobs drifting slowly
- * behind the cream sections, plus a faint haze / light-ray drift. Transform + opacity only, every layer promoted, so a
- * frame costs one composite of a handful of layers and nothing else (no blur filter, no mask, no layout).
- * Plain global CSS: the Turbopack `*.css` Tailwind rule in next.config.ts bypasses CSS modules.
- */
 .backdrop {
   position: fixed;
   inset: 0;
@@ -11,98 +5,45 @@
   overflow: hidden;
   pointer-events: none;
   contain: strict;
-  /* Driven from JS: hero handoff (opacity) and page depth (warmth). */
   --bd-fade: 0;
-  --bd-warmth: 0;
   opacity: var(--bd-fade);
+  background: var(--color-night);
 }
 
-.backdrop[data-paused="true"] * {
-  animation-play-state: paused;
-}
-
-.backdrop-layer {
-  position: absolute;
-  will-change: transform;
-}
-
-/* Haze + light rays: a cream-deep / gold wash and faint oblique streaks, like late sun through a window. */
-.backdrop-haze {
-  inset: -14% -16%;
-  background:
-    repeating-linear-gradient(
-      112deg,
-      transparent 0px,
-      transparent 200px,
-      rgb(255 244 230 / 0.35) 280px,
-      rgb(255 193 69 / 0.05) 350px,
-      transparent 440px
-    ),
-    linear-gradient(115deg, transparent 0%, rgb(255 228 196 / 0.5) 30%, rgb(255 193 69 / 0.12) 50%, rgb(255 228 196 / 0.45) 70%, transparent 100%);
-  animation: backdrop-haze 140s ease-in-out infinite alternate;
-}
-
-/* The photo texture is the main ambient layer; the gradients above and blobs below stay secondary. */
-.backdrop-texture {
-  inset: -10%;
-  background-image: url("/textures/cream-glow.webp");
-  background-size: cover;
-  background-position: center;
-  opacity: 0.55;
-  animation: backdrop-texture-drift 72s ease-in-out infinite alternate;
-}
-
-/* Blobs: radial gradients instead of filter: blur() (same softness, no blur pass each frame). */
-.backdrop-blob {
-  border-radius: 50%;
-  width: var(--size);
-  height: var(--size);
-  background: radial-gradient(circle at center, var(--tint) 0%, transparent 68%);
-  animation: var(--anim) var(--dur) ease-in-out infinite alternate;
-}
-
-.backdrop-gold {
-  --size: min(80vw, 70rem);
-  --tint: rgb(255 193 69 / 0.22);
-  --anim: backdrop-drift-a;
-  --dur: 95s;
-  left: -22vw;
-  top: -18vh;
-}
-
-.backdrop-peach {
-  --size: min(72vw, 64rem);
-  --tint: rgb(255 170 100 / 0.2);
-  --anim: backdrop-drift-b;
-  --dur: 110s;
-  right: -24vw;
-  top: 10vh;
-}
-
-.backdrop-coral {
-  --size: min(64vw, 56rem);
-  --tint: rgb(255 90 78 / 0.12);
-  --anim: backdrop-drift-c;
-  --dur: 125s;
-  left: 18vw;
-  bottom: -32vh;
-}
-
-/* Warmer toward the end of the page (journey / contact): a sunset glow rising from the bottom. */
-.backdrop-warm {
-  inset: auto -10% -30% -10%;
-  height: 90vh;
-  background:
-    radial-gradient(60% 70% at 20% 100%, rgb(255 122 26 / 0.16) 0%, transparent 70%),
-    radial-gradient(60% 70% at 85% 100%, rgb(255 90 78 / 0.12) 0%, transparent 70%),
-    linear-gradient(180deg, transparent 0%, rgb(255 193 69 / 0.1) 100%);
-  opacity: var(--bd-warmth);
-  transition: opacity 0.6s linear;
-}
-
-/* Quiet Gemini cutouts stay at the viewport edges, above the paper and beneath the veil. */
+.backdrop-canvas,
+.backdrop-fallback,
 .backdrop-symbols {
+  position: absolute;
   inset: 0;
+}
+
+.backdrop-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.backdrop[data-webgl="false"] .backdrop-canvas {
+  display: none;
+}
+
+.backdrop-fallback {
+  background:
+    radial-gradient(58% 45% at 84% 15%, rgb(74 36 18 / 0.12) 0%, transparent 70%),
+    radial-gradient(70% 70% at 15% 95%, rgb(36 20 12 / 0.38) 0%, transparent 78%),
+    linear-gradient(135deg, var(--color-night) 0%, var(--color-umber) 52%, var(--color-night) 100%);
+}
+
+.backdrop[data-webgl="true"] .backdrop-fallback {
+  opacity: 0;
+}
+
+.backdrop-symbols {
+  mix-blend-mode: screen;
+}
+
+.backdrop[data-paused="true"] .backdrop-symbol {
+  animation-play-state: paused;
 }
 
 .backdrop-symbol {
@@ -122,15 +63,15 @@
 
 .backdrop-symbol-1 {
   --symbol-size: clamp(220px, 22vw, 320px);
-  --symbol-opacity: 0.1;
+  --symbol-opacity: 0.065;
   top: 4vh;
   left: -8vw;
-  animation: backdrop-symbol-rotate 180s linear infinite;
+  animation: backdrop-symbol-rotate 190s linear infinite;
 }
 
 .backdrop-symbol-2 {
   --symbol-size: clamp(170px, 16vw, 225px);
-  --symbol-opacity: 0.18;
+  --symbol-opacity: 0.09;
   top: 13vh;
   right: -6vw;
   animation: backdrop-symbol-drift 21s ease-in-out infinite alternate;
@@ -138,7 +79,7 @@
 
 .backdrop-symbol-3 {
   --symbol-size: clamp(180px, 18vw, 250px);
-  --symbol-opacity: 0.17;
+  --symbol-opacity: 0.09;
   top: 54vh;
   left: -5vw;
   animation: backdrop-symbol-drift 19s ease-in-out infinite alternate;
@@ -146,15 +87,15 @@
 
 .backdrop-symbol-4 {
   --symbol-size: clamp(210px, 19vw, 280px);
-  --symbol-opacity: 0.16;
+  --symbol-opacity: 0.08;
   top: 49vh;
   right: -12vw;
-  animation: backdrop-symbol-rotate 240s linear infinite;
+  animation: backdrop-symbol-rotate 230s linear infinite;
 }
 
 .backdrop-symbol-5 {
   --symbol-size: clamp(200px, 22vw, 300px);
-  --symbol-opacity: 0.16;
+  --symbol-opacity: 0.08;
   bottom: -12vh;
   left: -8vw;
   animation: backdrop-symbol-rotate 210s linear infinite;
@@ -162,7 +103,7 @@
 
 .backdrop-symbol-6 {
   --symbol-size: clamp(200px, 21vw, 290px);
-  --symbol-opacity: 0.1;
+  --symbol-opacity: 0.065;
   right: -8vw;
   bottom: -10vh;
   animation: backdrop-symbol-rotate 210s linear infinite;
@@ -170,7 +111,7 @@
 
 .backdrop-symbol-7 {
   --symbol-size: 160px;
-  --symbol-opacity: 0.15;
+  --symbol-opacity: 0.08;
   top: 31vh;
   left: -3vw;
   animation: backdrop-symbol-drift 20s ease-in-out infinite alternate;
@@ -178,53 +119,10 @@
 
 .backdrop-symbol-8 {
   --symbol-size: 170px;
-  --symbol-opacity: 0.15;
+  --symbol-opacity: 0.08;
   top: 30vh;
   right: -4vw;
-  animation: backdrop-symbol-rotate 180s linear infinite;
-}
-
-/* Veil: lifts the paper tone under text while keeping the photo texture visible (WCAG AA). */
-.backdrop-veil {
-  inset: 0;
-  background:
-    linear-gradient(rgb(255 244 230 / 0.18), rgb(255 244 230 / 0.18)),
-    radial-gradient(60% 55% at 50% 45%, rgb(255 244 230 / 0.62) 0%, rgb(255 244 230 / 0.35) 60%, rgb(255 244 230 / 0.18) 100%);
-  will-change: auto;
-}
-
-@keyframes backdrop-haze {
-  to {
-    transform: translate3d(10%, 8%, 0);
-  }
-}
-
-@keyframes backdrop-texture-drift {
-  from {
-    transform: translate3d(-3%, -2%, 0) scale(1);
-  }
-
-  to {
-    transform: translate3d(3%, 2%, 0) scale(1.06);
-  }
-}
-
-@keyframes backdrop-drift-a {
-  to {
-    transform: translate3d(22vw, 16vh, 0) scale(1.15);
-  }
-}
-
-@keyframes backdrop-drift-b {
-  to {
-    transform: translate3d(-20vw, 24vh, 0) scale(0.9);
-  }
-}
-
-@keyframes backdrop-drift-c {
-  to {
-    transform: translate3d(-16vw, -22vh, 0) scale(1.2);
-  }
+  animation: backdrop-symbol-rotate 190s linear infinite;
 }
 
 @keyframes backdrop-symbol-drift {
@@ -243,24 +141,7 @@
   }
 }
 
-/* Mobile: two blobs, no coral, bigger so they still fill the narrow viewport. */
 @media (max-width: 767px) {
-  .backdrop-gold {
-    --size: 130vw;
-    left: -45vw;
-    top: -25vh;
-  }
-
-  .backdrop-peach {
-    --size: 120vw;
-    right: -55vw;
-    top: 30vh;
-  }
-
-  .backdrop-coral {
-    display: none;
-  }
-
   .backdrop-symbol-1 {
     --symbol-size: 170px;
     top: 2vh;
@@ -287,17 +168,7 @@
   }
 }
 
-/* Reduced motion: the same soft light, still. */
 @media (prefers-reduced-motion: reduce) {
-  .backdrop-layer {
-    animation: none;
-    will-change: auto;
-  }
-
-  .backdrop-warm {
-    transition: none;
-  }
-
   .backdrop-symbol {
     animation: none;
     transform: none;
