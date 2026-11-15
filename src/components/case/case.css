@@ -1,0 +1,223 @@
+/* Case study page (src/components/case). Plain global CSS: CSS modules are not hashed in this repo. */
+
+.case-hero,
+.case-figure,
+.case-next {
+  --case-radius: 16px;
+}
+
+@media (min-width: 768px) {
+  .case-hero,
+  .case-figure,
+  .case-next {
+    --case-radius: 28px;
+  }
+}
+
+.case-hero-scrim {
+  background:
+    linear-gradient(to top, rgb(20 11 7 / 0.94) 0%, rgb(20 11 7 / 0.62) 26%, rgb(20 11 7 / 0) 62%),
+    linear-gradient(to bottom, rgb(20 11 7 / 0.6) 0%, rgb(20 11 7 / 0) 24%);
+}
+
+.case-hero-title {
+  font-size: clamp(2.75rem, 11vw, 13rem);
+  font-weight: 500;
+  line-height: 0.86;
+  letter-spacing: -0.055em;
+  text-wrap: balance;
+  overflow-wrap: anywhere;
+}
+
+/* Before hydration: the cover waits in its intro window, the text is hidden (failsafe after 4 s). */
+@media (scripting: enabled) and (prefers-reduced-motion: no-preference) {
+  .case-hero[data-intro="pending"] .case-hero-clip {
+    clip-path: inset(18% 16% 18% 16% round 28px);
+    animation: case-failsafe-clip 0.6s ease 4s forwards;
+  }
+
+  .case-hero[data-intro="pending"] .case-hero-img {
+    transform: scale(1.32);
+    animation: case-failsafe-img 0.6s ease 4s forwards;
+  }
+}
+
+@media (scripting: enabled) {
+  .case-hero[data-intro="pending"] [data-case-reveal],
+  .case-hero[data-intro="pending"] .case-hero-scrim,
+  [data-title-pending] {
+    opacity: 0;
+    animation: motion-failsafe 0s linear 4s forwards;
+  }
+}
+
+@keyframes case-failsafe-clip {
+  to {
+    clip-path: inset(0 round 0);
+  }
+}
+
+@keyframes case-failsafe-img {
+  to {
+    transform: none;
+  }
+}
+
+.case-statement {
+  font-size: clamp(1.625rem, 2.9vw, 3.125rem);
+  font-weight: 500;
+  line-height: 1.12;
+  letter-spacing: -0.025em;
+  text-wrap: pretty;
+}
+
+.case-step-index {
+  font-size: clamp(3.5rem, 8vw, 8.5rem);
+  font-weight: 500;
+  line-height: 0.85;
+  letter-spacing: -0.05em;
+  font-variant-numeric: tabular-nums;
+  color: transparent;
+  -webkit-text-stroke: 1px var(--color-sun);
+}
+
+.case-result {
+  font-size: clamp(1.75rem, 4vw, 4.25rem);
+  font-weight: 500;
+  line-height: 1.02;
+  letter-spacing: -0.035em;
+  color: var(--color-cream);
+  text-wrap: balance;
+}
+
+.case-figure-frame {
+  border-radius: var(--case-radius);
+}
+
+.case-figure--full .case-figure-frame,
+.case-figure--full .case-figure-caption {
+  margin-inline: auto;
+}
+
+@media (min-width: 768px) {
+  .case-figure--left,
+  .case-figure--right {
+    width: 72%;
+  }
+
+  .case-figure--right {
+    margin-left: auto;
+  }
+
+  .case-figure--full .case-figure-caption {
+    margin-inline: 0;
+    padding-inline: 0.75rem;
+  }
+}
+
+.case-pill {
+  position: relative;
+  display: inline-flex;
+  min-height: 4.5rem;
+  align-items: center;
+  gap: 1.25rem;
+  border-radius: 9999px;
+  border: 1px solid color-mix(in srgb, var(--color-cream) 30%, transparent);
+  padding: 0 2.25rem;
+  font-size: clamp(1.125rem, 1.6vw, 1.5rem);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: var(--color-cream);
+  transition:
+    background-color 0.5s var(--ease-out-expo),
+    border-color 0.5s var(--ease-out-expo),
+    color 0.5s var(--ease-out-expo);
+}
+
+.case-pill:hover,
+.case-pill:focus-visible {
+  border-color: var(--color-sun);
+  background: var(--color-sun);
+  color: var(--color-night);
+}
+
+.case-pill--solid {
+  border-color: var(--color-cream);
+  background: var(--color-cream);
+  color: var(--color-night);
+}
+
+.case-pill-arrow {
+  display: inline-grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 9999px;
+  background: color-mix(in srgb, currentColor 12%, transparent);
+  transition: transform 0.6s var(--ease-out-expo);
+}
+
+.case-pill:hover .case-pill-arrow {
+  transform: rotate(-45deg);
+}
+
+@media (min-width: 768px) {
+  .case-pill {
+    min-height: 5.5rem;
+    padding: 0 2.75rem;
+  }
+}
+
+.case-next-title {
+  font-size: clamp(3.5rem, 14vw, 16rem);
+  font-weight: 500;
+  line-height: 0.84;
+  letter-spacing: -0.06em;
+  text-wrap: balance;
+  overflow-wrap: anywhere;
+}
+
+.case-next-preview {
+  width: clamp(16rem, 30vw, 30rem);
+  aspect-ratio: 16 / 10;
+  clip-path: inset(50% 50% 50% 50% round 20px);
+  will-change: transform, clip-path;
+}
+
+/* Touch / no hover: the cover sits above the title instead of following the pointer. */
+@media (hover: hover) and (pointer: fine) {
+  .case-next-still {
+    display: none;
+  }
+}
+
+@media not ((hover: hover) and (pointer: fine)) {
+  .case-next-preview {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .case-next-preview {
+    display: none;
+  }
+
+  .case-next-still {
+    display: block;
+  }
+}
+
+.case-handoff-overlay {
+  position: fixed;
+  z-index: 45;
+  overflow: hidden;
+  pointer-events: none;
+  background: var(--color-night);
+}
+
+.case-handoff-overlay img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}

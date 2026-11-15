@@ -12,6 +12,12 @@
   --color-gold: #ffc145;
   --color-ink: #2b1a12;
   --color-ink-soft: #6b4a3a;
+  --color-night: #140b07;
+  --color-umber: #24140c;
+  --color-ember: #4a2412;
+  --color-silk: #8a3e18;
+  --color-cream-muted: #d9bfa8;
+  --color-cream-dim: #a88b76;
 
   --font-sans: var(--font-grotesk), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-mono-face), ui-monospace, monospace;

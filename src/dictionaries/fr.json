@@ -116,6 +116,28 @@
     "category": "Catégorie",
     "contact": "Me contacter"
   },
+  "caseStudy": {
+    "eyebrow": "Étude de cas",
+    "counter": "Projet {current} sur {total}",
+    "back": "Retour aux projets",
+    "role": "Rôle",
+    "year": "Année",
+    "category": "Catégorie",
+    "stack": "Stack",
+    "award": "Prix",
+    "skills": "Compétences",
+    "overview": "Le projet",
+    "myRole": "Mon rôle",
+    "approach": "Approche",
+    "results": "Résultats",
+    "gallery": "En images",
+    "figure": "Fig.",
+    "links": "Liens",
+    "newTab": "(nouvel onglet)",
+    "contact": "Me contacter",
+    "next": "Projet suivant",
+    "nextCursor": "Suivant"
+  },
   "preloader": {
     "greeting": "Bonjour.",
     "label": "Clément Cochod — Portfolio",

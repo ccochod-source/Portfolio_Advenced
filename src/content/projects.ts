@@ -22,6 +22,8 @@ export type Project = {
   approach: Localized[];
   results: Localized[];
   images: ProjectImage[];
+  /** Cinematic cover (public/projects/<slug>/cinematic.webp), preferred over images[0] when present. */
+  cinematic?: { src: string; width: number; height: number };
   links?: ProjectLink[];
 };
 
@@ -676,3 +678,6 @@ export const getNextProject = (slug: string): Project => {
   const index = projects.findIndex((p) => p.slug === slug);
   return projects[(index + 1) % projects.length];
 };
+
+/** Main visual of a project: the cinematic cover when there is one, else the first image. */
+export const projectCover = (p: Project) => p.cinematic ?? p.images[0];
