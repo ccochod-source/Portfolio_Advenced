@@ -44,6 +44,12 @@
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+/* On both: the root value goes to the viewport, so body keeps its own clip for wide timeline/wordmark children. */
+html,
+body {
+  overflow-x: clip;
+}
+
 body {
   background: var(--color-night);
   color: var(--color-cream);
