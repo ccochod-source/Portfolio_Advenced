@@ -28,21 +28,17 @@ const io = new NodeIO()
   .registerDependencies({ "meshopt.decoder": MeshoptDecoder, "meshopt.encoder": MeshoptEncoder });
 const document = await io.read(inputPath);
 
-const selectedWeights = new Set([
-  "Spine",
-  "Spine1",
-  "Spine2",
-  "LeftShoulder",
-  "RightShoulder",
-  "LeftArm",
-  "RightArm",
-  "LeftForeArm",
-  "RightForeArm",
-]);
+const SMOOTHING_ITERATIONS = 5;
+const SMOOTHING_STRENGTH = 0.5;
+const WELD_SCALE = 100_000;
 const isHandOrFinger = (name) => /Hand|Thumb|Index|Middle|Ring|Pinky/.test(name);
 const smoothstep = (min, max, value) => {
   const t = Math.max(0, Math.min(1, (value - min) / (max - min)));
   return t * t * (3 - 2 * t);
+};
+const normalize = (vector) => {
+  const length = Math.hypot(...vector);
+  return length > 1e-8 ? vector.map((value) => value / length) : [0, 0, 1];
 };
 const multiplyMatrices = (a, b) => {
   const result = new Array(16).fill(0);
@@ -59,6 +55,87 @@ const transformPoint = (matrix, point) => [
   matrix[2] * point[0] + matrix[6] * point[1] + matrix[10] * point[2] + matrix[14],
 ];
 
+function createWeldedAdjacency(positions, indexAccessor) {
+  const groups = [];
+  const vertexGroup = new Array(positions.getCount());
+  const byPosition = new Map();
+
+  for (let index = 0; index < positions.getCount(); index++) {
+    const position = positions.getElement(index, []);
+    const key = position.map((value) => Math.round(value * WELD_SCALE)).join(":");
+    let groupIndex = byPosition.get(key);
+    if (groupIndex === undefined) {
+      groupIndex = groups.length;
+      byPosition.set(key, groupIndex);
+      groups.push({ vertices: [], neighbors: new Set() });
+    }
+    groups[groupIndex].vertices.push(index);
+    vertexGroup[index] = groupIndex;
+  }
+
+  const indexCount = indexAccessor?.getCount() ?? positions.getCount();
+  const indexAt = (index) => (indexAccessor ? indexAccessor.getElement(index, [])[0] : index);
+  const addEdge = (a, b) => {
+    const from = vertexGroup[a];
+    const to = vertexGroup[b];
+    if (from === to) return;
+    groups[from].neighbors.add(to);
+    groups[to].neighbors.add(from);
+  };
+
+  for (let index = 0; index + 2 < indexCount; index += 3) {
+    const a = indexAt(index);
+    const b = indexAt(index + 1);
+    const c = indexAt(index + 2);
+    addEdge(a, b);
+    addEdge(b, c);
+    addEdge(c, a);
+  }
+
+  return { groups, vertexGroup };
+}
+
+function smoothScalars(values, groups, fixedZero) {
+  let current = values;
+  for (let iteration = 0; iteration < SMOOTHING_ITERATIONS; iteration++) {
+    current = current.map((value, index) => {
+      if (fixedZero[index]) return 0;
+      const neighbors = [...groups[index].neighbors];
+      if (neighbors.length === 0) return value;
+      const neighborMean = neighbors.reduce((sum, neighbor) => sum + current[neighbor], 0) / neighbors.length;
+      return value * (1 - SMOOTHING_STRENGTH) + neighborMean * SMOOTHING_STRENGTH;
+    });
+  }
+  return current;
+}
+
+function smoothVectors(vectors, groups) {
+  let current = vectors;
+  for (let iteration = 0; iteration < SMOOTHING_ITERATIONS; iteration++) {
+    current = current.map((vector, index) => {
+      const neighbors = [...groups[index].neighbors];
+      if (neighbors.length === 0) return vector;
+      const sum = neighbors.reduce(
+        (result, neighbor) => result.map((value, axis) => value + current[neighbor][axis]),
+        [0, 0, 0],
+      );
+      const mean = sum.map((value) => value / neighbors.length);
+      return normalize(
+        vector.map((value, axis) => value * (1 - SMOOTHING_STRENGTH) + mean[axis] * SMOOTHING_STRENGTH),
+      );
+    });
+  }
+  return current;
+}
+
+const distanceAlong = (point, start, end) => {
+  const direction = end.map((value, axis) => value - start[axis]);
+  const lengthSquared = direction.reduce((sum, value) => sum + value * value, 0);
+  if (lengthSquared <= 1e-8) return 0;
+  const projection = point.reduce((sum, value, axis) => sum + (value - start[axis]) * direction[axis], 0) / lengthSquared;
+  return Math.max(0, Math.min(1, projection));
+};
+
 for (const node of document.getRoot().listNodes()) {
   const mesh = node.getMesh();
   const skin = node.getSkin();
@@ -67,27 +144,47 @@ for (const node of document.getRoot().listNodes()) {
   const joints = skin.listJoints();
   const names = joints.map((joint) => joint.getName());
   const inverseBindMatrices = skin.getInverseBindMatrices();
-  const jointMatrices = joints.map((joint, index) =>
-    multiplyMatrices(joint.getWorldMatrix([]), inverseBindMatrices.getElement(index, [])),
+  const jointWorldMatrices = joints.map((joint) => joint.getWorldMatrix([]));
+  const jointMatrices = jointWorldMatrices.map((matrix, index) =>
+    multiplyMatrices(matrix, inverseBindMatrices.getElement(index, [])),
   );
+  const jointOrigins = new Map(
+    joints.map((joint, index) => [joint.getName(), [jointWorldMatrices[index][12], jointWorldMatrices[index][13], jointWorldMatrices[index][14]]]),
+  );
+  const leftArmStart = jointOrigins.get("LeftArm");
+  const leftElbow = jointOrigins.get("LeftForeArm");
+  const rightArmStart = jointOrigins.get("RightArm");
+  const rightElbow = jointOrigins.get("RightForeArm");
   const nodeMatrix = node.getWorldMatrix([]);
 
   for (const primitive of mesh.listPrimitives()) {
     const positions = primitive.getAttribute("POSITION");
     const normals = primitive.getAttribute("NORMAL");
+    const indices = primitive.getIndices();
     const jointSets = [0, 1]
       .map((set) => ({
         indices: primitive.getAttribute(`JOINTS_${set}`),
         weights: primitive.getAttribute(`WEIGHTS_${set}`),
-      }))
+    }))
       .filter(({ indices, weights }) => indices && weights);
     if (!positions || !normals || jointSets.length === 0) continue;
 
-    let changed = 0;
-    let maxOffset = 0;
+    const { groups, vertexGroup } = createWeldedAdjacency(positions, indices);
+    const groupMagnitudes = new Array(groups.length).fill(0);
+    const groupNormals = groups.map((group) => {
+      const sum = [0, 0, 0];
+      for (const index of group.vertices) {
+        const normal = normals.getElement(index, []);
+        for (let axis = 0; axis < 3; axis++) sum[axis] += normal[axis];
+      }
+      return normalize(sum);
+    });
+    const groupExcluded = new Array(groups.length).fill(false);
+    const groupSamples = new Array(groups.length).fill(0);
+
     for (let index = 0; index < positions.getCount(); index++) {
       const position = positions.getElement(index, []);
-      const normal = normals.getElement(index, []);
+      const groupIndex = vertexGroup[index];
       const influence = new Map();
       let excluded = false;
 
@@ -99,22 +196,13 @@ for (const node of document.getRoot().listNodes()) {
           if (weight <= 0) continue;
           const name = names[jointIndices[slot]];
           if (name === "Neck" || name === "Head" || isHandOrFinger(name)) excluded = true;
-          if (selectedWeights.has(name)) influence.set(name, (influence.get(name) ?? 0) + weight);
+          influence.set(name, (influence.get(name) ?? 0) + weight);
         }
       }
-      if (excluded) continue;
-
-      const weight = (name) => influence.get(name) ?? 0;
-      const forearms = weight("LeftForeArm") + weight("RightForeArm");
-      const targetWeight =
-        weight("Spine1") +
-        weight("Spine2") +
-        weight("LeftShoulder") +
-        weight("RightShoulder") +
-        weight("LeftArm") +
-        weight("RightArm") +
-        (weight("Spine") + forearms) * 0.5;
-      if (targetWeight <= 0) continue;
+      if (excluded) {
+        groupExcluded[groupIndex] = true;
+        continue;
+      }
 
       let bindPosition = [0, 0, 0];
       for (const { indices, weights } of jointSets) {
@@ -129,26 +217,43 @@ for (const node of document.getRoot().listNodes()) {
       }
       bindPosition = transformPoint(nodeMatrix, bindPosition);
 
+      const weight = (name) => influence.get(name) ?? 0;
       const neckTaper =
         1 -
         smoothstep(1.38, 1.515, bindPosition[1]) *
           (1 - smoothstep(0.08, 0.2, Math.abs(bindPosition[0])));
-      const torsoWeight = weight("Spine1") + weight("Spine2") + weight("LeftShoulder") + weight("RightShoulder") + weight("Spine") * 0.5;
-      const armWeight = weight("LeftArm") + weight("RightArm");
-      const thickness = (0.028 * torsoWeight + 0.022 * armWeight + 0.01 * forearms) * neckTaper;
-      const lateral =
-        0.03 *
-        (weight("LeftShoulder") + weight("LeftArm") - weight("RightShoulder") - weight("RightArm")) *
+      const leftProgress = leftArmStart && leftElbow ? distanceAlong(bindPosition, leftArmStart, leftElbow) : 0;
+      const rightProgress = rightArmStart && rightElbow ? distanceAlong(bindPosition, rightArmStart, rightElbow) : 0;
+      const leftArmProfile = 1 - 0.5 * smoothstep(0.55, 1, leftProgress);
+      const rightArmProfile = 1 - 0.5 * smoothstep(0.55, 1, rightProgress);
+      const magnitude =
+        (0.024 * (weight("Spine1") + weight("Spine2")) +
+          0.01 * weight("Spine") +
+          0.024 * 0.35 * (weight("LeftShoulder") + weight("RightShoulder")) +
+          0.02 * (weight("LeftArm") * leftArmProfile + weight("RightArm") * rightArmProfile) +
+          0.008 * (weight("LeftForeArm") + weight("RightForeArm"))) *
         neckTaper;
-      const normalLength = Math.hypot(normal[0], normal[1], normal[2]) || 1;
-      const offset = [
-        (normal[0] / normalLength) * thickness + lateral,
-        (normal[1] / normalLength) * thickness,
-        (normal[2] / normalLength) * thickness,
-      ];
+      groupMagnitudes[groupIndex] += magnitude;
+      groupSamples[groupIndex]++;
+    }
+
+    for (let index = 0; index < groups.length; index++) {
+      if (groupSamples[index] > 0) groupMagnitudes[index] /= groupSamples[index];
+    }
+    const magnitudes = smoothScalars(groupMagnitudes, groups, groupExcluded);
+    const smoothedNormals = smoothVectors(groupNormals, groups);
+    let changed = 0;
+    let maxOffset = 0;
+
+    for (let index = 0; index < positions.getCount(); index++) {
+      const groupIndex = vertexGroup[index];
+      const magnitude = magnitudes[groupIndex];
+      if (magnitude <= 1e-7) continue;
+      const offset = smoothedNormals[groupIndex].map((value) => value * magnitude);
+      const position = positions.getElement(index, []);
       positions.setElement(index, position.map((value, axis) => value + offset[axis]));
       changed++;
-      maxOffset = Math.max(maxOffset, Math.hypot(...offset));
+      maxOffset = Math.max(maxOffset, magnitude);
     }
 
     if (changed > 0) {
