@@ -161,7 +161,7 @@ function GalleryStage({ items, copy, hud }: SelectedWorkGalleryProps) {
         invalidateOnRefresh: true,
         onUpdate: (self) => {
           if (!gallery.dragging && !opening) gallery.target = self.progress * last;
-          commit(Math.round(gallery.target));
+          commit(Math.round(gallery.target), self.isActive);
           scheduleSnap();
         },
         onToggle: (self) => {
@@ -185,12 +185,12 @@ function GalleryStage({ items, copy, hud }: SelectedWorkGalleryProps) {
         }
       };
 
-      function commit(i: number) {
+      function commit(i: number, active = inRange()) {
         const next = clamp(i, 0, n - 1);
         if (next === shown) return;
         shown = next;
         setIndex(next);
-        if (inRange()) pushHud(next);
+        if (active) pushHud(next);
       }
 
       function scheduleSnap() {
@@ -616,6 +616,9 @@ function GalleryFallback({ items, copy, reduce }: SelectedWorkGalleryProps & { r
           {pad(index + 1)} / {pad(items.length)}
         </span>
         <span>{copy.swipe}</span>
+      </p>
+      <p className="sr-only" aria-live="polite">
+        {fill(copy.current, { index: index + 1, count: items.length, title: items[index]?.title ?? "" })}
       </p>
       <div
         ref={overlay}
