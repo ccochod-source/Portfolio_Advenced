@@ -80,7 +80,7 @@ const fragmentSource = /* glsl */ `
     float value = 0.0;
     float amplitude = 0.5;
     mat2 rotation = mat2(0.8, -0.6, 0.6, 0.8);
-    for (int i = 0; i < 5; i++) {
+    for (int i = 0; i < 4; i++) {
       value += amplitude * noise(p);
       p = rotation * p * 2.03 + 11.7;
       amplitude *= 0.49;
@@ -91,21 +91,22 @@ const fragmentSource = /* glsl */ `
   float fabricHeight(vec2 uv) {
     float aspect = u_resolution.x / max(1.0, u_resolution.y);
     float phase = u_time * 0.261799;
-    vec2 drift = vec2(cos(phase), sin(phase)) * 0.18;
+    vec2 drift = vec2(cos(phase), sin(phase)) * 0.12;
     vec2 p = (uv - 0.5) * vec2(aspect, 1.0);
     vec2 cursor = (u_mouse - 0.5) * vec2(aspect, 1.0);
     float influence = exp(-dot(p - cursor, p - cursor) * 14.0) * u_mouseStrength;
-    p += (p - cursor) * influence * 0.065;
+    p += (p - cursor) * influence * 0.085;
 
-    vec2 domain = p * 2.35;
-    float warpX = fbm(domain + drift + vec2(1.7, 5.2));
-    float warpY = fbm(domain * 0.78 - drift + vec2(6.1, 2.3));
-    vec2 warped = domain + (vec2(warpX, warpY) - 0.5) * 1.75;
-    float broad = fbm(warped * 1.15 + drift * 0.7);
-    float fine = fbm(warped * 3.4 - drift * 1.8);
-    float band = sin((warped.y * 1.45 + warped.x * 0.42 + (broad - 0.5) * 0.95) * 6.283 + phase * 0.16);
-    float ridge = pow(max(0.0, 1.0 - abs(band)), 6.0);
-    return broad * 0.66 + fine * 0.12 + ridge * 0.22;
+    vec2 domain = p * 1.8;
+    float warpX = fbm(domain * 0.58 + drift + vec2(1.7, 5.2));
+    float warpY = fbm(domain * 0.52 - drift + vec2(6.1, 2.3));
+    vec2 warped = domain + (vec2(warpX, warpY) - 0.5) * 1.15;
+    float broad = fbm(warped * 0.62 + drift * 0.55);
+    float fine = fbm(warped * 1.25 - drift * 1.2);
+    float band = sin((warped.y * 1.05 + warped.x * 0.32 + (broad - 0.5) * 0.55) * 6.283 + phase * 0.16);
+    float fold = 0.5 + 0.5 * band;
+    float ridge = smoothstep(0.75, 0.99, fold);
+    return broad * 0.16 + fine * 0.03 + fold * 0.66 + ridge * 0.13;
   }
 
   void main() {
@@ -113,29 +114,27 @@ const fragmentSource = /* glsl */ `
     float height = fabricHeight(v_uv);
     float dx = fabricHeight(v_uv + vec2(stepSize.x, 0.0)) - fabricHeight(v_uv - vec2(stepSize.x, 0.0));
     float dy = fabricHeight(v_uv + vec2(0.0, stepSize.y)) - fabricHeight(v_uv - vec2(0.0, stepSize.y));
-    vec3 normal = normalize(vec3(-dx * 115.0, -dy * 115.0, 1.0));
+    vec3 normal = normalize(vec3(-dx * 82.0, -dy * 82.0, 1.0));
 
     vec3 night = vec3(0.0784, 0.0431, 0.0275);
     vec3 umber = vec3(0.1412, 0.0784, 0.0471);
     vec3 ember = vec3(0.2902, 0.1412, 0.0706);
-    vec3 silk = vec3(0.5412, 0.2431, 0.0941);
-    vec3 color = mix(night, umber, smoothstep(0.26, 0.62, height));
-    color = mix(color, ember, smoothstep(0.48, 0.79, height) * 0.68);
-    color = mix(color, silk, smoothstep(0.73, 0.99, height) * 0.32);
+    vec3 silk = vec3(0.4157, 0.1961, 0.0941);
+    vec3 color = mix(night, umber, smoothstep(0.12, 0.46, height));
+    color = mix(color, ember, smoothstep(0.34, 0.68, height) * 0.86);
+    color = mix(color, silk, smoothstep(0.58, 0.88, height) * 0.8);
 
     vec3 lightDirection = normalize(vec3(-0.58, 0.42, 0.70));
     float diffuse = max(dot(normal, lightDirection), 0.0);
     vec3 viewDirection = vec3(0.0, 0.0, 1.0);
     vec3 halfDirection = normalize(lightDirection + viewDirection);
     float anisotropy = 0.25 + 0.75 * abs(normal.y);
-    float sheen = pow(max(dot(normal, halfDirection), 0.0), 34.0) * anisotropy;
+    float sheen = pow(max(dot(normal, halfDirection), 0.0), 28.0) * anisotropy;
     float rareRidge = smoothstep(0.88, 0.98, height) * smoothstep(0.48, 0.78, noise(v_uv * vec2(4.0, 7.0) + u_time * 0.025));
-    color *= 0.76 + diffuse * 0.22;
-    color += vec3(0.24, 0.105, 0.028) * sheen * 0.38;
-    color += vec3(1.0, 0.56, 0.16) * rareRidge * 0.11;
+    color *= 0.82 + diffuse * 0.18;
+    color += vec3(0.24, 0.105, 0.028) * sheen * 0.22;
+    color += vec3(1.0, 0.56, 0.16) * rareRidge * 0.075;
 
-    // Keep the whole fabric field under a deep night veil so cream-dim remains AA-readable.
-    color = mix(night, color, 0.38);
     gl_FragColor = vec4(color, 1.0);
   }
 `;

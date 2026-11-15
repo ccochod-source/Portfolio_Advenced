@@ -13,9 +13,13 @@ export async function Nav() {
 
   return (
     <header className="fixed inset-x-0 top-3 z-50 px-4 md:top-5 md:px-12">
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 -top-3 z-0 h-28 bg-gradient-to-b from-night/90 via-night/75 to-transparent md:-top-5"
+      />
       <nav
         aria-label={dict.nav.aria}
-        className="site-nav mx-auto grid w-full max-w-[1440px] grid-cols-[1fr_auto_1fr] items-center gap-2"
+        className="site-nav relative z-10 mx-auto grid w-full max-w-[1440px] grid-cols-[1fr_auto_1fr] items-center gap-2"
       >
         <NavMenu links={links} label={dict.nav.menu} closeLabel={dict.nav.close} />
         <Link
