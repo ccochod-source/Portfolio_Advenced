@@ -53,7 +53,8 @@ export function CaseHero({ slug, title, category, year, award, cover, eyebrow, c
       const [img] = q("[data-case-img]");
       const [scrim] = q("[data-case-scrim]");
       const [shade] = q("[data-case-shade]");
-      const [content] = q("[data-case-content]");
+      const [top] = q("[data-case-top]");
+      const [bottom] = q("[data-case-bottom]");
       const [heading] = q("[data-case-title]");
       const reveals = q("[data-case-reveal]");
       const mm = gsap.matchMedia();
@@ -122,7 +123,8 @@ export function CaseHero({ slug, title, category, year, award, cover, eyebrow, c
           .timeline({ scrollTrigger: { trigger: el, start: "top top", end: "bottom bottom", scrub: true } })
           .fromTo(frame, { scale: 1, borderRadius: 0 }, { scale: mobile ? 0.9 : 0.84, borderRadius: mobile ? 20 : 36, ease: EASE.linear }, 0)
           .fromTo(shade, { opacity: 0 }, { opacity: 0.55, ease: EASE.linear }, 0)
-          .fromTo(content, { y: 0 }, { y: mobile ? -36 : -96, ease: EASE.linear }, 0);
+          .fromTo(top, { opacity: 1 }, { opacity: 0, duration: 0.25, ease: EASE.linear }, 0)
+          .fromTo(bottom, { y: 0 }, { y: mobile ? -36 : -96, ease: EASE.linear }, 0);
 
         return () => {
           cancelled = true;
@@ -162,6 +164,7 @@ export function CaseHero({ slug, title, category, year, award, cover, eyebrow, c
         </div>
 
         <div data-case-content className="absolute inset-0 flex flex-col justify-between px-5 pb-20 pt-24 md:px-10 md:pb-24 md:pt-28">
+          <div data-case-top>
           <div data-case-reveal className="flex items-center justify-between gap-6 font-mono text-label uppercase text-cream">
             <Link href={backHref} className="group inline-flex min-h-11 items-center gap-2 underline decoration-cream/30 underline-offset-4 hover:decoration-current">
               <span aria-hidden className="transition-transform duration-500 ease-out-expo group-hover:-translate-x-1">
@@ -173,8 +176,9 @@ export function CaseHero({ slug, title, category, year, award, cover, eyebrow, c
               {counter}
             </p>
           </div>
+          </div>
 
-          <div>
+          <div data-case-bottom>
             <div data-case-reveal className="flex flex-wrap items-end justify-between gap-x-8 gap-y-2 font-mono text-label uppercase text-cream-muted">
               <p>
                 {eyebrow} — {category}
