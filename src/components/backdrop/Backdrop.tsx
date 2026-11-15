@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { ZOOM, getZoomProgress, subscribeZoom } from "@/lib/hero/zoom";
+import { Enso, Lotus, Mandala, Unalome } from "./symbols";
 
 const clamp01 = (value: number) => Math.min(1, Math.max(0, value));
 
@@ -82,6 +83,16 @@ export function Backdrop() {
       <div className="backdrop-layer backdrop-blob backdrop-peach" />
       <div className="backdrop-layer backdrop-blob backdrop-coral" />
       <div className="backdrop-layer backdrop-warm" />
+      <div className="backdrop-layer backdrop-symbols">
+        <span className="backdrop-symbol backdrop-symbol-1 symbol-rotate"><Enso /></span>
+        <span className="backdrop-symbol backdrop-symbol-2 symbol-drift"><Lotus /></span>
+        <span className="backdrop-symbol backdrop-symbol-3 symbol-drift"><Unalome /></span>
+        <span className="backdrop-symbol backdrop-symbol-4 symbol-rotate"><Mandala /></span>
+        <span className="backdrop-symbol backdrop-symbol-5 symbol-drift"><Lotus /></span>
+        <span className="backdrop-symbol backdrop-symbol-6 symbol-rotate"><Enso /></span>
+        <span className="backdrop-symbol backdrop-symbol-7 symbol-drift"><Unalome /></span>
+        <span className="backdrop-symbol backdrop-symbol-8 symbol-rotate"><Mandala /></span>
+      </div>
       <div className="backdrop-layer backdrop-veil" />
     </div>
   );
