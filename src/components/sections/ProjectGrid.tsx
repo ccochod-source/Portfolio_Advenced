@@ -49,14 +49,16 @@ export function ProjectGrid({ lang, copy, hud, projects, id = "autres-projets", 
                   <li key={project.slug} id={`archive-${project.slug}`} data-project={project.slug} data-cover-index={i} data-hud-left={sectionHud.left} data-hud-center={sectionHud.center} data-hud-right={sectionHud.right} className="group/row scroll-mt-22 border-b border-cream/20 md:first:border-t">
                     <Link
                       href={`/${lang}/projets/${project.slug}`}
-                      className="grid min-h-28 gap-3 pb-6 transition-colors duration-500 hover:text-gold md:grid-cols-[2.5rem_minmax(0,1fr)_minmax(10rem,0.55fr)_3rem_2rem] md:items-center md:gap-6 md:py-7"
+                      className="block min-h-28 pb-6 transition-colors duration-500 hover:text-gold md:pb-0"
                     >
                       {cover && <div className="relative mb-3 aspect-[16/10] overflow-hidden rounded-lg bg-umber md:hidden"><Image src={cover.src} alt={"alt" in cover ? t(cover.alt as ProjectImage["alt"], lang) : project.title} fill sizes="(max-width: 767px) 100vw, 1px" className="object-cover" /></div>}
-                      <span aria-hidden className="hidden font-mono text-label text-cream-dim md:block">{String(i + 1).padStart(2, "0")}</span>
-                      <h3 className="text-[clamp(1.75rem,3vw,3.25rem)] leading-none font-medium tracking-[-0.045em] transition-transform duration-500 ease-out-expo motion-safe:group-hover/row:translate-x-2">{project.title}</h3>
-                      <span className="text-sm text-cream-muted">{t(project.category, lang)}</span>
-                      <span className="font-mono text-label text-cream-dim">{project.year}</span>
-                      <span aria-hidden className="hidden justify-self-end text-2xl text-sun md:block">↗</span>
+                      <div className="grid gap-3 rounded-sm bg-night/95 px-3 py-3 md:grid-cols-[2.5rem_minmax(0,1fr)_minmax(10rem,0.55fr)_3rem_2rem] md:items-center md:gap-6 md:px-4 md:py-7">
+                        <span aria-hidden className="hidden font-mono text-label text-cream md:block">{String(i + 1).padStart(2, "0")}</span>
+                        <h3 className="text-[clamp(1.75rem,3vw,3.25rem)] leading-none font-medium tracking-[-0.045em] transition-transform duration-500 ease-out-expo motion-safe:group-hover/row:translate-x-2">{project.title}</h3>
+                        <span className="text-sm text-cream">{t(project.category, lang)}</span>
+                        <span className="font-mono text-label text-cream">{project.year}</span>
+                        <span aria-hidden className="hidden justify-self-end text-2xl text-sun md:block">↗</span>
+                      </div>
                     </Link>
                   </li>
                 );

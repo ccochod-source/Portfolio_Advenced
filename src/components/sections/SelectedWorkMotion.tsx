@@ -75,7 +75,7 @@ function GalleryMeta({ item, index, count, copy }: { item: GalleryItem; index: n
   );
 
   return (
-    <div ref={ref} className="flex flex-col items-center text-center">
+    <div ref={ref} className="mx-auto flex w-fit max-w-full flex-col items-center rounded-lg bg-night/95 px-5 py-3 text-center">
       <p className="overflow-hidden font-mono text-label uppercase text-sun">
         <span data-swap className="block">
           {pad(index + 1)} / {pad(count)}
@@ -86,7 +86,7 @@ function GalleryMeta({ item, index, count, copy }: { item: GalleryItem; index: n
           {item.title}
         </span>
       </h3>
-      <dl className="mt-3 flex flex-wrap items-center justify-center gap-x-5 gap-y-1 font-mono text-label uppercase text-cream-muted">
+      <dl className="mt-3 flex flex-wrap items-center justify-center gap-x-5 gap-y-1 font-mono text-label uppercase text-cream">
         {[
           [copy.categoryLabel, item.category],
           [copy.yearLabel, item.year],
@@ -452,7 +452,7 @@ function GalleryStage({ items, copy, hud }: SelectedWorkGalleryProps) {
       <p
         data-gallery-chrome
         aria-hidden
-        className="pointer-events-none absolute right-6 top-24 hidden font-mono text-label uppercase text-cream-dim md:right-12 md:block"
+        className="pointer-events-none absolute right-6 top-24 hidden rounded-sm bg-night/95 px-3 py-2 font-mono text-label uppercase text-cream md:right-12 md:block"
       >
         {copy.hint}
       </p>
@@ -597,12 +597,12 @@ function GalleryFallback({ items, copy, reduce }: SelectedWorkGalleryProps & { r
                     className="object-cover transition-transform duration-700 ease-out-expo group-hover:scale-[1.04]"
                   />
                   <span aria-hidden className="absolute inset-0 bg-gradient-to-t from-night/70 via-night/0 to-night/0" />
-                  <span className="absolute inset-x-5 bottom-5 flex items-end justify-between gap-3">
+                  <span className="absolute inset-x-5 bottom-5 flex items-end justify-between gap-3 rounded-md bg-night/95 px-3 py-2">
                     <span className="text-h3 font-medium text-cream">{it.title}</span>
                     <span className="font-mono text-label text-sun">{pad(i + 1)}</span>
                   </span>
                 </span>
-                <span className="mt-4 flex flex-wrap gap-x-4 gap-y-1 px-1 font-mono text-label uppercase text-cream-muted">
+                <span className="mt-4 flex w-fit flex-wrap gap-x-4 gap-y-1 rounded-sm bg-night/95 px-3 py-2 font-mono text-label uppercase text-cream">
                   <span>{it.category}</span>
                   <span>{it.year}</span>
                 </span>
@@ -611,7 +611,7 @@ function GalleryFallback({ items, copy, reduce }: SelectedWorkGalleryProps & { r
           </li>
         ))}
       </ol>
-      <p className="mt-2 flex items-center justify-center gap-3 font-mono text-label uppercase text-cream-dim" aria-hidden>
+      <p className="mx-auto mt-2 flex w-fit items-center justify-center gap-3 rounded-sm bg-night/95 px-3 py-2 font-mono text-label uppercase text-cream" aria-hidden>
         <span className="text-sun">
           {pad(index + 1)} / {pad(items.length)}
         </span>

@@ -166,11 +166,11 @@ export function ProjectGridDisclosure({
               <p className="flex flex-wrap items-center gap-2 pt-8 text-sm text-cream-muted">
                 <span className="mr-1 font-mono text-label uppercase">{teaserLabel}</span>
                 {teaser.map((name) => (
-                  <span key={name} className="rounded-full border border-cream/15 px-3 py-1">
+                  <span key={name} className="rounded-full border border-cream/15 bg-night/95 px-3 py-1 text-cream">
                     {name}
                   </span>
                 ))}
-                {more && <span className="rounded-full bg-cream/10 px-3 py-1 font-mono text-label">{more}</span>}
+                {more && <span className="rounded-full bg-night/95 px-3 py-1 font-mono text-label text-cream">{more}</span>}
               </p>
             </div>
           </div>
