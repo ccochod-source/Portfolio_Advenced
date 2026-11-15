@@ -11,7 +11,13 @@ export const metadata: Metadata = {
 };
 
 const colors = [
-  { name: "cream", hex: "#FFF4E6", className: "bg-cream border border-ink/10" },
+  { name: "night", hex: "#140B07", className: "bg-night" },
+  { name: "umber", hex: "#24140C", className: "bg-umber" },
+  { name: "ember", hex: "#4A2412", className: "bg-ember" },
+  { name: "silk", hex: "#8A3E18", className: "bg-silk" },
+  { name: "cream-muted", hex: "#D9BFA8", className: "bg-cream-muted" },
+  { name: "cream-dim", hex: "#A88B76", className: "bg-cream-dim" },
+  { name: "cream", hex: "#FFF4E6", className: "bg-cream border border-cream/10" },
   { name: "cream-deep", hex: "#FFE4C4", className: "bg-cream-deep" },
   { name: "gold", hex: "#FFC145", className: "bg-gold" },
   { name: "sun", hex: "#FF7A1A", className: "bg-sun" },
@@ -42,7 +48,7 @@ export default function Styleguide() {
               <div key={c.name}>
                 <div className={`aspect-square rounded-2xl ${c.className}`} />
                 <p className="mt-3 font-medium">{c.name}</p>
-                <p className="font-mono text-label text-ink-soft">{c.hex}</p>
+                <p className="font-mono text-label text-cream-dim">{c.hex}</p>
               </div>
             ))}
           </div>
@@ -53,10 +59,10 @@ export default function Styleguide() {
         </Section>
 
         <Section index="02" eyebrow="Typographie" className="pt-0!">
-          <div className="divide-y divide-ink/10 border-y border-ink/10">
+          <div className="divide-y divide-cream/15 border-y border-cream/15">
             {typeScale.map((t) => (
               <div key={t.name} className="grid gap-4 py-8 md:grid-cols-[10rem_1fr]">
-                <span className="font-mono text-label uppercase text-ink-soft">{t.name}</span>
+                <span className="font-mono text-label uppercase text-cream-dim">{t.name}</span>
                 <p className={`${t.className} font-medium`}>{t.sample}</p>
               </div>
             ))}
@@ -68,7 +74,7 @@ export default function Styleguide() {
             <Button href="#" arrow>Me contacter</Button>
             <Button href="#" variant="secondary">Voir les projets</Button>
             <Button href="#" variant="link" arrow>Lire l&apos;étude de cas</Button>
-            <span className="rounded-full bg-ink p-2">
+            <span className="rounded-full bg-umber p-2">
               <Button href="#" variant="light" arrow>Télécharger mon CV</Button>
             </span>
           </div>

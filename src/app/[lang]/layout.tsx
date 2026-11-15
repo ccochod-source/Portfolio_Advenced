@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { Space_Grotesk, Space_Mono } from "next/font/google";
+import { Backdrop } from "@/components/backdrop/Backdrop";
+import { HudBar } from "@/components/HudBar";
 import { Nav } from "@/components/Nav";
 import { Cursor, Preloader } from "@/components/motion";
 import { PRELOADER_INERT_ID } from "@/components/motion/Preloader";
@@ -54,6 +56,7 @@ export default async function RootLayout({ children }: LayoutProps<"/[lang]">) {
       className={`${grotesk.variable} ${mono.variable} h-full antialiased`}
     >
       <body className="grain min-h-full">
+        <Backdrop />
         <Preloader greeting={dict.preloader.greeting} label={dict.preloader.label} skipHint={dict.preloader.skipHint} />
         <Cursor label={dict.common.cursorView} />
         <a href="#main" className="skip-link">
@@ -65,6 +68,7 @@ export default async function RootLayout({ children }: LayoutProps<"/[lang]">) {
             {children}
           </div>
         </SmoothScroll>
+        <HudBar />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{

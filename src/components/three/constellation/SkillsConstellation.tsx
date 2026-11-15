@@ -152,7 +152,7 @@ export function SkillsConstellation({
                     labelRefs.current[index] = el;
                   }}
                   className={`absolute left-0 top-0 whitespace-nowrap rounded-full px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.12em] opacity-0 transition-colors md:text-[11px] md:tracking-[0.14em] duration-300 ${
-                    activeIndex === index ? "bg-ink text-cream" : "text-ink"
+                    activeIndex === index ? "bg-umber text-cream" : "text-cream-muted"
                   }`}
                 >
                   {skill.label}
@@ -171,7 +171,7 @@ export function SkillsConstellation({
                 onFocus={() => setFocused(index)}
                 onBlur={() => setFocused((f) => (f === index ? null : f))}
                 onClick={() => onSelect(index)}
-                className="sr-only rounded-full bg-cream px-4 py-2 font-mono text-label uppercase tracking-[0.14em] text-ink focus:not-sr-only focus:m-1 focus:inline-flex focus:min-h-11 focus:items-center focus:border focus:border-ink/20"
+                className="sr-only rounded-full bg-umber px-4 py-2 font-mono text-label uppercase tracking-[0.14em] text-cream focus:not-sr-only focus:m-1 focus:inline-flex focus:min-h-11 focus:items-center focus:border focus:border-cream/20"
               >
                 {skill.label}
                 <span className="sr-only"> — {labels.groups[skill.group]}</span>
@@ -181,34 +181,34 @@ export function SkillsConstellation({
         </ul>
       </div>
 
-      <aside className="flex flex-col justify-between rounded-3xl border border-ink/10 bg-cream-deep/50 p-6 backdrop-blur-sm md:p-8">
+      <aside className="flex flex-col justify-between rounded-3xl border border-cream/15 bg-umber/85 p-6 backdrop-blur-sm md:p-8">
         <p className="sr-only" aria-live="polite">
           {active ? (labels.status ?? "{skill} — {group}").replace("{skill}", active.label).replace("{group}", labels.groups[active.group]) : ""}
         </p>
         {active ? (
           <div>
-            <span className="inline-flex items-center gap-2 font-mono text-label uppercase text-ink-soft">
+            <span className="inline-flex items-center gap-2 font-mono text-label uppercase text-cream-dim">
               <span aria-hidden className={`size-2 rounded-full ${GROUP_TAILWIND[active.group]}`} />
               {labels.groups[active.group]}
             </span>
             <h3 className="mt-4 text-h3 font-medium">{active.label}</h3>
-            {active.description ? <p className="mt-2 max-w-md text-sm text-ink-soft">{active.description}</p> : null}
+            {active.description ? <p className="mt-2 max-w-md text-sm text-cream-muted">{active.description}</p> : null}
             {active.weight ? (
               <div className="mt-4 flex gap-1" aria-hidden>
                 {Array.from({ length: 5 }, (_, i) => (
-                  <span key={i} className={`h-1 w-6 rounded-full ${i < Math.min(active.weight ?? 0, 5) ? "bg-sun" : "bg-ink/10"}`} />
+                  <span key={i} className={`h-1 w-6 rounded-full ${i < Math.min(active.weight ?? 0, 5) ? "bg-sun" : "bg-cream/15"}`} />
                 ))}
               </div>
             ) : null}
             {active.relatedProjects?.length ? (
               <div className="mt-8">
-                <p className="font-mono text-label uppercase text-ink-soft">{labels.relatedProjects}</p>
-                <ul className="mt-3 divide-y divide-ink/10 border-y border-ink/10">
+                <p className="font-mono text-label uppercase text-cream-dim">{labels.relatedProjects}</p>
+                <ul className="mt-3 divide-y divide-cream/15 border-y border-cream/15">
                   {active.relatedProjects.map((p) => (
                     <li key={p.slug}>
                       <a
                         href={href(p.slug)}
-                        className="group flex min-h-11 items-center justify-between gap-4 py-3 text-sm font-medium underline decoration-ink/30 underline-offset-4 transition-colors hover:text-sun-deep hover:decoration-current"
+                        className="group flex min-h-11 items-center justify-between gap-4 py-3 text-sm font-medium underline decoration-cream/30 underline-offset-4 transition-colors hover:text-gold hover:decoration-current"
                       >
                         {p.title}
                         <span aria-hidden className="transition-transform duration-300 ease-out-expo group-hover:translate-x-1">
@@ -222,10 +222,10 @@ export function SkillsConstellation({
             ) : null}
           </div>
         ) : (
-          <p className="max-w-xs text-lead text-ink-soft">{hint}</p>
+          <p className="max-w-xs text-lead text-cream-muted">{hint}</p>
         )}
 
-        <ul className="mt-10 flex flex-wrap gap-x-5 gap-y-2 font-mono text-label uppercase text-ink-soft">
+        <ul className="mt-10 flex flex-wrap gap-x-5 gap-y-2 font-mono text-label uppercase text-cream-dim">
           {(["ai", "build", "business"] as const).map((group) => (
             <li key={group} className="flex items-center gap-2">
               <span aria-hidden className={`size-2 rounded-full ${GROUP_TAILWIND[group]}`} />

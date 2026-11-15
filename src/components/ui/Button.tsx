@@ -4,11 +4,11 @@ import type { ReactNode } from "react";
 type Variant = "primary" | "secondary" | "light" | "outlineLight" | "link";
 
 const variants: Record<Variant, string> = {
-  primary: "bg-ink text-cream hover:bg-sun",
-  secondary: "border border-ink/25 text-ink hover:border-ink hover:bg-ink hover:text-cream",
-  light: "bg-cream text-ink hover:bg-gold",
-  outlineLight: "border border-cream/30 text-cream hover:bg-cream hover:text-ink",
-  link: "text-ink underline underline-offset-4 decoration-ink/30 hover:decoration-current px-0! py-0! touch-target",
+  primary: "button-primary bg-silk text-cream hover:bg-ember",
+  secondary: "button-secondary border border-cream/30 text-cream-muted hover:border-cream/60 hover:bg-cream/10 hover:text-cream",
+  light: "bg-cream text-night hover:bg-gold",
+  outlineLight: "border border-cream/30 text-cream hover:bg-cream hover:text-night",
+  link: "text-cream-muted underline underline-offset-4 decoration-cream/30 hover:decoration-current px-0! py-0! touch-target",
 };
 
 type ButtonProps = {

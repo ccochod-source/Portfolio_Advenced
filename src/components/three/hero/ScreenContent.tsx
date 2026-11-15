@@ -26,7 +26,7 @@ const vertexShader = /* glsl */ `
   }
 `;
 
-// Raw output on purpose (no tone mapping / colour conversion): the cream must match the CSS cream exactly at handover.
+// Raw output on purpose (no tone mapping / colour conversion): the night base must match the CSS page at handover.
 const fragmentShader = /* glsl */ `
   precision highp float;
   uniform sampler2D uMap;
@@ -122,7 +122,7 @@ export function ScreenContent() {
       const ctx = canvas.getContext("2d");
       if (!ctx) return;
       ctx.setTransform(1, 0, 0, 1, 0, 0);
-      ctx.fillStyle = PALETTE.cream;
+      ctx.fillStyle = PALETTE.night;
       ctx.fillRect(0, 0, tw, th);
       mapping.current = { u0: visible.u0, v1: visible.v1, fu, fv };
       material.uniforms.uCaret.value.set(0, 0, 0, 0);

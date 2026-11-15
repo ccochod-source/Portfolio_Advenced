@@ -12,32 +12,26 @@ export async function Nav() {
   ];
 
   return (
-    <header className="fixed inset-x-0 top-4 z-50 flex justify-center px-4">
+    <header className="fixed inset-x-0 top-3 z-50 px-4 md:top-5 md:px-12">
       <nav
         aria-label={dict.nav.aria}
-        className="relative flex w-full max-w-3xl items-center justify-between gap-3 rounded-full border border-ink/10 bg-cream/75 py-1.5 pl-4 pr-1.5 shadow-[0_8px_30px_-12px_rgba(43,26,18,0.25)] backdrop-blur-md"
+        className="site-nav mx-auto grid w-full max-w-[1440px] grid-cols-[1fr_auto_1fr] items-center gap-2"
       >
-        <Link href={`/${lang}`} className="flex min-h-11 items-center whitespace-nowrap font-medium tracking-tight">
-          Clément Cochod
+        <NavMenu links={links} label={dict.nav.menu} closeLabel={dict.nav.close} />
+        <Link
+          href={`/${lang}`}
+          className="flex min-h-11 items-center justify-center whitespace-nowrap font-mono text-label uppercase tracking-[0.14em]"
+        >
+          CLÉMENT COCHOD
         </Link>
-        <ul className="hidden items-center gap-6 text-sm md:flex">
-          {links.map((link) => (
-            <li key={link.href}>
-              <Link href={link.href} className="flex min-h-11 items-center opacity-70 transition-opacity hover:opacity-100">
-                {link.label}
-              </Link>
-            </li>
-          ))}
-        </ul>
-        <div className="flex items-center gap-1.5 font-mono text-label uppercase sm:gap-2">
-          <LangSwitch label={dict.langSwitch.label} ariaLabel={dict.langSwitch.aria} />
+        <div className="flex items-center justify-self-end gap-1 font-mono text-label uppercase sm:gap-3">
           <Link
             href={`/${lang}#contact`}
-            className="hidden min-h-11 items-center whitespace-nowrap rounded-full bg-ink px-3 text-cream transition-[color,background-color] hover:bg-sun sm:flex sm:px-4"
+            className="flex min-h-11 items-center whitespace-nowrap px-1 transition-colors hover:text-gold sm:px-2"
           >
-            {dict.nav.cta}
+            {dict.nav.contact}
           </Link>
-          <NavMenu links={links} label={dict.nav.menu} closeLabel={dict.nav.close} />
+          <LangSwitch label={dict.langSwitch.label} ariaLabel={dict.langSwitch.aria} />
         </div>
       </nav>
     </header>

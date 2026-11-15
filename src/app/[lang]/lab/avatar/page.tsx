@@ -34,11 +34,11 @@ const copy: Record<Locale, { eyebrow: string; title: string; lead: string; label
 export default async function AvatarLabPage() {
   const t = copy[await getLocale()];
   return (
-    <main className="min-h-screen bg-cream pt-28 pb-24 text-ink">
+    <main className="min-h-screen bg-night pt-28 pb-24 text-cream">
       <Container>
         <Eyebrow index="LAB">{t.eyebrow}</Eyebrow>
         <h1 className="mt-6 max-w-3xl text-h1 text-balance">{t.title}</h1>
-        <p className="mt-6 max-w-2xl text-lead text-ink-soft">{t.lead}</p>
+        <p className="mt-6 max-w-2xl text-lead text-cream-muted">{t.lead}</p>
         <div className="mt-14">
           <AvatarLab labels={t.labels} />
         </div>

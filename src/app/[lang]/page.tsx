@@ -1,4 +1,3 @@
-import { Backdrop } from "@/components/backdrop/Backdrop";
 import { Footer } from "@/components/Footer";
 import { FeaturedProjects } from "@/components/sections/FeaturedProjects";
 import { AvatarLayerLazy } from "@/components/three/avatar/AvatarLayerLazy";
@@ -17,14 +16,13 @@ export default async function Home() {
 
   return (
     <>
-      <Backdrop />
       <main id="main" tabIndex={-1} className="outline-none">
         <Hero lang={lang} copy={dict.hero} />
-        <Manifesto copy={dict.manifesto} index="01" />
-        <FeaturedProjects id="projets" index="02" lang={lang} copy={dict.projects} projects={featuredProjects} />
-        <ProjectGrid index="03" lang={lang} copy={dict.projects} projects={otherProjects} />
-        <Skills id="stack" index="04" lang={lang} copy={dict.skills} skills={skills} />
-        <Journey id="parcours" index="05" lang={lang} copy={dict.journey} steps={journey} />
+        <Manifesto copy={dict.manifesto} hud={dict.hud.sections.manifesto} index="01" />
+        <FeaturedProjects id="projets" index="02" lang={lang} copy={dict.projects} hud={dict.hud.sections.selectedWork} projects={featuredProjects} />
+        <ProjectGrid index="03" lang={lang} copy={dict.projects} hud={dict.hud.sections.projectGrid} projects={otherProjects} />
+        <Skills id="stack" index="04" lang={lang} copy={dict.skills} hud={dict.hud.sections.stack} skills={skills} />
+        <Journey id="parcours" index="05" lang={lang} copy={dict.journey} hud={dict.hud.sections.journey} steps={journey} />
       </main>
       <Footer />
       <AvatarLayerLazy />

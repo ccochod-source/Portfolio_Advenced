@@ -27,6 +27,17 @@
     "close": "Fermer le menu",
     "skip": "Aller au contenu"
   },
+  "hud": {
+    "sections": {
+      "manifesto": { "left": "MANIFESTE", "center": "IA × BUSINESS", "right": "01 / 06" },
+      "selectedWork": { "left": "PROJETS", "center": "PROJETS SÉLECTIONNÉS 2024 — 2026", "right": "02 / 06" },
+      "projectGrid": { "left": "AUTRES PROJETS", "center": "PROJETS 2024 — 2026", "right": "03 / 06" },
+      "stack": { "left": "STACK", "center": "OUTILS & SYSTÈMES", "right": "04 / 06" },
+      "journey": { "left": "PARCOURS", "center": "ANNECY — TAHITI — PARIS", "right": "05 / 06" },
+      "contact": { "left": "CONTACT", "center": "CONSTRUISONS LA SUITE", "right": "06 / 06" }
+    },
+    "projectPage": { "left": "ÉTUDE DE CAS", "right": "01 / 05" }
+  },
   "footer": {
     "eyebrow": "Contact",
     "title": "Un projet IA, une alternance ? Parlons-en.",
