@@ -83,6 +83,7 @@ export const projects: Project[] = [
       { fr: "26 feuilles Excel remplacées, 150 véhicules suivis", en: "26 Excel sheets replaced, 150 vehicles tracked" },
       { fr: "Plus de 200 contrôles, 7 rôles, 9 statuts, 17 formulaires dynamiques", en: "200+ checks, 7 roles, 9 statuses, 17 dynamic forms" },
     ],
+    cinematic: { src: "/projects/brasserie-de-tahiti/cinematic.webp", width: 2400, height: 1340 },
     images: [
       {
         src: "/projects/brasserie-de-tahiti/cover.webp",
@@ -95,6 +96,18 @@ export const projects: Project[] = [
         alt: { fr: "Logo de la Brasserie de Tahiti", en: "Brasserie de Tahiti logo" },
         width: 894,
         height: 630,
+      },
+      {
+        src: "/projects/brasserie-de-tahiti/ambiance-dashboards.webp",
+        alt: { fr: "Illustration : tableaux de bord sur un ordinateur portable face au lagon au coucher du soleil", en: "Illustration: dashboards on a laptop facing the lagoon at sunset" },
+        width: 2400,
+        height: 1340,
+      },
+      {
+        src: "/projects/brasserie-de-tahiti/ambiance-flotte.webp",
+        alt: { fr: "Illustration : camions de livraison garés sous les palmiers au crépuscule", en: "Illustration: delivery trucks parked under palm trees at dusk" },
+        width: 2000,
+        height: 1116,
       },
     ],
   },
@@ -151,7 +164,20 @@ export const projects: Project[] = [
         width: 900,
         height: 1598,
       },
+      {
+        src: "/projects/nami/ambiance-passeport.webp",
+        alt: { fr: "Illustration : passeport et carte d'embarquement sur un bureau, sous une lampe chaude", en: "Illustration: passport and boarding pass on a desk under a warm lamp" },
+        width: 2400,
+        height: 1340,
+      },
+      {
+        src: "/projects/nami/ambiance-bali.webp",
+        alt: { fr: "Illustration : rizières en terrasses de Bali au lever du soleil, un petit avion dans le ciel", en: "Illustration: Bali rice terraces at sunrise with a small plane in the sky" },
+        width: 2000,
+        height: 1116,
+      },
     ],
+    cinematic: { src: "/projects/nami/cinematic.webp", width: 2400, height: 1340 },
     links: [{ label: { fr: "Code sur GitHub", en: "Code on GitHub" }, href: "https://github.com/llecalvez-dotcom/nami", kind: "github" }],
   },
   {
@@ -214,7 +240,20 @@ export const projects: Project[] = [
         width: 1600,
         height: 900,
       },
+      {
+        src: "/projects/hackathon-payfit/ambiance-equipe.webp",
+        alt: { fr: "Illustration : une équipe d'étudiants en pleine session de hackathon, ordinateurs et post-it sur la table", en: "Illustration: a student team mid-hackathon, laptops and sticky notes on the table" },
+        width: 2400,
+        height: 1191,
+      },
+      {
+        src: "/projects/hackathon-payfit/ambiance-paie.webp",
+        alt: { fr: "Illustration : bulletins de paie annotés à vérifier à côté d'un ordinateur portable", en: "Illustration: annotated payslips waiting to be checked next to a laptop" },
+        width: 2400,
+        height: 1610,
+      },
     ],
+    cinematic: { src: "/projects/hackathon-payfit/cinematic.webp", width: 2400, height: 1340 },
     links: [{ label: { fr: "Voir la démo", en: "See the demo" }, href: "https://payfit-pied.vercel.app", kind: "demo" }],
   },
   {
@@ -277,7 +316,20 @@ export const projects: Project[] = [
         width: 1600,
         height: 584,
       },
+      {
+        src: "/projects/hackathon-mirakl/ambiance-reseau.webp",
+        alt: { fr: "Illustration : réseau de points lumineux reliés, comme une carte de prospects", en: "Illustration: a network of glowing connected points, like a map of prospects" },
+        width: 2400,
+        height: 1340,
+      },
+      {
+        src: "/projects/hackathon-mirakl/ambiance-emails.webp",
+        alt: { fr: "Illustration : une pile d'enveloppes qui s'envolent en particules dorées, image des e-mails envoyés automatiquement", en: "Illustration: a stack of envelopes flying off in golden particles, a picture of automated emails" },
+        width: 2400,
+        height: 1340,
+      },
     ],
+    cinematic: { src: "/projects/hackathon-mirakl/cinematic.webp", width: 2400, height: 1340 },
     links: [{ label: { fr: "Voir le tableau de bord", en: "See the dashboard" }, href: "https://mirakl.vercel.app", kind: "demo" }],
   },
   {
@@ -498,7 +550,20 @@ export const projects: Project[] = [
         width: 1600,
         height: 953,
       },
+      {
+        src: "/projects/auralife/ambiance-avis.webp",
+        alt: { fr: "Illustration : un client consulte des avis cinq étoiles sur son téléphone", en: "Illustration: a client reading five-star reviews on a phone" },
+        width: 2400,
+        height: 1340,
+      },
+      {
+        src: "/projects/auralife/ambiance-carnet.webp",
+        alt: { fr: "Illustration : tisane fumante et carnet ouvert dans la lumière dorée du soir", en: "Illustration: steaming herbal tea and an open notebook in golden evening light" },
+        width: 2400,
+        height: 1340,
+      },
     ],
+    cinematic: { src: "/projects/auralife/cinematic.webp", width: 2400, height: 1340 },
     links: [{ label: { fr: "Visiter Auralife", en: "Visit Auralife" }, href: "https://auralife.fr", kind: "demo" }],
   },
   {
