@@ -32,7 +32,7 @@ export function Skills({ lang, copy, skills, id = "stack", index = "04" }: Skill
   const labels = { groups: copy.groups, relatedProjects: copy.related, hint: copy.hint, hintTouch: copy.hintTouch, status: copy.status };
 
   return (
-    <section id={id} className="py-24 md:py-36">
+    <section id={id} className="pt-14 pb-24 md:pt-20 md:pb-36">
       <Container>
         <Eyebrow index={index}>{copy.eyebrow}</Eyebrow>
         <h2 className="mt-6 max-w-5xl text-h2 font-medium">{copy.title}</h2>

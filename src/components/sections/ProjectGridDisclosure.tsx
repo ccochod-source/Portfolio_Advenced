@@ -123,8 +123,8 @@ export function ProjectGridDisclosure({
         className={`${collapse} duration-700 ${open ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"}`}
       >
         <div className="min-h-0 overflow-hidden">
-          {/* Side/bottom padding keeps the cards' focus rings and hover scale inside the clipped box. */}
-          <div className="-mx-3 px-3 pb-3 pt-14 md:pt-20">{children}</div>
+          {/* Side padding keeps the cards' focus rings and hover scale inside the clipped box. */}
+          <div className="-mx-3 px-3">{children}</div>
         </div>
       </div>
     </div>

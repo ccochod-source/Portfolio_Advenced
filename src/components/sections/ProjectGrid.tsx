@@ -22,7 +22,7 @@ export function ProjectGrid({ lang, copy, projects, id = "autres-projets", index
   const rest = projects.length - teaser.length;
 
   return (
-    <section id={id} aria-label={copy.otherAria} className="bg-cream-deep/40 py-24 md:py-36">
+    <section id={id} aria-label={copy.otherAria} className="pt-24 pb-6 md:pt-36 md:pb-10">
       <Container>
         <ProjectGridDisclosure
           panelId={`${id}-grid`}
@@ -36,26 +36,28 @@ export function ProjectGrid({ lang, copy, projects, id = "autres-projets", index
           teaser={teaser}
           more={rest > 0 ? fill(copy.otherMore, rest) : undefined}
         >
-          <ul className="grid gap-x-8 gap-y-14 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {projects.map((project) => {
-              const cover = project.images[0];
-              return (
-                <li key={project.slug} data-project={project.slug}>
-                  <ProjectCard
-                    href={`/${lang}/projets/${project.slug}`}
-                    title={project.title}
-                    category={t(project.category, lang)}
-                    year={project.year}
-                    summary={t(project.summary, lang)}
-                    award={project.award ? t(project.award, lang) : undefined}
-                    tags={project.tags.slice(0, 3)}
-                    image={cover ? { src: cover.src, alt: t(cover.alt, lang), width: cover.width, height: cover.height } : undefined}
-                    compact
-                  />
-                </li>
-              );
-            })}
-          </ul>
+          <div className="pt-14 pb-16 md:pt-20 md:pb-24">
+            <ul className="grid gap-x-8 gap-y-14 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              {projects.map((project) => {
+                const cover = project.images[0];
+                return (
+                  <li key={project.slug} data-project={project.slug}>
+                    <ProjectCard
+                      href={`/${lang}/projets/${project.slug}`}
+                      title={project.title}
+                      category={t(project.category, lang)}
+                      year={project.year}
+                      summary={t(project.summary, lang)}
+                      award={project.award ? t(project.award, lang) : undefined}
+                      tags={project.tags.slice(0, 3)}
+                      image={cover ? { src: cover.src, alt: t(cover.alt, lang), width: cover.width, height: cover.height } : undefined}
+                      compact
+                    />
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
         </ProjectGridDisclosure>
       </Container>
     </section>
