@@ -1,0 +1,67 @@
+/* 404 — a sun that has already set: huge outlined digits lit from below, over the silk backdrop. */
+
+.lost {
+  isolation: isolate;
+}
+
+.lost-sun {
+  position: absolute;
+  left: 50%;
+  bottom: -55vmax;
+  width: 110vmax;
+  height: 110vmax;
+  translate: -50% 0;
+  z-index: -1;
+  border-radius: 9999px;
+  pointer-events: none;
+  background: radial-gradient(closest-side, color-mix(in srgb, var(--color-sun) 42%, transparent), color-mix(in srgb, var(--color-coral) 16%, transparent) 55%, transparent 100%);
+  filter: blur(20px);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .lost-sun {
+    animation: lost-breathe 9s ease-in-out infinite;
+  }
+}
+
+@keyframes lost-breathe {
+  50% {
+    scale: 1.06;
+    opacity: 0.8;
+  }
+}
+
+.lost-code {
+  position: relative;
+  margin-bottom: 1.5rem;
+  font-size: clamp(8rem, min(36vw, 42svh), 26rem);
+  font-weight: 500;
+  line-height: 0.8;
+  letter-spacing: -0.07em;
+  user-select: none;
+}
+
+.lost-code-glow,
+.lost-code-outline {
+  display: block;
+}
+
+.lost-code-glow {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 30%, var(--color-sun) 75%, var(--color-coral));
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  filter: blur(28px);
+  opacity: 0.7;
+}
+
+.lost-code-outline {
+  position: relative;
+  background: linear-gradient(180deg, transparent 35%, color-mix(in srgb, var(--color-sun) 85%, transparent) 80%, var(--color-coral));
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  -webkit-text-stroke: 1.5px color-mix(in srgb, var(--color-cream-muted) 55%, transparent);
+}

@@ -2,8 +2,8 @@
 
 import { useEffect, useMemo, useRef, useState, type RefObject } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { ContactShadows, useAnimations, useGLTF } from "@react-three/drei";
-import { LoopOnce, LoopRepeat, type AnimationAction, type Group } from "three";
+import { useAnimations, useGLTF } from "@react-three/drei";
+import { LoopOnce, LoopRepeat, type AnimationAction, type Group, type Mesh } from "three";
 import { SkeletonUtils } from "three-stdlib";
 import {
   AVATAR_MODEL_URL,
@@ -176,7 +176,61 @@ type AvatarStageProps = Omit<AvatarProps, "position"> & {
   cameraZ?: number;
 };
 
-/** Canvas with warm key light, soft rim light and a contact shadow; decorative (aria-hidden). */
+const GLOW_VERT = /* glsl */ `
+varying vec2 vUv;
+void main() {
+  vUv = uv;
+  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+}`;
+
+const GLOW_FRAG = /* glsl */ `
+uniform vec3 uCore;
+uniform vec3 uHalo;
+uniform float uStrength;
+varying vec2 vUv;
+void main() {
+  vec2 p = vUv * 2.0 - 1.0;
+  float r = length(p);
+  float core = pow(max(0.0, 1.0 - length(p * vec2(1.0, 1.6)) * 1.25), 2.2);
+  float halo = pow(max(0.0, 1.0 - r), 2.6);
+  float a = clamp(core + halo * 0.55, 0.0, 1.0);
+  vec3 col = mix(uHalo, uCore, clamp(core / max(a, 1e-4), 0.0, 1.0));
+  gl_FragColor = vec4(col, a * uStrength);
+}`;
+
+/**
+ * Soft warm pool of light under the feet (replaces the dark contact shadow on the night backdrop).
+ * A camera-facing ellipse just behind the feet (the legs occlude it); it ignores the parent's yaw.
+ */
+export function FootGlow({ strength = 0.8, width = 2.2, height = 0.8, y = 0.04, depth = 0.35 }: { strength?: number; width?: number; height?: number; y?: number; depth?: number }) {
+  const mesh = useRef<Mesh>(null);
+  const uniforms = useMemo(
+    () => ({ uCore: { value: [1.0, 0.62, 0.28] }, uHalo: { value: [1.0, 0.36, 0.22] }, uStrength: { value: strength } }),
+    [strength],
+  );
+  useFrame(() => {
+    const m = mesh.current;
+    const ry = m?.parent?.rotation.y ?? 0;
+    if (!m) return;
+    m.rotation.y = -ry;
+    m.position.set(depth * -Math.sin(ry), y, -depth * Math.cos(ry));
+  });
+  return (
+    <mesh ref={mesh} renderOrder={-1}>
+      <planeGeometry args={[width, height]} />
+      <shaderMaterial
+        vertexShader={GLOW_VERT}
+        fragmentShader={GLOW_FRAG}
+        uniforms={uniforms}
+        transparent
+        depthWrite={false}
+        toneMapped={false}
+      />
+    </mesh>
+  );
+}
+
+/** Canvas with warm key light, sun/coral rim lights and a warm foot glow (tuned for the night backdrop); decorative (aria-hidden). */
 export function AvatarStage({
   className = "",
   cameraZ = 3.9,
@@ -190,6 +244,9 @@ export function AvatarStage({
         <Canvas
           dpr={[1, 1.5]}
           shadows="percentage"
+          onCreated={({ gl }) => {
+            gl.toneMappingExposure = 1.2;
+          }}
           camera={{ position: [0, 0.15, cameraZ], fov: 32 }}
           gl={{
             antialias: true,
@@ -198,35 +255,22 @@ export function AvatarStage({
           }}
           style={{ background: "transparent" }}
         >
-          <ambientLight intensity={0.55} color="#FFE4C4" />
+          <ambientLight intensity={0.5} color="#FFD9B8" />
           <directionalLight
-            position={[2.5, 4, 3]}
-            intensity={2.4}
-            color="#FFC145"
+            position={[2.5, 3.5, 4]}
+            intensity={2.6}
+            color="#FFC58A"
             castShadow
             shadow-mapSize={[1024, 1024]}
             shadow-bias={-0.0004}
           />
-          <directionalLight
-            position={[-3, 2.5, -2.5]}
-            intensity={1.4}
-            color="#FF7A1A"
-          />
-          <hemisphereLight
-            intensity={0.5}
-            color="#FFF4E6"
-            groundColor="#6B4A3A"
-          />
-          <Avatar position={[0, AVATAR_FLOOR_Y, 0]} {...avatarProps} />
-          <ContactShadows
-            position={[0, AVATAR_FLOOR_Y + 0.001, 0]}
-            opacity={0.45}
-            scale={4}
-            blur={2.2}
-            far={2}
-            color="#6B4A3A"
-            frames={Infinity}
-          />
+          <directionalLight position={[-2.6, 2.4, -3.6]} intensity={4} color="#FF7A1A" />
+          <directionalLight position={[2.8, 1.6, -3.2]} intensity={2.6} color="#FF5A4E" />
+          <hemisphereLight intensity={0.6} color="#FFE4C4" groundColor="#4A2412" />
+          <group position={[0, AVATAR_FLOOR_Y, 0]}>
+            <Avatar {...avatarProps} />
+            <FootGlow />
+          </group>
         </Canvas>
       )}
     </div>
