@@ -62,12 +62,8 @@
         "text": "RAG, agents, document extraction: AI is a controlled step of the product, not a gimmick. Five applications in eight weeks, a computer-use agent in 36 hours."
       },
       {
-        "title": "Measure",
-        "text": "22,000 entries migrated, around 400 anomalies detected, 19 dashboards, 1,018 tests: what isn't measured isn't shipped."
-      },
-      {
-        "title": "Ship to real users",
-        "text": "User testing, permissions, exports, documentation. A live website for Auralife, tools in service in Tahiti, an agent acting in front of the user."
+        "title": "Ship. Measure. Improve.",
+        "text": "22,000 entries migrated, around 400 anomalies detected, 1,018 tests. Tools in service in Tahiti, a live website for Auralife."
       }
     ]
   },
@@ -103,7 +99,9 @@
   },
   "skills": {
     "eyebrow": "Stack",
-    "title": "AI first, code to ship it, business sense to make it useful.",
+    "title": "Everything connects.",
+    "intro": "AI first, code to ship it, business sense to make it useful.",
+    "explore": "One idea lights up another.",
     "related": "Related projects",
     "groups": {
       "ai": "Artificial intelligence",

@@ -6,8 +6,8 @@ import { OrbitControls } from "@react-three/drei";
 import * as THREE from "three";
 import type { LayoutEdge, LayoutNode } from "./layout";
 
-const EDGE_IDLE = new THREE.Color("#e9c7a6");
-const EDGE_ACTIVE = new THREE.Color("#ff7a1a");
+const EDGE_IDLE = new THREE.Color("#a66d3f");
+const EDGE_ACTIVE = new THREE.Color("#ffc145");
 const tmpColor = new THREE.Color();
 const tmpVec = new THREE.Vector3();
 
@@ -20,7 +20,9 @@ function getGlowTexture() {
   const ctx = canvas.getContext("2d")!;
   const gradient = ctx.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
   gradient.addColorStop(0, "rgba(255,255,255,1)");
-  gradient.addColorStop(0.35, "rgba(255,255,255,0.45)");
+  gradient.addColorStop(0.06, "rgba(255,255,255,0.95)");
+  gradient.addColorStop(0.2, "rgba(255,255,255,0.22)");
+  gradient.addColorStop(0.5, "rgba(255,255,255,0.04)");
   gradient.addColorStop(1, "rgba(255,255,255,0)");
   ctx.fillStyle = gradient;
   ctx.fillRect(0, 0, size, size);
@@ -70,12 +72,12 @@ function SkillNode({ node, state, segments, animate, onHover, onSelect }: NodePr
     g.scale.setScalar(THREE.MathUtils.lerp(g.scale.x, targetScale, k));
 
     if (material.current) {
-      const emissive = state === "active" ? 0.9 : state === "linked" ? 0.65 : 0.3;
+      const emissive = state === "active" ? 3 : state === "linked" ? 2 : 1.4;
       material.current.emissiveIntensity = THREE.MathUtils.lerp(material.current.emissiveIntensity, emissive, k);
     }
     if (glow.current) {
       const mat = glow.current.material as THREE.SpriteMaterial;
-      const opacity = state === "active" ? 0.95 : state === "linked" ? 0.6 : state === "dimmed" ? 0.18 : 0.4;
+      const opacity = state === "active" ? 1 : state === "linked" ? 0.85 : state === "dimmed" ? 0.3 : 0.7;
       mat.opacity = THREE.MathUtils.lerp(mat.opacity, opacity, k);
     }
   });
@@ -97,11 +99,15 @@ function SkillNode({ node, state, segments, animate, onHover, onSelect }: NodePr
   return (
     <group ref={group} position={node.position}>
       <mesh onPointerOver={over} onPointerOut={out} onClick={click}>
-        <sphereGeometry args={[node.radius, segments, segments]} />
-        <meshStandardMaterial ref={material} color={color} emissive={color} emissiveIntensity={0.3} roughness={0.35} metalness={0.1} />
+        <sphereGeometry args={[0.4, 8, 8]} />
+        <meshBasicMaterial transparent opacity={0} depthWrite={false} />
       </mesh>
-      <sprite ref={glow} scale={node.radius * 6}>
-        <spriteMaterial map={texture} color={color} transparent opacity={0.4} depthWrite={false} blending={THREE.AdditiveBlending} />
+      <mesh>
+        <sphereGeometry args={[node.radius, segments, segments]} />
+        <meshStandardMaterial ref={material} color="#fff4e6" emissive={color} emissiveIntensity={1.4} roughness={0.2} toneMapped={false} />
+      </mesh>
+      <sprite ref={glow} scale={node.radius * 22} raycast={() => {}}>
+        <spriteMaterial map={texture} color={color} transparent opacity={0.7} depthWrite={false} toneMapped={false} blending={THREE.AdditiveBlending} />
       </sprite>
     </group>
   );
@@ -152,7 +158,7 @@ function Edges({ nodes, edges, activeIndex, animate }: { nodes: LayoutNode[]; ed
         <bufferAttribute attach="attributes-position" args={[positions, 3]} />
         <bufferAttribute ref={colors} attach="attributes-color" args={[colorArray, 3]} />
       </bufferGeometry>
-      <lineBasicMaterial vertexColors transparent opacity={0.9} depthWrite={false} />
+      <lineBasicMaterial vertexColors transparent opacity={0.45} depthWrite={false} />
     </lineSegments>
   );
 }
@@ -189,19 +195,23 @@ function LabelProjector({ nodes, world, labelRefs, activeIndex, linked, mobile }
       parent.localToWorld(tmpVec);
       const dist = camera.position.distanceTo(tmpVec);
       tmpVec.project(camera);
-      const x = (tmpVec.x * 0.5 + 0.5) * size.width;
+      let x = (tmpVec.x * 0.5 + 0.5) * size.width;
       const y = (-tmpVec.y * 0.5 + 0.5) * size.height;
       const scale = THREE.MathUtils.clamp(camDist / dist, 0.7, 1.15);
-      const depthFade = THREE.MathUtils.clamp(1 - (dist - camDist) / 3.2, 0.3, 1);
+      if (mobile) {
+        const halfWidth = el.offsetWidth * scale / 2;
+        x = THREE.MathUtils.clamp(x, halfWidth + 8, size.width - halfWidth - 8);
+      }
+      const depthFade = THREE.MathUtils.clamp(1 - (dist - camDist) / 3.2, 0.8, 1);
       const state = activeIndex === null ? "idle" : activeIndex === node.index ? "active" : linked.has(node.index) ? "linked" : "dimmed";
-      const hiddenOnMobile = mobile && state !== "active" && state !== "linked" && (node.skill.weight ?? 3) < 4;
-      const opacity = hiddenOnMobile ? 0 : state === "active" ? 1 : state === "dimmed" ? depthFade * 0.35 : depthFade;
+      const hiddenOnMobile = mobile && (state === "dimmed" || (state !== "active" && state !== "linked" && (node.skill.weight ?? 3) < 4));
+      const opacity = hiddenOnMobile ? 0 : state === "active" ? 1 : state === "dimmed" ? 0.8 : depthFade;
       el.style.transform = `translate(-50%, 0) translate(${x.toFixed(1)}px, ${y.toFixed(1)}px) scale(${scale.toFixed(3)})`;
       el.style.opacity = opacity.toFixed(3);
       el.style.zIndex = String(Math.round((camDist * 2 - dist) * 10) + (state === "active" ? 1000 : 0));
       if (mobile && opacity > 0) {
-        // Nearest first within a state; the pinned skill, then its links, keep their place before the others.
-        const keep = state === "active" || state === "linked";
+        // The selected label is mandatory. Nearest linked labels get the remaining space.
+        const keep = state === "active";
         queue.push({ el, rank: (state === "active" ? 0 : state === "linked" ? 100 : 200) + dist, x, y, scale, keep });
       }
     });
@@ -209,11 +219,15 @@ function LabelProjector({ nodes, world, labelRefs, activeIndex, linked, mobile }
 
     // Narrow screens: labels of a dense cluster would print over each other. In priority order, a label that collides
     // slides under the ones already placed; if there is no room nearby it is dropped,
-    // except the pinned skill and its links, which always stay readable.
+    // except the selected skill. Limit the mobile field so long labels still have breathing room.
     const boxes = labelBoxes;
     boxes.length = 0;
     queue.sort((a, b) => a.rank - b.rank);
     for (const { el, x, y, scale, keep } of queue) {
+      if (!keep && boxes.length >= (activeIndex === null ? 8 : 6)) {
+        el.style.opacity = "0";
+        continue;
+      }
       const w = el.offsetWidth * scale;
       const h = el.offsetHeight * scale;
       // The label scales around its centre: `inset` is how far its drawn top sits below the translated top.

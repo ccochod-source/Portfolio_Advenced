@@ -12,7 +12,7 @@ export function SkillsConstellationFallback({
 }: Omit<SkillsConstellationProps, "reducedMotion">) {
   const href = resolveProjectHref(projectHref, projectBasePath);
   return (
-    <div className={`grid gap-10 md:grid-cols-3 ${className}`}>
+    <div className={`grid gap-10 rounded-xl border border-gold/20 bg-night/60 p-6 md:grid-cols-3 md:p-8 ${className}`}>
       {ORDER.map((group) => {
         const list = skills.filter((s) => s.group === group);
         if (!list.length) return null;
@@ -24,25 +24,17 @@ export function SkillsConstellationFallback({
             </h3>
             <ul className="mt-4 flex flex-wrap gap-2">
               {list.map((s) => (
-                <li key={s.id} className="rounded-full border border-cream/20 px-3 py-1 text-sm">
-                  {s.label}
-                  {s.relatedProjects?.length ? (
-                    <span className="sr-only">
-                      {" "}
-                      — {labels.relatedProjects}: {s.relatedProjects.map((p) => p.title).join(", ")}
-                    </span>
-                  ) : null}
+                <li key={s.id} className="text-sm">
+                  <details className="group/skill rounded-2xl border border-cream/20 px-3 open:bg-umber">
+                    <summary className="flex min-h-11 cursor-pointer list-none items-center gap-3 text-cream marker:hidden [&::-webkit-details-marker]:hidden">{s.label}<span aria-hidden className="ml-auto text-gold">+</span></summary>
+                    <div className="max-w-sm pb-4">
+                      <p className="text-cream-muted">{s.description}</p>
+                      {s.relatedProjects?.length ? <p className="mt-4 font-mono text-label text-cream-dim">{labels.relatedProjects}</p> : null}
+                      <ul>{s.relatedProjects?.map((p) => <li key={p.slug}><a className="flex min-h-11 items-center text-cream underline decoration-gold/50 underline-offset-4 hover:text-gold" href={href(p.slug)}>{p.title} ↗</a></li>)}</ul>
+                    </div>
+                  </details>
                 </li>
               ))}
-            </ul>
-            <ul className="sr-only">
-              {list.flatMap((s) =>
-                (s.relatedProjects ?? []).map((p) => (
-                  <li key={`${s.id}-${p.slug}`}>
-                    <a href={href(p.slug)}>{p.title}</a>
-                  </li>
-                )),
-              )}
             </ul>
           </section>
         );
