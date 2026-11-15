@@ -100,7 +100,7 @@
   transition: opacity 0.6s linear;
 }
 
-/* Quiet line-art motifs stay at the viewport edges, above the paper and beneath the veil. */
+/* Quiet Gemini cutouts stay at the viewport edges, above the paper and beneath the veil. */
 .backdrop-symbols {
   inset: 0;
 }
@@ -109,13 +109,12 @@
   position: absolute;
   display: block;
   width: var(--symbol-size);
-  color: var(--symbol-color);
   opacity: var(--symbol-opacity);
   transform-origin: center;
   will-change: transform;
 }
 
-.backdrop-symbol svg {
+.backdrop-symbol img {
   display: block;
   width: 100%;
   height: auto;
@@ -123,35 +122,31 @@
 
 .backdrop-symbol-1 {
   --symbol-size: clamp(220px, 22vw, 320px);
-  --symbol-color: #ffc145;
-  --symbol-opacity: 0.18;
+  --symbol-opacity: 0.1;
   top: 4vh;
   left: -8vw;
   animation: backdrop-symbol-rotate 180s linear infinite;
 }
 
 .backdrop-symbol-2 {
-  --symbol-size: clamp(180px, 18vw, 260px);
-  --symbol-color: #ff5a4e;
-  --symbol-opacity: 0.17;
+  --symbol-size: clamp(170px, 16vw, 225px);
+  --symbol-opacity: 0.18;
   top: 13vh;
   right: -6vw;
   animation: backdrop-symbol-drift 21s ease-in-out infinite alternate;
 }
 
 .backdrop-symbol-3 {
-  --symbol-size: clamp(160px, 15vw, 220px);
-  --symbol-color: #ff5a4e;
-  --symbol-opacity: 0.15;
+  --symbol-size: clamp(180px, 18vw, 250px);
+  --symbol-opacity: 0.17;
   top: 54vh;
   left: -5vw;
   animation: backdrop-symbol-drift 19s ease-in-out infinite alternate;
 }
 
 .backdrop-symbol-4 {
-  --symbol-size: clamp(260px, 28vw, 390px);
-  --symbol-color: #ffc145;
-  --symbol-opacity: 0.17;
+  --symbol-size: clamp(210px, 19vw, 280px);
+  --symbol-opacity: 0.16;
   top: 49vh;
   right: -12vw;
   animation: backdrop-symbol-rotate 240s linear infinite;
@@ -159,17 +154,15 @@
 
 .backdrop-symbol-5 {
   --symbol-size: clamp(200px, 22vw, 300px);
-  --symbol-color: #ffc145;
-  --symbol-opacity: 0.15;
+  --symbol-opacity: 0.16;
   bottom: -12vh;
   left: -8vw;
-  animation: backdrop-symbol-drift 22s ease-in-out infinite alternate;
+  animation: backdrop-symbol-rotate 210s linear infinite;
 }
 
 .backdrop-symbol-6 {
   --symbol-size: clamp(200px, 21vw, 290px);
-  --symbol-color: #ff5a4e;
-  --symbol-opacity: 0.16;
+  --symbol-opacity: 0.1;
   right: -8vw;
   bottom: -10vh;
   animation: backdrop-symbol-rotate 210s linear infinite;
@@ -177,8 +170,7 @@
 
 .backdrop-symbol-7 {
   --symbol-size: 160px;
-  --symbol-color: #ffc145;
-  --symbol-opacity: 0.1;
+  --symbol-opacity: 0.15;
   top: 31vh;
   left: -3vw;
   animation: backdrop-symbol-drift 20s ease-in-out infinite alternate;
@@ -186,11 +178,10 @@
 
 .backdrop-symbol-8 {
   --symbol-size: 170px;
-  --symbol-color: #ff5a4e;
-  --symbol-opacity: 0.1;
+  --symbol-opacity: 0.15;
   top: 30vh;
   right: -4vw;
-  animation: backdrop-symbol-rotate 150s linear infinite;
+  animation: backdrop-symbol-rotate 180s linear infinite;
 }
 
 /* Veil: lifts the paper tone under text while keeping the photo texture visible (WCAG AA). */
@@ -271,34 +262,28 @@
   }
 
   .backdrop-symbol-1 {
-    --symbol-size: 185px;
+    --symbol-size: 170px;
     top: 2vh;
     left: -92px;
   }
 
   .backdrop-symbol-2 {
-    --symbol-size: 150px;
+    --symbol-size: 135px;
     top: 15vh;
-    right: -76px;
+    right: -68px;
   }
 
-  .backdrop-symbol-3,
   .backdrop-symbol-5,
+  .backdrop-symbol-6,
   .backdrop-symbol-7,
   .backdrop-symbol-8 {
     display: none;
   }
 
   .backdrop-symbol-4 {
-    --symbol-size: 205px;
+    --symbol-size: 195px;
     top: 52vh;
     right: -112px;
-  }
-
-  .backdrop-symbol-6 {
-    --symbol-size: 170px;
-    right: -82px;
-    bottom: -54px;
   }
 }
 

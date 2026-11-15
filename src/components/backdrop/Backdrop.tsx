@@ -2,7 +2,30 @@
 
 import { useEffect, useRef } from "react";
 import { ZOOM, getZoomProgress, subscribeZoom } from "@/lib/hero/zoom";
-import { Enso, Lotus, Mandala, Unalome } from "./symbols";
+
+type SymbolArtworkName = "enso" | "lotus" | "flower-of-life" | "unalome" | "mandala";
+
+function SymbolArtwork({
+  name,
+  width,
+  height,
+}: {
+  name: SymbolArtworkName;
+  width: number;
+  height: number;
+}) {
+  return (
+    // eslint-disable-next-line @next/next/no-img-element -- pre-cut decorative WebP artwork
+    <img
+      src={`/textures/symbols/${name}.webp`}
+      alt=""
+      width={width}
+      height={height}
+      loading="lazy"
+      decoding="async"
+    />
+  );
+}
 
 const clamp01 = (value: number) => Math.min(1, Math.max(0, value));
 
@@ -84,14 +107,30 @@ export function Backdrop() {
       <div className="backdrop-layer backdrop-blob backdrop-coral" />
       <div className="backdrop-layer backdrop-warm" />
       <div className="backdrop-layer backdrop-symbols">
-        <span className="backdrop-symbol backdrop-symbol-1 symbol-rotate"><Enso /></span>
-        <span className="backdrop-symbol backdrop-symbol-2 symbol-drift"><Lotus /></span>
-        <span className="backdrop-symbol backdrop-symbol-3 symbol-drift"><Unalome /></span>
-        <span className="backdrop-symbol backdrop-symbol-4 symbol-rotate"><Mandala /></span>
-        <span className="backdrop-symbol backdrop-symbol-5 symbol-drift"><Lotus /></span>
-        <span className="backdrop-symbol backdrop-symbol-6 symbol-rotate"><Enso /></span>
-        <span className="backdrop-symbol backdrop-symbol-7 symbol-drift"><Unalome /></span>
-        <span className="backdrop-symbol backdrop-symbol-8 symbol-rotate"><Mandala /></span>
+        <span className="backdrop-symbol backdrop-symbol-1">
+          <SymbolArtwork name="enso" width={900} height={900} />
+        </span>
+        <span className="backdrop-symbol backdrop-symbol-2">
+          <SymbolArtwork name="unalome" width={414} height={900} />
+        </span>
+        <span className="backdrop-symbol backdrop-symbol-3">
+          <SymbolArtwork name="lotus" width={600} height={556} />
+        </span>
+        <span className="backdrop-symbol backdrop-symbol-4">
+          <SymbolArtwork name="mandala" width={400} height={393} />
+        </span>
+        <span className="backdrop-symbol backdrop-symbol-5">
+          <SymbolArtwork name="flower-of-life" width={500} height={494} />
+        </span>
+        <span className="backdrop-symbol backdrop-symbol-6">
+          <SymbolArtwork name="enso" width={900} height={900} />
+        </span>
+        <span className="backdrop-symbol backdrop-symbol-7">
+          <SymbolArtwork name="lotus" width={600} height={556} />
+        </span>
+        <span className="backdrop-symbol backdrop-symbol-8">
+          <SymbolArtwork name="flower-of-life" width={500} height={494} />
+        </span>
       </div>
       <div className="backdrop-layer backdrop-veil" />
     </div>
