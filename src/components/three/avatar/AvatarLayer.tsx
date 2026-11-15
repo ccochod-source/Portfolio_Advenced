@@ -2,10 +2,9 @@
 
 import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { ContactShadows } from "@react-three/drei";
 import { Group, MathUtils } from "three";
 import { useCanHover, useIsMobile, usePrefersReducedMotion } from "../hero/useHeroMotion";
-import { Avatar } from "./Avatar";
+import { Avatar, FootGlow } from "./Avatar";
 import { WALK_CYCLE_S, WALK_STRIDE_M, type AvatarClip } from "./clips";
 import { AVATAR_TARGETS, STORY, getManifestoProgress, type AvatarSegment } from "@/lib/avatar/story";
 import { MEDIA } from "@/lib/motion/ease";
@@ -20,7 +19,6 @@ const LAYER_HALF_H = LAYER_Z * Math.tan(MathUtils.degToRad(LAYER_FOV / 2));
 const MODEL_HEIGHT = 1.8;
 /** Facing while walking: ±90° would be a pure profile, this keeps a readable three-quarter view. */
 const WALK_YAW = Math.PI / 2 - 0.4;
-const SHADOW_OPACITY = 0.35;
 const CROSS_FADE = 0.5;
 /** Marks the canvas wrapper whose CSS opacity fades the whole layer. */
 const FADE_ATTR = "data-avatar-fade";
@@ -207,7 +205,7 @@ type Motion = {
  * forcing it opaque wrote its transparent fringe into the premultiplied canvas as alpha ≈ 0 — a hole showing the cream
  * page as a white band along the hairline — and turned the glasses' 10 % lenses into solid white.)
  */
-function Rig({ mobile, narrow }: { mobile: boolean; narrow: boolean }) {
+function Rig({ narrow }: { narrow: boolean }) {
   const group = useRef<Group>(null);
   const { size, gl } = useThree();
   const fade = useRef<HTMLElement | null>(null);
@@ -374,7 +372,7 @@ function Rig({ mobile, narrow }: { mobile: boolean; narrow: boolean }) {
   return (
     <group ref={group} visible={false}>
       <Avatar clip={clip} timeScaleRef={clip === "Walk" ? walkSpeed : undefined} crossFade={play.fade} playOnce={clip === "Wave" || clip === "Celebrate"} onFinished={onFinished} />
-      {!mobile && <ContactShadows position={[0, 0.002, 0]} opacity={SHADOW_OPACITY} scale={3.2} blur={2.4} far={1.6} color="#6B4A3A" frames={Infinity} />}
+      <FootGlow />
     </group>
   );
 }
@@ -432,14 +430,19 @@ export function AvatarLayer() {
         className="pointer-events-none!"
         style={{ background: "transparent", pointerEvents: "none" }}
         fallback={null}
+        onCreated={({ gl }) => {
+          gl.toneMappingExposure = 1.2;
+        }}
       >
-        <ambientLight intensity={0.6} color="#FFE4C4" />
-        <directionalLight position={[2.5, 4, 3]} intensity={2.2} color="#FFC145" />
-        <directionalLight position={[-3, 2.5, -2.5]} intensity={1.3} color="#FF7A1A" />
-        <hemisphereLight intensity={0.5} color="#FFF4E6" groundColor="#6B4A3A" />
+        {/* Night backdrop: warm key, sun + coral rims from behind so the black outfit separates from the silk. */}
+        <ambientLight intensity={0.5} color="#FFD9B8" />
+        <directionalLight position={[2.5, 3.5, 4]} intensity={2.6} color="#FFC58A" />
+        <directionalLight position={[-2.6, 2.4, -3.6]} intensity={4} color="#FF7A1A" />
+        <directionalLight position={[2.8, 1.6, -3.2]} intensity={2.6} color="#FF5A4E" />
+        <hemisphereLight intensity={0.6} color="#FFE4C4" groundColor="#4A2412" />
         <ActivityPause frameloop={frameloop} />
         <Suspense fallback={null}>
-          <Rig mobile={mobile} narrow={narrow} />
+          <Rig narrow={narrow} />
         </Suspense>
       </Canvas>
     </div>

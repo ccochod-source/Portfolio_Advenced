@@ -39,6 +39,12 @@
     "projectPage": { "left": "ÉTUDE DE CAS", "right": "01 / 05" }
   },
   "footer": {
+    "statementTop": "Travaillons",
+    "statementBottom": "ensemble.",
+    "availability": "Disponible · alternance IA · septembre 2027",
+    "writeMe": "Écrivez-moi",
+    "emailAria": "Envoyer un email à",
+    "backToTop": "Haut de page",
     "eyebrow": "Contact",
     "title": "Un projet IA, une alternance ? Parlons-en.",
     "emailPersonal": "Email perso",
@@ -106,6 +112,7 @@
     "status": "{skill} — {group}"
   },
   "journey": {
+    "lead": "Cinq étapes, un même fil : apprendre vite, livrer des outils utiles, et viser l'IA appliquée au métier.",
     "eyebrow": "Parcours",
     "title": "D'Annecy à Tahiti, et retour à Paris.",
     "cta": "Parlons-en",
@@ -136,6 +143,7 @@
     "cursorView": "Voir"
   },
   "notFound": {
+    "code": "Hors champ",
     "eyebrow": "Erreur 404",
     "title": "Cette page n'existe pas.",
     "text": "Le lien est peut-être ancien, ou l'adresse mal saisie. Les projets et le contact sont à un clic.",
