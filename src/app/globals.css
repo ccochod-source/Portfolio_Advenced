@@ -216,6 +216,10 @@ html.motion-scroll-lock {
   will-change: transform;
 }
 
+#hero > [aria-hidden].pointer-events-none {
+  opacity: var(--hero-haze-opacity, 1);
+}
+
 /* Hero title: avoid a lonely last word on wide screens. */
 .hero-title {
   text-wrap: balance;

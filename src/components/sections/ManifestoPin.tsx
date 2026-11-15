@@ -1,9 +1,9 @@
 "use client";
 
-import { useRef, type ReactNode } from "react";
+import { useEffect, useRef, type ReactNode } from "react";
 import { Pin } from "@/components/motion";
 import { setManifestoProgress } from "@/lib/avatar/story";
-import { ZOOM_PAGE_ATTR } from "@/lib/hero/zoom";
+import { ZOOM, ZOOM_PAGE_ATTR, getZoomProgress, subscribeZoom } from "@/lib/hero/zoom";
 import { gsap, useGSAP } from "@/lib/motion/gsap";
 import { EASE, MEDIA } from "@/lib/motion/ease";
 
@@ -19,6 +19,20 @@ export function ManifestoPin({
 }) {
   const scope = useRef<HTMLDivElement>(null);
   const reveal = useRef<gsap.core.Timeline | null>(null);
+
+  useEffect(() => {
+    const hero = document.getElementById("hero");
+    if (!hero) return;
+    const sync = (progress: number) => {
+      hero.style.setProperty("--hero-haze-opacity", String(Math.max(0, 1 - progress / ZOOM.copyFadeEnd)));
+    };
+    sync(getZoomProgress());
+    const unsubscribe = subscribeZoom(sync);
+    return () => {
+      unsubscribe();
+      hero.style.removeProperty("--hero-haze-opacity");
+    };
+  }, []);
 
   useGSAP(() => {
     const root = scope.current;
