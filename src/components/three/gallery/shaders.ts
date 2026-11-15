@@ -74,7 +74,7 @@ void main() {
   vec2 q = vUv - 0.5;
   graded *= 1.0 - dot(q, q) * 0.7;
   graded *= 1.0 - uDim;
-  graded += (hash(gl_FragCoord.xy + fract(uTime) * 97.0) - 0.5) * 0.055;
+  graded += (hash(gl_FragCoord.xy + fract(uTime) * 97.0) - 0.5) * (0.012 + 0.03 * l);
   col = mix(col, graded, uGrade);
 
   vec2 p = (vUv - 0.5) * vec2(uAspect, 1.0);
