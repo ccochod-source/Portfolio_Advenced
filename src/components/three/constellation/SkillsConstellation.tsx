@@ -84,7 +84,7 @@ export function SkillsConstellation({
       io.disconnect();
       document.removeEventListener("visibilitychange", onVisibility);
     };
-  }, []);
+  }, [webgl, mobile, reduced]);
 
   useEffect(
     () => () => {
@@ -113,8 +113,10 @@ export function SkillsConstellation({
   const hint = (touch && labels.hintTouch) || labels.hint;
 
   return (
-    <div ref={container} className={`grid gap-6 lg:grid-cols-[minmax(0,1fr)_20rem] lg:items-stretch xl:grid-cols-[minmax(0,1fr)_22rem] ${className}`}>
+    <div ref={container} className={`grid gap-6 lg:grid-cols-[minmax(0,1fr)_20rem] lg:items-stretch ${className}`}>
       <div className={`relative ${CANVAS_HEIGHT}`}>
+        <div aria-hidden className="pointer-events-none absolute inset-[12%] rounded-[50%] border border-gold/[0.08]" />
+        <span aria-hidden className="pointer-events-none absolute top-4 left-0 font-mono text-label text-cream-dim">✦ &nbsp; {String(skills.length).padStart(2, "0")}</span>
         <div aria-hidden className="absolute inset-0 touch-pan-y">
           {webgl && (
             <Canvas
@@ -152,7 +154,7 @@ export function SkillsConstellation({
                     labelRefs.current[index] = el;
                   }}
                   className={`absolute left-0 top-0 whitespace-nowrap rounded-full px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.12em] opacity-0 transition-colors md:text-[11px] md:tracking-[0.14em] duration-300 ${
-                    activeIndex === index ? "bg-umber text-cream" : "text-cream-muted"
+                    activeIndex === index ? "bg-night/95 text-gold" : "bg-night/75 text-cream"
                   }`}
                 >
                   {skill.label}
@@ -181,7 +183,7 @@ export function SkillsConstellation({
         </ul>
       </div>
 
-      <aside className="flex flex-col justify-between rounded-3xl border border-cream/15 bg-umber/85 p-6 backdrop-blur-sm md:p-8">
+      <aside className="relative flex min-h-72 flex-col justify-between overflow-hidden rounded-xl border border-gold/20 bg-gradient-to-br from-umber/95 to-night/80 p-7 shadow-[inset_0_1px_0_#ffc14510,0_20px_80px_#140b0720] backdrop-blur-md md:p-8">
         <p className="sr-only" aria-live="polite">
           {active ? (labels.status ?? "{skill} — {group}").replace("{skill}", active.label).replace("{group}", labels.groups[active.group]) : ""}
         </p>
@@ -222,7 +224,11 @@ export function SkillsConstellation({
             ) : null}
           </div>
         ) : (
-          <p className="max-w-xs text-lead text-cream-muted">{hint}</p>
+          <div>
+            <span aria-hidden className="block text-5xl leading-none text-gold">✳</span>
+            {labels.explore && <h3 className="mt-8 text-[2rem] leading-[1.05] tracking-[-0.04em] text-cream">{labels.explore}</h3>}
+            <p className="mt-5 max-w-xs text-base leading-relaxed text-cream-muted">{hint}</p>
+          </div>
         )}
 
         <ul className="mt-10 flex flex-wrap gap-x-5 gap-y-2 font-mono text-label uppercase text-cream-dim">

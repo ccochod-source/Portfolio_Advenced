@@ -1,9 +1,9 @@
 import type { ConstellationSkill, SkillGroup } from "./types";
 
 export const GROUP_COLORS: Record<SkillGroup, string> = {
-  ai: "#ff7a1a",
-  build: "#ffc145",
-  business: "#ff5a4e",
+  ai: "#ffb04f",
+  build: "#ffe4a1",
+  business: "#ff8b55",
 };
 
 export const GROUP_TAILWIND: Record<SkillGroup, string> = {
@@ -34,7 +34,7 @@ const hash = (s: string) => {
   return ((h >>> 0) % 1000) / 1000;
 };
 
-export const nodeRadius = (weight = 3) => 0.08 + Math.min(Math.max(weight, 1), 5) * 0.04;
+export const nodeRadius = (weight = 3) => 0.035 + Math.min(Math.max(weight, 1), 5) * 0.009;
 
 function fibonacciSphere(count: number, i: number): [number, number, number] {
   const y = count === 1 ? 0 : 1 - (2 * (i + 0.5)) / count;

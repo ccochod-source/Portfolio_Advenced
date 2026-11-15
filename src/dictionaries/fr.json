@@ -62,12 +62,8 @@
         "text": "RAG, agents, extraction de documents : l'IA est une étape contrôlée du produit, pas un gadget. Cinq applications en huit semaines, un agent computer use en 36 heures."
       },
       {
-        "title": "Mesurer",
-        "text": "22 000 entrées reprises, environ 400 anomalies détectées, 19 tableaux de bord, 1 018 tests : ce qui n'est pas mesuré n'est pas livré."
-      },
-      {
-        "title": "Livrer à de vrais utilisateurs",
-        "text": "Tests utilisateurs, droits, exports, documentation. Un site en production chez Auralife, des outils en service à Tahiti, un agent qui agit sous les yeux de l'utilisateur."
+        "title": "Livrer. Mesurer. Améliorer.",
+        "text": "22 000 entrées reprises, environ 400 anomalies détectées, 1 018 tests. Des outils en service à Tahiti, un site en production chez Auralife."
       }
     ]
   },
@@ -93,7 +89,9 @@
   },
   "skills": {
     "eyebrow": "Stack",
-    "title": "L'IA d'abord, le code pour la livrer, le métier pour la rendre utile.",
+    "title": "Tout est connecté.",
+    "intro": "L'IA d'abord, le code pour la livrer, le métier pour la rendre utile.",
+    "explore": "Une idée en éclaire une autre.",
     "related": "Projets liés",
     "groups": {
       "ai": "Intelligence artificielle",

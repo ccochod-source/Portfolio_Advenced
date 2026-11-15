@@ -11,6 +11,7 @@ export type ConstellationSkill = {
 };
 
 export type ConstellationLabels = {
+  explore?: string;
   groups: Record<SkillGroup, string>;
   relatedProjects: string;
   hint: string;

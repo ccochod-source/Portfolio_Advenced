@@ -30,14 +30,16 @@ export function Skills({ lang, copy, hud, skills, id = "stack", index = "04" }: 
       return project ? [{ slug, title: project.title }] : [];
     }),
   }));
-  const labels = { groups: copy.groups, relatedProjects: copy.related, hint: copy.hint, hintTouch: copy.hintTouch, status: copy.status };
+  const labels = { groups: copy.groups, relatedProjects: copy.related, hint: copy.hint, hintTouch: copy.hintTouch, status: copy.status, explore: copy.explore };
+  const sectionHud = { ...hud, center: "CLÉMENT COCHOD — PORTFOLIO", right: `${index} / 05` };
 
   return (
-    <section id={id} className="pt-14 pb-24 md:pt-20 md:pb-36">
+    <section id={id} data-hud-left={sectionHud.left} data-hud-center={sectionHud.center} data-hud-right={sectionHud.right} className="pt-20 pb-24 md:pt-28 md:pb-36">
       <Container>
-        <div data-hud-left={hud.left} data-hud-center={hud.center} data-hud-right={hud.right}>
+        <div data-hud-left={sectionHud.left} data-hud-center={sectionHud.center} data-hud-right={sectionHud.right}>
           <Eyebrow index={index}>{copy.eyebrow}</Eyebrow>
-          <h2 className="mt-6 max-w-5xl text-h2 font-medium">{copy.title}</h2>
+          <h2 className="mt-7 max-w-6xl text-[clamp(3.3rem,8.4vw,9rem)] leading-[0.95] font-medium tracking-[-0.055em]">{copy.title}</h2>
+          <p className="mt-6 max-w-xl text-lead text-cream-muted">{copy.intro}</p>
         </div>
 
         <SkillsVisual skills={constellationSkills} labels={labels} projectBasePath={`/${lang}/projets`} listLabel={copy.fullList}>
@@ -47,7 +49,7 @@ export function Skills({ lang, copy, hud, skills, id = "stack", index = "04" }: 
               return (
                 <div key={group.id} data-skill-group={group.id}>
                   <h3 className="flex items-center gap-3 font-mono text-label uppercase text-cream-dim">
-                    <span className="text-cream-dim">{String(gi + 1).padStart(2, "0")}</span>
+                    <span className="text-gold">{String(gi + 1).padStart(2, "0")}</span>
                     {t(group.label, lang)}
                   </h3>
                   <ul className="mt-6 divide-y divide-cream-muted/15 border-y border-cream-muted/15">
@@ -60,7 +62,7 @@ export function Skills({ lang, copy, hud, skills, id = "stack", index = "04" }: 
                             const project = getProject(slug);
                             return project ? (
                               <li key={slug}>
-                                  <Link href={`/${lang}/projets/${slug}`} className="touch-target inline-block py-1 underline decoration-cream/30 underline-offset-4 hover:text-gold hover:decoration-current">
+                                <Link href={`/${lang}/projets/${slug}`} className="touch-target inline-block py-1 underline decoration-cream/30 underline-offset-4 hover:text-gold hover:decoration-current">
                                   {project.title}
                                 </Link>
                               </li>

@@ -20,11 +20,11 @@ type SkillsVisualProps = {
  */
 export function SkillsVisual({ skills, labels, projectBasePath, listLabel, children }: SkillsVisualProps) {
   return (
-    <div className="relative mt-14 md:mt-20">
+    <div className="relative mt-10 md:mt-14">
       <SkillsConstellationLazy skills={skills} labels={labels} projectBasePath={projectBasePath} className="mb-10" />
-      <details className="group/list border-t border-cream-muted/15 pt-4">
+      <details className="group/list border-y border-cream/20 py-3">
         <summary className="flex min-h-11 cursor-pointer list-none items-center gap-3 font-mono text-label uppercase text-cream-dim marker:hidden [&::-webkit-details-marker]:hidden">
-          <span aria-hidden className="transition-transform duration-300 group-open/list:rotate-90">→</span>
+          <span aria-hidden className="text-gold transition-transform duration-300 motion-reduce:transition-none group-open/list:rotate-90">↗</span>
           {listLabel}
         </summary>
         <div className="pt-10">{children}</div>
