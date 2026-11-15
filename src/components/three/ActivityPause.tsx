@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { useThree } from "@react-three/fiber";
+import "@/lib/three/console";
 
 type Frameloop = "always" | "demand" | "never";
 

@@ -165,7 +165,7 @@ export function CaseHero({ slug, title, category, year, award, cover, eyebrow, c
 
         <div data-case-content className="absolute inset-0 flex flex-col justify-between px-5 pb-20 pt-24 md:px-10 md:pb-24 md:pt-28">
           <div data-case-top>
-          <div data-case-reveal className="flex items-center justify-between gap-6 font-mono text-label uppercase text-cream">
+          <div data-case-reveal className="case-hero-chrome flex items-center justify-between gap-6 font-mono text-label uppercase text-cream">
             <Link href={backHref} className="group inline-flex min-h-11 items-center gap-2 underline decoration-cream/30 underline-offset-4 hover:decoration-current">
               <span aria-hidden className="transition-transform duration-500 ease-out-expo group-hover:-translate-x-1">
                 ←
@@ -178,8 +178,9 @@ export function CaseHero({ slug, title, category, year, award, cover, eyebrow, c
           </div>
           </div>
 
-          <div data-case-bottom>
-            <div data-case-reveal className="flex flex-wrap items-end justify-between gap-x-8 gap-y-2 font-mono text-label uppercase text-cream-muted">
+          <div data-case-bottom className="relative isolate">
+            <div data-case-reveal aria-hidden className="case-hero-meta-scrim" />
+            <div data-case-reveal className="case-hero-chrome flex flex-wrap items-end justify-between gap-x-8 gap-y-2 font-mono text-label uppercase text-cream-muted">
               <p>
                 {eyebrow} — {category}
               </p>

@@ -64,7 +64,7 @@ export async function Footer() {
           </div>
         </div>
 
-        <div {...hudAttrs}>
+        <div {...hudAttrs} data-hud-stop="">
           <div className="footer-mail-block">
             <p className="font-mono text-label uppercase text-cream-dim">{footer.writeMe}</p>
             <a href={`mailto:${profile.emailPersonal}`} className="footer-email" aria-label={`${footer.emailAria} ${profile.emailPersonal}`}>
