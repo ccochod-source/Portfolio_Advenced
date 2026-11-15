@@ -3,8 +3,8 @@
 import { useLayoutEffect, useMemo, useRef, useState, type RefObject } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
 import { useTexture } from "@react-three/drei";
-import { BackSide, Color, EquirectangularReflectionMapping, Group, RepeatWrapping, SRGBColorSpace, type ShaderMaterial, type Texture, Vector2, Vector4 } from "three";
-import { CLOUD_TEXTURE_URLS, SKY_TEXTURE_URL } from "./constants";
+import { Color, EquirectangularReflectionMapping, Group, MathUtils, SRGBColorSpace, type ShaderMaterial, type Texture, Vector2, Vector3, Vector4 } from "three";
+import { CLOUD_PHOTO_URLS, HERO_SKY_PORTRAIT_URL, HERO_SKY_URL, SKY_TEXTURE_URL } from "./constants";
 import type { MouseState } from "./mouse";
 import { useSceneTime } from "./useSceneTime";
 
@@ -13,17 +13,11 @@ export const SKY_YAW = 1.15;
 export const SKY_PITCH = 0.22;
 
 type Layer = { z: number; y: number; scale: number; count: number; speed: number; alpha: number; parallax: number };
-type LayerLook = { lit: string; shade: string };
-/**
- * Far → near. Distant clouds are small and pale, the horizon bank is large and soft, mid clouds sit around the set's
- * cloud, near clouds are large, faint and low so they frame the set without covering the headline.
- */
+type LayerLook = { tint: string };
+/** Mid → near. The photo covers the distance; remaining warm clouds sit low at the frame edges. */
 const LAYERS: (Layer & LayerLook)[] = [
-  { z: -14, y: 0.4, scale: 1.6, count: 7, speed: 0.02, alpha: 0.55, parallax: 0.03, lit: "#ffe6cf", shade: "#f5c9a6" },
-  { z: -9, y: -1.6, scale: 5.2, count: 6, speed: 0.03, alpha: 0.8, parallax: 0.05, lit: "#ffdcbb", shade: "#e8a97e" },
-  { z: -6, y: -1.0, scale: 3.4, count: 6, speed: 0.045, alpha: 0.8, parallax: 0.08, lit: "#ffd9b5", shade: "#e09a6c" },
-  { z: -3, y: -1.9, scale: 2.8, count: 5, speed: 0.08, alpha: 0.85, parallax: 0.18, lit: "#ffd3ad", shade: "#d98b5e" },
-  { z: 1.2, y: -3.1, scale: 3.6, count: 3, speed: 0.13, alpha: 0.6, parallax: 0.35, lit: "#ffcfa6", shade: "#d08158" },
+  { z: -3, y: -3.05, scale: 1.2, count: 2, speed: 0.08, alpha: 0.38, parallax: 0.18, tint: "#fff7ee" },
+  { z: 1.2, y: -3.3, scale: 1.15, count: 1, speed: 0.13, alpha: 0.42, parallax: 0.35, tint: "#fff9f0" },
 ];
 
 /** Deterministic PRNG (mulberry32) so the cloud field is stable across renders. */
@@ -40,20 +34,23 @@ function createRandom(seed: number) {
 
 type Cloud = { x: number; y: number; z: number; w: number; h: number; tex: number; alpha: number; speed: number; flip: boolean; layer: number };
 
-function buildClouds(counts: readonly number[]) {
+function buildClouds(counts: readonly number[], portrait: boolean) {
   const rand = createRandom(4242);
   const clouds: Cloud[] = [];
   LAYERS.forEach((layer, li) => {
     const n = counts[li] ?? layer.count;
     for (let i = 0; i < n; i++) {
-      const w = layer.scale * (0.8 + rand() * 0.5);
+      const tall = !portrait && li === 0 && i === n - 1;
+      const h = layer.scale * (0.88 + rand() * 0.24);
+      const imageAspect = tall ? 1536 / 2752 : 2752 / 1536;
+      const edge = portrait ? 0.85 + li * 0.2 + rand() * 0.3 : 4.8 + li * 0.8 + rand() * 0.8;
       clouds.push({
-        x: -8 + (i + rand() * 0.6) * (16 / n),
-        y: layer.y + (rand() - 0.5) * 0.9,
-        z: layer.z + (rand() - 0.5) * 0.6,
-        w,
-        h: w * 0.5,
-        tex: Math.floor(rand() * CLOUD_TEXTURE_URLS.length),
+        x: ((i + li) % 2 === 0 ? -1 : 1) * edge,
+        y: layer.y + (rand() - 0.5) * 0.36,
+        z: layer.z + (rand() - 0.5) * 0.5,
+        w: h * imageAspect,
+        h,
+        tex: tall ? 1 : 0,
         alpha: layer.alpha * (0.7 + rand() * 0.3),
         speed: layer.speed * (0.8 + rand() * 0.4),
         flip: rand() > 0.5,
@@ -66,7 +63,7 @@ function buildClouds(counts: readonly number[]) {
 
 const HALF_SPAN = 9;
 
-/** Cloud billboard: the texture alpha shapes the cloud, the colour grades from a darker underside to a warm lit top. */
+/** Photo-cloud billboard: preserve the warm image colour with a slight light tint and layer opacity. */
 const CLOUD_VERTEX = /* glsl */ `
   varying vec2 vUv;
   void main() {
@@ -77,18 +74,14 @@ const CLOUD_VERTEX = /* glsl */ `
 const CLOUD_FRAGMENT = /* glsl */ `
   precision highp float;
   uniform sampler2D uMap;
-  uniform vec3 uLit;
-  uniform vec3 uShade;
+  uniform vec3 uTint;
   uniform float uOpacity;
   varying vec2 vUv;
   void main() {
     vec4 tex = texture2D(uMap, vUv);
     float a = tex.a * uOpacity;
     if (a < 0.003) discard;
-    // Brighter where the puff is dense and high, darker along the underside; edges catch the sun.
-    float height = smoothstep(0.1, 0.8, vUv.y);
-    float edge = 1.0 - smoothstep(0.2, 0.9, tex.a);
-    vec3 col = mix(uShade, uLit, clamp(height * 0.8 + edge * 0.45, 0.0, 1.0)) * (0.85 + 0.15 * tex.r);
+    vec3 col = tex.rgb * uTint;
     gl_FragColor = vec4(col, a);
     #include <colorspace_fragment>
   }
@@ -96,41 +89,52 @@ const CLOUD_FRAGMENT = /* glsl */ `
 
 const MAX_RIPPLES = 8;
 type SkyUniforms = {
-  uSky: { value: Texture };
-  uClouds: { value: Texture };
+  uSkyPhoto: { value: Texture };
   uTime: { value: number };
   uAspect: { value: number };
   uResolution: { value: Vector2 };
+  uImageAspect: { value: number };
+  uFocus: { value: Vector2 };
+  uParallax: { value: Vector2 };
+  uTopWarm: { value: number };
   uRipples: { value: Vector4[] };
 };
 const SKY_VERTEX = /* glsl */ `
-  varying vec3 vDir;
+  varying vec2 vUv;
   void main() {
-    vDir = normalize(position);
-    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+    vUv = uv;
+    gl_Position = vec4(position.xy, 1.0, 1.0);
   }
 `;
 /**
- * Photoreal equirect sunset + a slowly drifting cloud layer, distorted by pointer ripples: each ripple is a damped
- * ring (screen space) that displaces the sky lookup: a gentle liquid shimmer under the pointer, not a warp of the sky.
- * Screen position comes from gl_FragCoord / uResolution (exact): an interpolated clip-space varying is wrong on the
- * huge dome triangles, especially those clipped by the camera plane.
+ * The photo is cover-fitted around the focal point with bounded camera parallax. Pointer ripples stay a damped
+ * screen-space shimmer, not a warp of the sky.
  */
 const SKY_FRAGMENT = /* glsl */ `
   precision highp float;
-  uniform sampler2D uSky;
-  uniform sampler2D uClouds;
+  uniform sampler2D uSkyPhoto;
   uniform float uTime;
   uniform float uAspect;
   uniform vec2 uResolution;
+  uniform float uImageAspect;
+  uniform vec2 uFocus;
+  uniform vec2 uParallax;
+  uniform float uTopWarm;
   uniform vec4 uRipples[${MAX_RIPPLES}];
-  varying vec3 vDir;
-  const float PI = 3.14159265;
+  varying vec2 vUv;
 
   void main() {
-    vec3 d = normalize(vDir);
     vec2 vScreen = gl_FragCoord.xy / uResolution;
-    vec2 uv = vec2(atan(d.z, d.x) / (2.0 * PI) + 0.5, asin(clamp(d.y, -1.0, 1.0)) / PI + 0.5);
+    float viewAspect = uResolution.x / max(1.0, uResolution.y);
+    float imageAspect = max(uImageAspect, 0.001);
+    vec2 cover = vec2(1.0);
+    if (viewAspect > imageAspect) cover.y = imageAspect / viewAspect;
+    else cover.x = viewAspect / imageAspect;
+    cover *= 1.0 / 1.06;
+    vec2 uv = uFocus + (vUv - uFocus) * cover;
+    vec2 minOffset = vec2(0.006) - (uFocus - uFocus * cover);
+    vec2 maxOffset = vec2(0.994) - (uFocus + (vec2(1.0) - uFocus) * cover);
+    uv += clamp(uParallax, minOffset, maxOffset);
 
     vec2 disp = vec2(0.0);
     for (int i = 0; i < ${MAX_RIPPLES}; i++) {
@@ -144,47 +148,44 @@ const SKY_FRAGMENT = /* glsl */ `
       float amp = ring * exp(-age * 2.2) * r.w * 0.0035;
       disp += (dist > 1e-4 ? toP / dist : vec2(0.0)) * amp;
     }
-    uv += disp;
+    uv = clamp(uv + disp, vec2(0.006), vec2(0.994));
 
-    vec3 col = texture2D(uSky, uv).rgb;
-    // Two tiled, slowly scrolling cloud octaves above the horizon: a broad bank low in the sky and finer wisps higher up.
-    float band = smoothstep(0.49, 0.56, uv.y) * smoothstep(0.98, 0.72, uv.y);
-    float bank = texture2D(uClouds, vec2(uv.x * 2.2 + uTime * 0.003, uv.y * 2.6 - 1.25)).a * smoothstep(0.78, 0.56, uv.y);
-    float wisp = texture2D(uClouds, vec2(uv.x * 4.5 - uTime * 0.002 + 0.37, uv.y * 3.2 - 1.6)).a;
-    float cloud = clamp(bank * 0.75 + wisp * 0.45, 0.0, 1.0) * band;
-    col = mix(col, vec3(1.0, 0.9, 0.78), cloud * 0.55);
-    // Lighter cream zenith: keeps the coral wordmark legible over the sky.
-    col = mix(col, vec3(1.0, 0.95, 0.88), smoothstep(0.6, 0.95, uv.y) * 0.4);
+    vec3 col = texture2D(uSkyPhoto, uv).rgb;
+    vec3 luma = vec3(0.2126, 0.7152, 0.0722);
+    vec3 peach = vec3(1.0, 0.702, 0.478);
+    peach *= dot(col, luma) / max(dot(peach, luma), 0.001);
+    float warm = clamp(uTopWarm, 0.0, 1.0) * smoothstep(0.55, 1.0, vUv.y);
+    col = mix(col, peach, warm);
     gl_FragColor = vec4(col, 1.0);
     #include <colorspace_fragment>
   }
 `;
 
-/**
- * Golden-hour sunset dome (equirect photo + drifting cloud layer + pointer ripples, see SKY_FRAGMENT) that is also the
- * environment light, plus five layers of slowly drifting cloud billboards (lit tops, shaded undersides) for parallax.
- */
+/** Photo sky backdrop; the equirect sky remains the environment light, with mid/near cloud billboards for parallax. */
 export function SkyDome({ animate, mouseRef, counts }: { animate: boolean; mouseRef: RefObject<MouseState>; counts: readonly number[] }) {
   const get = useThree((s) => s.get);
+  const size = useThree((s) => s.size);
+  const portrait = size.width / Math.max(1, size.height) < 1;
   const sky = useTexture(SKY_TEXTURE_URL, (tex) => {
     tex.mapping = EquirectangularReflectionMapping;
     tex.colorSpace = SRGBColorSpace;
   });
-  const cloudTextures = useTexture([...CLOUD_TEXTURE_URLS], (textures) => {
-    (textures as Texture[]).forEach((t, i) => {
+  const skyPhoto = useTexture(portrait ? HERO_SKY_PORTRAIT_URL : HERO_SKY_URL, (tex) => {
+    tex.colorSpace = SRGBColorSpace;
+  });
+  const cloudTextureUrls = useMemo(() => (portrait ? [CLOUD_PHOTO_URLS[0]] : [...CLOUD_PHOTO_URLS]), [portrait]);
+  const cloudTextures = useTexture(cloudTextureUrls, (textures) => {
+    (textures as Texture[]).forEach((t) => {
       t.colorSpace = SRGBColorSpace;
-      // The first cloud texture doubles as the dome's tiled drift layer.
-      if (i === 0) t.wrapS = t.wrapT = RepeatWrapping;
     });
   }) as Texture[];
   const groups = useRef<(Group | null)[]>([]);
-  const clouds = useMemo(() => buildClouds(counts), [counts]);
+  const clouds = useMemo(() => buildClouds(counts, portrait), [counts, portrait]);
   const cloudUniforms = useMemo(
     () =>
       clouds.map((c) => ({
         uMap: { value: cloudTextures[c.tex] },
-        uLit: { value: new Color(LAYERS[c.layer].lit) },
-        uShade: { value: new Color(LAYERS[c.layer].shade) },
+        uTint: { value: new Color(LAYERS[c.layer].tint).multiplyScalar(1.12) },
         uOpacity: { value: c.alpha },
       })),
     [clouds, cloudTextures],
@@ -192,14 +193,18 @@ export function SkyDome({ animate, mouseRef, counts }: { animate: boolean; mouse
   const scroll = useRef(0);
   // Stable uniform objects (mutated per frame, never re-created): a lazily initialised state.
   const [uniforms] = useState<SkyUniforms>(() => ({
-    uSky: { value: sky },
-    uClouds: { value: cloudTextures[0] },
+    uSkyPhoto: { value: skyPhoto },
     uTime: { value: 0 },
     uAspect: { value: 1 },
     uResolution: { value: new Vector2(1, 1) },
+    uImageAspect: { value: 1 },
+    uFocus: { value: new Vector2(0.4, 0.5) },
+    uParallax: { value: new Vector2() },
+    uTopWarm: { value: 0 },
     uRipples: { value: Array.from({ length: MAX_RIPPLES }, () => new Vector4(0, 0, 0, 0)) },
   }));
   const ripple = useRef({ next: 0, last: new Vector2(10, 10), lastSpawn: 0, time: 0 });
+  const cameraDirection = useMemo(() => new Vector3(), []);
 
   useLayoutEffect(() => {
     const scene = get().scene;
@@ -213,15 +218,22 @@ export function SkyDome({ animate, mouseRef, counts }: { animate: boolean; mouse
 
   const skyMaterial = useRef<ShaderMaterial>(null);
 
-  useFrame(({ size, gl }, delta) => {
+  useFrame(({ size, gl, camera }, delta) => {
     scroll.current = typeof window === "undefined" ? 0 : window.scrollY / Math.max(1, window.innerHeight);
     // Per-frame updates go through the material ref (the `uniforms` object above is only the initial value).
     const uniforms = skyMaterial.current?.uniforms as SkyUniforms | undefined;
     if (!uniforms) return;
-    uniforms.uSky.value = sky;
-    uniforms.uClouds.value = cloudTextures[0];
+    uniforms.uSkyPhoto.value = skyPhoto;
     uniforms.uAspect.value = size.width / Math.max(1, size.height);
     gl.getDrawingBufferSize(uniforms.uResolution.value);
+    const image = skyPhoto.image as { width: number; height: number };
+    uniforms.uImageAspect.value = image.width / Math.max(1, image.height);
+    uniforms.uFocus.value.set(portrait ? 0.35 : 0.4, portrait ? 0.35 : 0.5);
+    camera.getWorldDirection(cameraDirection);
+    uniforms.uParallax.value.set(
+      Math.atan2(cameraDirection.x, -cameraDirection.z) * 0.04,
+      Math.asin(MathUtils.clamp(cameraDirection.y, -1, 1)) * 0.04,
+    );
     if (!animate) return;
     const r = ripple.current;
     r.time += Math.min(delta, 0.05);
@@ -260,9 +272,9 @@ export function SkyDome({ animate, mouseRef, counts }: { animate: boolean; mouse
 
   return (
     <group>
-      <mesh rotation={[SKY_PITCH, SKY_YAW, 0]} renderOrder={-20} frustumCulled={false}>
-        <sphereGeometry args={[30, 48, 32]} />
-        <shaderMaterial ref={skyMaterial} vertexShader={SKY_VERTEX} fragmentShader={SKY_FRAGMENT} uniforms={uniforms} side={BackSide} depthWrite={false} toneMapped={false} />
+      <mesh renderOrder={-20} frustumCulled={false}>
+        <planeGeometry args={[2, 2]} />
+        <shaderMaterial ref={skyMaterial} vertexShader={SKY_VERTEX} fragmentShader={SKY_FRAGMENT} uniforms={uniforms} depthTest={false} depthWrite={false} toneMapped={false} />
       </mesh>
       {clouds.map((c, i) => (
         <group
@@ -290,4 +302,3 @@ export function SkyDome({ animate, mouseRef, counts }: { animate: boolean; mouse
 }
 
 useTexture.preload(SKY_TEXTURE_URL);
-useTexture.preload([...CLOUD_TEXTURE_URLS]);

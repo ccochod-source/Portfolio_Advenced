@@ -20,8 +20,10 @@ export const PALETTE = {
   ink: "#2b1a12",
 } as const;
 
-/** Drifting cloud billboards per layer (far, mid, near). */
-export const CLOUD_COUNT = { desktop: [7, 6, 6, 5, 3], mobile: [4, 3, 3, 3, 2] } as const;
-/** Equirectangular golden-hour sky (Poly Haven "Kloppenheim 06 (Pure Sky)", CC0, warm-graded — see public/models/LICENSE.md). */
+/** Warm photo-cloud billboards per layer (mid, near). */
+export const CLOUD_COUNT = { desktop: [2, 1], mobile: [1, 1] } as const;
+/** Equirectangular golden-hour sky used as the hero scene environment light. */
 export const SKY_TEXTURE_URL = "/textures/sky-golden-hour.webp";
-export const CLOUD_TEXTURE_URLS = ["/textures/cloud-1.webp", "/textures/cloud-2.webp", "/textures/cloud-3.webp"] as const;
+export const HERO_SKY_URL = "/textures/hero-sky.webp";
+export const HERO_SKY_PORTRAIT_URL = "/textures/hero-sky-portrait.webp";
+export const CLOUD_PHOTO_URLS = ["/textures/cloud-photo-wide.webp", "/textures/cloud-photo-tall.webp"] as const;

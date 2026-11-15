@@ -2,11 +2,11 @@
 
 import { useLayoutEffect, useMemo, useRef, type RefObject } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
-import { RoundedBox, useGLTF } from "@react-three/drei";
-import { AdditiveBlending, Color, type Group, type InstancedMesh, Matrix4, Quaternion, Vector3 } from "three";
+import { Billboard, RoundedBox, useGLTF, useTexture } from "@react-three/drei";
+import { AdditiveBlending, Color, SRGBColorSpace, type Group, type InstancedMesh, Matrix4, Quaternion, Vector3 } from "three";
 import { AVATAR_MODEL_URL, Avatar } from "../avatar/Avatar";
 import { HAND_PITCH, HAND_REST, dampTypingClip, findArms, offsetHand, rotateWorld } from "./typingPose";
-import { PALETTE } from "./constants";
+import { CLOUD_PHOTO_URLS, PALETTE } from "./constants";
 import {
   DESK_TOP_HEIGHT,
   DESK_YAW,
@@ -20,26 +20,6 @@ import {
   deskOriginFor,
   deskScaleFor,
 } from "./desk";
-
-/** Fluffy cloud seat: a cluster of soft spheres, seat top ≈ 0.5 m under the avatar's hips, lower puffs under the dangling feet. */
-const CLOUD_BLOBS: [number, number, number, number][] = [
-  [0, 0.08, 0.05, 0.44],
-  [0.3, 0.1, 0.12, 0.34],
-  [-0.3, 0.1, 0.1, 0.34],
-  [0.05, -0.2, 0.5, 0.34],
-  [-0.4, -0.05, 0.4, 0.3],
-  [0.48, -0.02, 0.35, 0.28],
-  [0, -0.02, -0.4, 0.36],
-  [0.36, -0.08, -0.3, 0.3],
-  [-0.38, -0.08, -0.28, 0.3],
-  [0, -0.32, 0, 0.48],
-  [0.55, -0.3, 0.05, 0.3],
-  [-0.58, -0.28, 0.1, 0.3],
-  [0.2, -0.45, 0.35, 0.26],
-  [-0.25, -0.5, -0.2, 0.26],
-  [0.62, -0.18, -0.15, 0.2],
-  [-0.66, -0.12, 0.3, 0.18],
-];
 
 const GLOW_VERTEX = /* glsl */ `
   varying vec2 vUv;
@@ -61,15 +41,24 @@ const GLOW_FRAGMENT = /* glsl */ `
 `;
 
 function Cloud() {
+  const photo = useTexture(CLOUD_PHOTO_URLS[0], (texture) => {
+    texture.colorSpace = SRGBColorSpace;
+  });
   const glowUniforms = useMemo(() => ({ uColor: { value: new Color(PALETTE.gold) }, uIntensity: { value: 0.55 } }), []);
   return (
     <group>
-      {CLOUD_BLOBS.map(([x, y, z, r], i) => (
-        <mesh key={i} position={[x, y, z]} scale={[r, r * 0.82, r]}>
-          <sphereGeometry args={[1, 28, 20]} />
-          <meshStandardMaterial color={PALETTE.cream} roughness={1} metalness={0} emissive={PALETTE.creamDeep} emissiveIntensity={0.18} />
+      <Billboard position={[0, 0, -0.22]}>
+        <mesh scale={[3.4, 1.4, 1]} renderOrder={1}>
+          <planeGeometry args={[1, 1]} />
+          <meshBasicMaterial map={photo} color="#fffaf1" transparent opacity={0.95} depthWrite={false} toneMapped={false} />
         </mesh>
-      ))}
+      </Billboard>
+      <Billboard position={[0, -0.4, 0.52]}>
+        <mesh scale={[2.25, 1.1, 1]} renderOrder={2}>
+          <planeGeometry args={[1, 1]} />
+          <meshBasicMaterial map={photo} color="#fffaf1" transparent opacity={0.95} depthWrite={false} toneMapped={false} />
+        </mesh>
+      </Billboard>
       <mesh position={[0, -0.1, -0.6]} scale={[3.2, 2.2, 1]} renderOrder={-1}>
         <planeGeometry args={[1, 1]} />
         <shaderMaterial vertexShader={GLOW_VERTEX} fragmentShader={GLOW_FRAGMENT} uniforms={glowUniforms} transparent depthWrite={false} blending={AdditiveBlending} />
