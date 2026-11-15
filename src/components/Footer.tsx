@@ -6,7 +6,9 @@ import { Eyebrow } from "./ui/Eyebrow";
 import { Year } from "./ui/Year";
 
 export async function Footer() {
-  const { footer } = await getDictionary();
+  const dict = await getDictionary();
+  const { footer } = dict;
+  const hud = dict.hud.sections.contact;
   const contacts = [
     { label: footer.emailPersonal, value: profile.emailPersonal, href: `mailto:${profile.emailPersonal}` },
     { label: footer.emailPro, value: profile.emailPro, href: `mailto:${profile.emailPro}` },
@@ -14,10 +16,12 @@ export async function Footer() {
   ];
 
   return (
-    <footer id="contact" className="relative overflow-hidden bg-ink text-cream">
+    <footer id="contact" className="relative overflow-hidden bg-night text-cream">
       <Container className="pt-24 md:pt-36">
-        <Eyebrow className="text-cream/70">{footer.eyebrow}</Eyebrow>
-        <h2 className="mt-6 max-w-4xl text-h1 font-medium">{footer.title}</h2>
+        <div data-hud-left={hud.left} data-hud-center={hud.center} data-hud-right={hud.right}>
+          <Eyebrow className="text-cream/70">{footer.eyebrow}</Eyebrow>
+          <h2 className="mt-6 max-w-4xl text-h1 font-medium">{footer.title}</h2>
+        </div>
 
         <div className="mt-14 grid gap-10 xl:grid-cols-[2fr_1fr]">
           <dl className="grid gap-6 md:grid-cols-3">

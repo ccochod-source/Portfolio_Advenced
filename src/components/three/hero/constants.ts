@@ -11,6 +11,7 @@ export const heroFocusFor = (aspect: number): Vec3Tuple => (aspect < 1 ? HERO_FO
 export const HERO_CAMERA_Z = 6;
 
 export const PALETTE = {
+  night: "#140b07",
   cream: "#fff4e6",
   creamDeep: "#ffe4c4",
   gold: "#ffc145",

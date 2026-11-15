@@ -20,7 +20,7 @@ export function AvatarLab({ labels, initialClip = "Idle" }: { labels: AvatarLabL
   return (
     <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)] lg:items-center">
       <div>
-        <p className="font-mono text-label uppercase text-ink-soft">
+        <p className="font-mono text-label uppercase text-cream-dim">
           {labels.current} <span className="text-sun">{labels.clips[clip]}</span>
         </p>
         <div role="group" aria-label={labels.clipGroup} className="mt-5 flex flex-wrap gap-3">
@@ -33,7 +33,7 @@ export function AvatarLab({ labels, initialClip = "Idle" }: { labels: AvatarLabL
                 aria-pressed={active}
                 onClick={() => setClip(name)}
                 className={`rounded-full px-5 py-3 text-sm font-medium transition-colors duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sun ${
-                  active ? "bg-ink text-cream" : "border border-ink/25 text-ink hover:border-ink hover:bg-ink hover:text-cream"
+                  active ? "bg-umber text-cream" : "border border-cream/25 text-cream-muted hover:border-cream/60 hover:bg-cream/10 hover:text-cream"
                 }`}
               >
                 {labels.clips[name]}
@@ -41,10 +41,10 @@ export function AvatarLab({ labels, initialClip = "Idle" }: { labels: AvatarLabL
             );
           })}
         </div>
-        {reducedMotion && <p className="mt-6 max-w-md text-sm text-ink-soft">{labels.reducedMotion}</p>}
+        {reducedMotion && <p className="mt-6 max-w-md text-sm text-cream-muted">{labels.reducedMotion}</p>}
       </div>
 
-      <figure className="relative mx-auto aspect-[3/4] w-full max-w-[520px] overflow-hidden rounded-[2rem] bg-[radial-gradient(ellipse_at_50%_70%,var(--color-cream-deep),var(--color-cream)_70%)]">
+      <figure className="relative mx-auto aspect-[3/4] w-full max-w-[520px] overflow-hidden rounded-[2rem] bg-[radial-gradient(ellipse_at_50%_70%,var(--color-umber),var(--color-night)_70%)]">
         <AvatarStageLazy clip={clip} rotation={[0, 0.35, 0]} cameraZ={4.7} className="h-full w-full" />
         <figcaption className="sr-only">
           {labels.figure} {labels.clips[clip]}

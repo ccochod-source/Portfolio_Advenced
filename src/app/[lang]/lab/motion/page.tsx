@@ -171,7 +171,7 @@ export default async function MotionLab() {
   };
   const jumpNav = (
     <nav aria-label={t.jump} className="flex flex-wrap items-center gap-x-5 gap-y-2 font-mono text-label uppercase">
-      <span className="text-ink-soft">{t.jump}</span>
+      <span className="text-cream-dim">{t.jump}</span>
       {anchors.map((anchor) => (
         <a key={anchor} href={`#${anchor}`} className="underline-offset-4 hover:underline">
           {labels[anchor]}
@@ -193,7 +193,7 @@ export default async function MotionLab() {
             <TextReveal as="h1" type="chars" className="mt-8 max-w-6xl text-display font-medium">
               {t.title}
             </TextReveal>
-            <TextReveal type="lines" delay={0.25} className="mt-10 max-w-2xl text-lead text-ink-soft">
+            <TextReveal type="lines" delay={0.25} className="mt-10 max-w-2xl text-lead text-cream-muted">
               {t.lead}
             </TextReveal>
             <PreloaderDemo
@@ -209,7 +209,7 @@ export default async function MotionLab() {
         </section>
 
         <Section id="text" index="01" eyebrow={t.text.eyebrow} className="pt-0!">
-          <div className="divide-y divide-ink/10 border-y border-ink/10">
+          <div className="divide-y divide-cream/15 border-y border-cream/15">
             <div className="grid gap-4 py-10 md:grid-cols-[10rem_1fr]">
               <Badge className="h-fit w-fit">type=&quot;lines&quot;</Badge>
               <TextReveal as="h2" className="max-w-4xl text-h2 font-medium">
@@ -230,17 +230,17 @@ export default async function MotionLab() {
             </div>
             <div className="grid gap-4 py-10 md:grid-cols-[10rem_1fr]">
               <Badge className="h-fit w-fit">type=&quot;lines&quot;</Badge>
-              <TextReveal className="max-w-2xl text-lead text-ink-soft">{t.text.lines}</TextReveal>
+              <TextReveal className="max-w-2xl text-lead text-cream-muted">{t.text.lines}</TextReveal>
             </div>
           </div>
         </Section>
 
         <Section id="reveal" index="02" eyebrow={t.reveal.eyebrow} title={t.reveal.title} className="pt-0!">
-          <Reveal className="rounded-[1.75rem] bg-cream-deep p-8 text-lead md:p-12">{t.reveal.single}</Reveal>
+          <Reveal className="rounded-[1.75rem] bg-umber p-8 text-lead text-cream-muted md:p-12">{t.reveal.single}</Reveal>
           <Reveal as="ul" stagger className="mt-6 grid grid-cols-2 gap-4 md:grid-cols-3">
             {t.reveal.items.map((item, index) => (
-              <li key={item} className="rounded-[1.75rem] border border-ink/10 p-6 md:p-8">
-                <span className="font-mono text-label text-sun">0{index + 1}</span>
+              <li key={item} className="rounded-[1.75rem] border border-cream/15 p-6 md:p-8">
+                <span className="font-mono text-label text-gold">0{index + 1}</span>
                 <p className="mt-10 text-h3 font-medium">{item}</p>
               </li>
             ))}
@@ -258,7 +258,7 @@ export default async function MotionLab() {
                 </Parallax>
                 <figcaption className="mt-4 flex items-baseline justify-between">
                   <span className="text-h3 font-medium">{card}</span>
-                  <span className="font-mono text-label uppercase text-ink-soft">
+                  <span className="font-mono text-label uppercase text-cream-dim">
                     {t.parallax.caption} {parallaxSpeeds[index]}
                   </span>
                 </figcaption>
@@ -285,7 +285,7 @@ export default async function MotionLab() {
               </span>
             </Magnetic>
           </div>
-          <p className="mt-8 max-w-xl text-ink-soft">{t.magnetic.note}</p>
+          <p className="mt-8 max-w-xl text-cream-muted">{t.magnetic.note}</p>
         </Section>
 
         <Section id="cursor" index="05" eyebrow={t.cursor.eyebrow} title={t.cursor.title} className="pt-0!">
@@ -301,18 +301,18 @@ export default async function MotionLab() {
               href="#counter"
               data-cursor="view"
               data-cursor-label={t.cursor.open}
-              className="flex aspect-[16/10] items-end rounded-[1.75rem] bg-ink p-8 text-h3 font-medium text-cream"
+              className="flex aspect-[16/10] items-end rounded-[1.75rem] bg-umber p-8 text-h3 font-medium text-cream"
             >
               {t.cursor.cardB}
             </a>
           </div>
           <div className="mt-8 grid gap-6 md:grid-cols-2">
-            <p className="max-w-xl text-ink-soft">{t.cursor.note}</p>
-            <label className="block font-mono text-label uppercase text-ink-soft">
+            <p className="max-w-xl text-cream-muted">{t.cursor.note}</p>
+            <label className="block font-mono text-label uppercase text-cream-dim">
               {t.cursor.field}
               <input
                 type="text"
-                className="mt-2 block w-full rounded-full border border-ink/25 bg-transparent px-5 py-3 font-sans text-base normal-case tracking-normal text-ink"
+                className="mt-2 block w-full rounded-full border border-cream/25 bg-transparent px-5 py-3 font-sans text-base normal-case tracking-normal text-cream"
               />
             </label>
           </div>
@@ -321,10 +321,10 @@ export default async function MotionLab() {
         <PinDemo id="pin" eyebrow={`06 · ${t.pin.eyebrow}`} title={t.pin.title} steps={t.pin.steps} hint={t.pin.hint} />
 
         <Section id="counter" index="07" eyebrow={t.counter.eyebrow} title={t.counter.title}>
-          <dl className="grid gap-10 border-t border-ink/10 pt-10 md:grid-cols-3">
+          <dl className="grid gap-10 border-t border-cream/15 pt-10 md:grid-cols-3">
             {figures.map((figure) => (
               <div key={figure} className="flex flex-col-reverse gap-3">
-                <dt className="font-mono text-label uppercase text-ink-soft">{t.counter.sample}</dt>
+                <dt className="font-mono text-label uppercase text-cream-dim">{t.counter.sample}</dt>
                 <dd className="text-h1 font-medium">
                   <Counter value={figure} locale={lang} />
                 </dd>

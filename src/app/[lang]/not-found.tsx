@@ -9,11 +9,11 @@ export default async function NotFound() {
   const copy = dict.notFound;
   return (
     <>
-      <main id="main" tabIndex={-1} className="golden-hour flex min-h-svh flex-col justify-end pb-16 pt-32 outline-none md:pb-24">
+      <main id="main" tabIndex={-1} className="page-not-found flex min-h-svh flex-col justify-end pb-16 pt-32 text-cream outline-none md:pb-24">
         <Container>
           <Eyebrow>{copy.eyebrow}</Eyebrow>
           <h1 className="mt-6 max-w-3xl text-h1 font-medium">{copy.title}</h1>
-          <p className="mt-8 max-w-xl text-lead text-ink-soft">{copy.text}</p>
+          <p className="mt-8 max-w-xl text-lead text-cream-muted">{copy.text}</p>
           <div className="mt-10 flex flex-wrap gap-3">
             <Button href={`/${lang}`} arrow>
               {copy.home}

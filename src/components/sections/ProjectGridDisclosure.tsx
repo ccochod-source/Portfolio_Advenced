@@ -25,6 +25,7 @@ export type ProjectGridDisclosureProps = {
   teaser: string[];
   /** "+4 autres" (omitted when every project is in the teaser). */
   more?: string;
+  hud: { left: string; center: string; right: string };
   children: ReactNode;
 };
 
@@ -47,6 +48,7 @@ export function ProjectGridDisclosure({
   teaserLabel,
   teaser,
   more,
+  hud,
   children,
 }: ProjectGridDisclosureProps) {
   const [open, setOpen] = useState(false);
@@ -65,7 +67,12 @@ export function ProjectGridDisclosure({
 
   return (
     <div>
-      <div className="group relative">
+      <div
+        className="group relative"
+        data-hud-left={hud.left}
+        data-hud-center={hud.center}
+        data-hud-right={hud.right}
+      >
         <div className="flex flex-wrap items-center gap-x-4 gap-y-3">
           <Eyebrow index={index}>{eyebrow}</Eyebrow>
           <Badge>{count}</Badge>
@@ -79,12 +86,12 @@ export function ProjectGridDisclosure({
             aria-expanded={open}
             aria-controls={panelId}
             onClick={toggle}
-            className="flex shrink-0 cursor-pointer items-center gap-4 rounded-full py-1 pl-3 font-mono text-label uppercase text-ink-soft transition-colors duration-300 hover:text-ink after:absolute after:inset-0 after:rounded-[1.75rem] after:content-['']"
+            className="flex shrink-0 cursor-pointer items-center gap-4 rounded-full py-1 pl-3 font-mono text-label uppercase text-cream-dim transition-colors duration-300 hover:text-cream after:absolute after:inset-0 after:rounded-[1.75rem] after:content-['']"
           >
             <span className="sr-only sm:not-sr-only">{open ? hideLabel : showLabel}</span>
             <span
               aria-hidden
-              className={`grid size-12 place-items-center rounded-full border border-ink/25 bg-cream text-ink transition-[transform,background-color,color,border-color] duration-500 ease-out-expo group-hover:border-ink group-hover:bg-ink group-hover:text-cream md:size-14 ${open ? "rotate-180" : ""}`}
+              className={`grid size-12 place-items-center rounded-full border border-cream/25 bg-umber text-cream transition-[transform,background-color,color,border-color] duration-500 ease-out-expo group-hover:border-cream/50 group-hover:bg-cream/10 md:size-14 ${open ? "rotate-180" : ""}`}
             >
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
                 <path d="m6 9 6 6 6-6" />
@@ -100,14 +107,14 @@ export function ProjectGridDisclosure({
             className={`${collapse} duration-500 ${open ? "grid-rows-[0fr] opacity-0" : "grid-rows-[1fr] opacity-100"}`}
           >
             <div className="min-h-0 overflow-hidden">
-              <p className="flex flex-wrap items-center gap-2 pt-8 text-sm text-ink-soft">
+              <p className="flex flex-wrap items-center gap-2 pt-8 text-sm text-cream-muted">
                 <span className="mr-1 font-mono text-label uppercase">{teaserLabel}</span>
                 {teaser.map((name) => (
-                  <span key={name} className="rounded-full border border-ink/15 px-3 py-1">
+                  <span key={name} className="rounded-full border border-cream/15 px-3 py-1">
                     {name}
                   </span>
                 ))}
-                {more && <span className="rounded-full bg-ink/5 px-3 py-1 font-mono text-label">{more}</span>}
+                {more && <span className="rounded-full bg-cream/10 px-3 py-1 font-mono text-label">{more}</span>}
               </p>
             </div>
           </div>

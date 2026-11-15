@@ -82,7 +82,7 @@ export default async function ConstellationLab() {
     <>
       <main className="pt-28">
         <Section index="05" eyebrow={t.eyebrow} title={t.title}>
-          <p className="-mt-6 mb-14 max-w-2xl text-lead text-ink-soft md:-mt-10 md:mb-20">{t.lead}</p>
+          <p className="-mt-6 mb-14 max-w-2xl text-lead text-cream-muted md:-mt-10 md:mb-20">{t.lead}</p>
           <SkillsConstellationLazy skills={skills} labels={t.labels} projectBasePath={`/${lang}/projets`} />
         </Section>
       </main>
