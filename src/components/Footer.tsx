@@ -46,7 +46,7 @@ export async function Footer() {
       <div aria-hidden className="footer-glow" />
       <Container className="relative pt-28 md:pt-40">
         <div {...hudAttrs}>
-          <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-3">
+          <div className="flex flex-wrap items-center justify-start gap-x-6 gap-y-3">
             <Eyebrow className="text-cream-dim">{footer.eyebrow}</Eyebrow>
             <p className="footer-status">
               <span aria-hidden className="footer-status-dot" />
