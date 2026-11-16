@@ -210,6 +210,17 @@ body {
   color: var(--color-cream);
 }
 
+.hero-video .button-secondary {
+  border-color: var(--color-cream);
+  color: var(--color-cream);
+}
+
+.hero-video .button-secondary:hover {
+  border-color: var(--color-cream);
+  background-color: var(--color-cream);
+  color: var(--color-ink);
+}
+
 /* motion — primitives in src/components/motion (append-only block) */
 
 :root {

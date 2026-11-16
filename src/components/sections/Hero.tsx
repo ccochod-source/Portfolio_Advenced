@@ -15,7 +15,7 @@ export function Hero({ lang, copy }: HeroProps) {
   return (
     <HeroZoom
       id="hero"
-      className={`golden-hour relative isolate flex min-h-svh flex-col overflow-hidden pb-7 ${
+      className={`golden-hour ${HERO_MODE === "video" ? "hero-video" : ""} relative isolate flex min-h-svh flex-col overflow-hidden pb-7 ${
         HERO_MODE === "video" ? "pt-16" : "pt-28"
       } md:pb-9 ${HERO_MODE === "video" ? "md:pt-16" : "md:pt-32"}`}
     >
@@ -39,11 +39,13 @@ export function Hero({ lang, copy }: HeroProps) {
         )}
       </div>
       {/* Golden-hour haze behind the copy: keeps the coral wordmark legible over the bright sunset band. */}
-      <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 z-[5] h-[62%] bg-gradient-to-b from-cream/60 via-cream/30 to-transparent motion-reduce:hidden" />
+      {HERO_MODE === "3d" && (
+        <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 z-[5] h-[62%] bg-gradient-to-b from-cream/60 via-cream/30 to-transparent motion-reduce:hidden" />
+      )}
       {HERO_MODE === "video" && (
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-x-0 bottom-0 z-[5] mx-auto h-[38%] w-full max-w-[1440px] bg-gradient-to-t from-cream/75 via-cream/70 to-transparent"
+          className="pointer-events-none absolute inset-x-0 bottom-0 z-[5] h-[40%] w-full bg-gradient-to-t from-night/80 via-night/70 to-transparent"
         />
       )}
       {HERO_MODE === "video" ? (
@@ -60,7 +62,7 @@ export function Hero({ lang, copy }: HeroProps) {
             </Reveal>
           </Container>
           <Container className="absolute inset-x-0 bottom-[5.5rem] flex flex-col items-start text-left">
-            <Reveal as="p" delay={0.35} start="top bottom" className="max-w-xl text-balance text-lead text-ink">
+            <Reveal as="p" delay={0.35} start="top bottom" className="max-w-xl text-balance text-lead text-cream">
               {copy.title}
             </Reveal>
             <Reveal as="div" delay={0.5} start="top bottom" className="mt-5 flex flex-wrap items-center justify-start gap-3">
@@ -80,7 +82,7 @@ export function Hero({ lang, copy }: HeroProps) {
             as="div"
             delay={0.7}
             start="top bottom"
-            className="mt-auto flex w-full max-w-[1440px] flex-wrap items-center justify-between gap-4 self-center px-6 pt-10 font-mono text-label uppercase text-ink/70 md:px-12"
+            className="mt-auto flex w-full max-w-[1440px] flex-wrap items-center justify-between gap-4 self-center px-6 pt-10 font-mono text-label uppercase text-cream/80 md:px-12"
           >
             <span className="flex items-center gap-2">
               <span className="size-2 rounded-full bg-sun" aria-hidden />
