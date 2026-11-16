@@ -124,10 +124,6 @@
     will-change: auto;
   }
 
-  .backdrop-symbol:not(.backdrop-centerpiece) {
-    transform: none;
-  }
-
   .backdrop-centerpiece {
     transform: translate(-50%, -50%);
   }

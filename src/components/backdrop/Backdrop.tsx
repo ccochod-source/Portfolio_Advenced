@@ -374,7 +374,7 @@ export function Backdrop() {
       <div className="backdrop-fallback" />
       <div className="backdrop-symbols">
         <span className="backdrop-symbol backdrop-centerpiece">
-          <SymbolArtwork name="mandala" width={900} height={900} />
+          <SymbolArtwork name="flower-of-life" width={500} height={494} />
         </span>
       </div>
     </div>
