@@ -87,10 +87,13 @@ export function HudBar() {
   }, [pathname]);
 
   return (
-    <div className="hud-bar" data-visible={zoomComplete && hasContent && !blocked} aria-hidden="true">
-      <span>{hud.left}</span>
-      <span>{hud.center}</span>
-      <span>{hud.right}</span>
-    </div>
+    <>
+      <div className="hud-scrim" data-visible={zoomComplete} aria-hidden="true" />
+      <div className="hud-bar" data-visible={zoomComplete && hasContent && !blocked} aria-hidden="true">
+        <span>{hud.left}</span>
+        <span>{hud.center}</span>
+        <span>{hud.right}</span>
+      </div>
+    </>
   );
 }

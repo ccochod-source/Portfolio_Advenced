@@ -259,7 +259,7 @@
 
   .journey-rail {
     position: absolute;
-    inset: 63% 0 auto;
+    inset: 70% 0 auto;
     margin-top: 0;
   }
 
@@ -307,7 +307,7 @@
     bottom: 100%;
     left: max(var(--journey-head, 0px), 2.5rem);
     width: 14rem;
-    height: 25svh;
+    height: 38svh;
     translate: -50% 0;
     pointer-events: none;
   }

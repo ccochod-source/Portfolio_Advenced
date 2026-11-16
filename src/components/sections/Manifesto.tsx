@@ -28,7 +28,7 @@ export function Manifesto({ copy, hud, index = "01" }: ManifestoProps) {
         </Container>
       </div>
 
-      <div id="manifesto-stage" aria-hidden data-avatar-anchor={AVATAR_ANCHORS.band} className="relative h-20 w-full shrink-0 md:h-[7vh] md:min-h-8" />
+      <div id="manifesto-stage" aria-hidden data-avatar-anchor={AVATAR_ANCHORS.band} className="relative h-[28svh] w-full shrink-0 md:h-[38vh] md:min-h-[260px]" />
 
       <Container>
         <ol className="divide-y divide-cream/15 border-y border-cream/15">

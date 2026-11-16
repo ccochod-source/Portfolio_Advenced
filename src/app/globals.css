@@ -123,6 +123,21 @@ body {
   transition: opacity 500ms ease;
 }
 
+.hud-scrim {
+  position: fixed;
+  z-index: 39;
+  inset: auto 0 0;
+  height: 110px;
+  background: linear-gradient(to top, rgba(20, 11, 7, 0.92), rgba(20, 11, 7, 0));
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 500ms ease;
+}
+
+.hud-scrim[data-visible="true"] {
+  opacity: 1;
+}
+
 .hud-bar[data-visible="true"] {
   opacity: 1;
 }
@@ -132,13 +147,15 @@ body {
 }
 
 @media (max-width: 639px) {
-  .hud-bar {
+  .hud-bar,
+  .hud-scrim {
     display: none;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .hud-bar {
+  .hud-bar,
+  .hud-scrim {
     transition: none;
   }
 }

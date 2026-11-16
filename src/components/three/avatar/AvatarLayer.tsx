@@ -78,12 +78,10 @@ const hidden = (seg: AvatarSegment = "none"): Target => ({ seg, x: 0, y: 0, h: 1
 /**
  * Pose along the manifesto band: feet on the band's bottom rule, walking right → left as `t` goes 0 → 1
  * (it walks in from beyond the band's right edge, where the manifesto has no copy, and ends under the intro text).
- * The model shrinks along the way so that it never overlaps the intro copy above the band's left half.
+ * The enlarged stage keeps the full-size model between the intro copy and principles rows.
  */
-function bandPose(band: DOMRect, t: number, H: number, narrow: boolean) {
-  const hStart = Math.min(band.height * (narrow ? 0.95 : 1.35), H * 0.32);
-  const hEnd = Math.min(band.height * 0.95, H * 0.28);
-  const h = lerp(hStart, hEnd, t);
+function bandPose(band: DOMRect, t: number, H: number) {
+  const h = Math.min(band.height * 0.92, H * 0.4);
   const inset = Math.min(band.width * 0.05, 56) + h * 0.22;
   return { x: lerp(band.right + h * 0.6, band.left + inset, t), y: band.bottom, h };
 }
@@ -97,7 +95,7 @@ function journeySpot(anchor: DOMRect, track: DOMRect, H: number) {
 /** Standing spot next to the contact headline: in the free space right of it, feet on its last line. */
 function contactSpot(contact: DOMRect, W: number, H: number) {
   const free = W - contact.right;
-  const h = Math.min(H * 0.34, free * 0.7);
+  const h = Math.min(H * 0.38, free * 0.8);
   return { x: contact.right + free / 2, y: contact.bottom, h, ok: free > 170 };
 }
 
@@ -116,7 +114,7 @@ function computeTarget(r: Rects, env: Env): Target {
       const t = smooth(range(band.bottom / H, STORY.band.narrowFrom, STORY.band.narrowTo));
       const exit = smooth(range(band.bottom / H, STORY.band.narrowTo, STORY.band.narrowExitTo));
       if (band.bottom > H * STORY.band.narrowFrom) return hidden();
-      const pose = bandPose(band, t, H, narrow);
+      const pose = bandPose(band, t, H);
       const alphaIn = range(band.bottom / H, STORY.band.narrowFrom, STORY.band.narrowFrom - 0.08);
       if (exit < 1) {
         return { seg: exit > 0 ? "bandExit" : "band", x: lerp(pose.x, offLeft(pose.h), exit), y: pose.y, h: pose.h, alpha: alphaIn, idleYaw: -0.35, walkable: true };
@@ -124,7 +122,7 @@ function computeTarget(r: Rects, env: Env): Target {
     } else {
       const p = getManifestoProgress();
       const t = smooth(range(p, STORY.band.walkFrom, STORY.band.walkTo));
-      const pose = bandPose(band, t, H, narrow);
+      const pose = bandPose(band, t, H);
       const pinnedTop = env.pinnedBandTop ?? Math.min(band.top, H * 0.45);
       const exit = p >= 1 ? smooth(range(band.top, pinnedTop - 2, pinnedTop - H * STORY.band.exitTravel)) : 0;
       if (exit < 1 && band.bottom > -H * 0.1) {
@@ -140,7 +138,7 @@ function computeTarget(r: Rects, env: Env): Target {
     if (narrow) {
       // Stacked layout: the headline spans the full width, so the avatar fades in beside the contact details below it.
       const alpha = smooth(range(footerTop, STORY.contact.narrowFadeFrom, STORY.contact.narrowFadeTo));
-      const h = Math.min(H * 0.22, W * 0.45);
+      const h = Math.min(H * 0.24, W * 0.5);
       if (alpha > 0) return { seg: "contact", x: W - 24 - h * 0.3, y: r.contact.bottom + H * 0.3, h, alpha, idleYaw: -0.15, walkable: false };
     } else if (spot.ok && footerTop < STORY.contact.enterFrom) {
       const enter = smooth(range(footerTop, STORY.contact.enterFrom, STORY.contact.enterTo));
