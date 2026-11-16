@@ -376,30 +376,6 @@ export function Backdrop() {
         <span className="backdrop-symbol backdrop-centerpiece">
           <SymbolArtwork name="mandala" width={900} height={900} />
         </span>
-        <span className="backdrop-symbol backdrop-symbol-1">
-          <SymbolArtwork name="enso" width={900} height={900} />
-        </span>
-        <span className="backdrop-symbol backdrop-symbol-2">
-          <SymbolArtwork name="unalome" width={414} height={900} />
-        </span>
-        <span className="backdrop-symbol backdrop-symbol-3">
-          <SymbolArtwork name="lotus" width={600} height={556} />
-        </span>
-        <span className="backdrop-symbol backdrop-symbol-4">
-          <SymbolArtwork name="mandala" width={400} height={393} />
-        </span>
-        <span className="backdrop-symbol backdrop-symbol-5">
-          <SymbolArtwork name="flower-of-life" width={500} height={494} />
-        </span>
-        <span className="backdrop-symbol backdrop-symbol-6">
-          <SymbolArtwork name="enso" width={900} height={900} />
-        </span>
-        <span className="backdrop-symbol backdrop-symbol-7">
-          <SymbolArtwork name="lotus" width={600} height={556} />
-        </span>
-        <span className="backdrop-symbol backdrop-symbol-8">
-          <SymbolArtwork name="flower-of-life" width={500} height={494} />
-        </span>
       </div>
     </div>
   );
