@@ -46,5 +46,14 @@ export const ZOOM = {
   pageSlide: { far: 0.55, from: 0.6, to: 0.85 },
 } as const;
 
+export const VIDEO_ZOOM = {
+  pinLength: { desktop: 2.2, mobile: 1.6 },
+  scrubEnd: 0.78,
+  focus: {
+    desktop: { origin: [0.4674, 0.5301], scale: 2.5 },
+    mobile: { origin: [0.5, 0.46], scale: 2.3 },
+  },
+} as const;
+
 /** `data-zoom-page` marks the DOM block the screen texture mirrors (the manifesto stage). */
 export const ZOOM_PAGE_ATTR = "data-zoom-page";

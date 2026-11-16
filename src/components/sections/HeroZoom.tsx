@@ -4,7 +4,8 @@ import { useRef, type ReactNode } from "react";
 import { MEDIA } from "@/lib/motion/ease";
 import { gsap, ScrollTrigger, useGSAP } from "@/lib/motion/gsap";
 import { useWebGL } from "@/components/three/useWebGL";
-import { ZOOM, setZoomProgress } from "@/lib/hero/zoom";
+import { HERO_MODE } from "@/lib/hero/mode";
+import { VIDEO_ZOOM, ZOOM, setZoomProgress } from "@/lib/hero/zoom";
 
 type HeroZoomProps = {
   id: string;
@@ -40,7 +41,7 @@ function keepDeepLink() {
  * Pins the hero while the camera zooms into the laptop screen (progress → `src/lib/hero/zoom.ts`).
  * The hero copy (`[data-hero-copy]`) fades out first; the whole hero fades out at the end, revealing the
  * manifesto that has been pulled up by one viewport (negative margin) so it sits exactly under the screen.
- * Reduced motion and no-WebGL users get the plain, unpinned layout.
+ * Reduced motion disables pinning; the 3D mode also requires WebGL.
  */
 export function HeroZoom({ id, className, children }: HeroZoomProps) {
   const wrapper = useRef<HTMLDivElement>(null);
@@ -55,12 +56,18 @@ export function HeroZoom({ id, className, children }: HeroZoomProps) {
       const copy = el.querySelector<HTMLElement>("[data-hero-copy]");
       const mm = gsap.matchMedia();
 
-      mm.add({ motion: MEDIA.motion, mobile: MEDIA.mobile }, (context) => {
-        const { motion, mobile } = context.conditions as { motion: boolean; mobile: boolean };
+      mm.add({ motion: MEDIA.motion, mobile: MEDIA.mobile, portrait: "(max-aspect-ratio: 1/1)" }, (context) => {
+        const { motion, mobile, portrait } = context.conditions as {
+          motion: boolean;
+          mobile: boolean;
+          portrait: boolean;
+        };
         setZoomProgress(0);
-        if (!motion || !webgl) return;
+        if (!motion || (HERO_MODE === "3d" && !webgl)) return;
 
-        const length = mobile ? ZOOM.pinLength.mobile : ZOOM.pinLength.desktop;
+        const pinMobile = HERO_MODE === "video" ? portrait : mobile;
+        const pinLength = HERO_MODE === "video" ? VIDEO_ZOOM.pinLength : ZOOM.pinLength;
+        const length = pinMobile ? pinLength.mobile : pinLength.desktop;
         // The next section must reach the viewport top exactly when the pin ends: pull it up by one viewport.
         const pull = () => {
           wrap.style.marginBottom = `-${window.innerHeight}px`;
@@ -95,7 +102,7 @@ export function HeroZoom({ id, className, children }: HeroZoomProps) {
         };
       });
     },
-    { scope: wrapper, dependencies: [webgl], revertOnUpdate: true },
+    { scope: wrapper, dependencies: [HERO_MODE === "3d" ? webgl : true], revertOnUpdate: true },
   );
 
   return (
