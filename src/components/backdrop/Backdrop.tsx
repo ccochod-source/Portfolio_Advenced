@@ -187,8 +187,10 @@ function connectFallbackState(el: HTMLDivElement) {
     const rect = hero?.getBoundingClientRect();
     const heroAtRest = !!rect && rect.height > 0 && rect.top >= -1 && rect.bottom <= window.innerHeight + 1 && progress < 0.01;
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const paused = document.visibilityState !== "visible" || heroAtRest || fade <= 0.001 || reduced;
     el.style.setProperty("--bd-fade", fade.toFixed(3));
-    el.dataset.paused = String(document.visibilityState !== "visible" || heroAtRest || fade <= 0.001 || reduced);
+    el.dataset.paused = String(paused);
+    if (!paused) el.style.setProperty("--bd-s", String(window.scrollY / Math.max(1, window.innerHeight)));
   };
   const schedule = () => {
     if (!frame) frame = window.requestAnimationFrame(sync);
@@ -315,6 +317,7 @@ export function Backdrop() {
       const heroAtRest = !!rect && rect.height > 0 && rect.top >= -1 && rect.bottom <= window.innerHeight + 1 && progress < 0.01;
       const nextPaused = document.visibilityState !== "visible" || heroAtRest || fade <= 0.001 || reducedMotion.matches;
       el.dataset.paused = String(nextPaused);
+      if (!nextPaused) el.style.setProperty("--bd-s", String(window.scrollY / Math.max(1, window.innerHeight)));
       if (paused !== nextPaused || reducedMotion.matches) {
         paused = nextPaused;
         if (paused || reducedMotion.matches) stop();
@@ -370,6 +373,9 @@ export function Backdrop() {
       <canvas ref={canvas} className="backdrop-canvas" />
       <div className="backdrop-fallback" />
       <div className="backdrop-symbols">
+        <span className="backdrop-symbol backdrop-centerpiece">
+          <SymbolArtwork name="mandala" width={900} height={900} />
+        </span>
         <span className="backdrop-symbol backdrop-symbol-1">
           <SymbolArtwork name="enso" width={900} height={900} />
         </span>

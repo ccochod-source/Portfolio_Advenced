@@ -6,6 +6,7 @@
   pointer-events: none;
   contain: strict;
   --bd-fade: 0;
+  --bd-s: 0;
   opacity: var(--bd-fade);
   background: var(--color-night);
 }
@@ -66,7 +67,8 @@
   width: var(--symbol-size);
   opacity: var(--symbol-opacity);
   transform-origin: center;
-  will-change: transform;
+  translate: 0 calc(sin((var(--bd-s, 0) * 1.2 + var(--seed, 0)) * 1rad) * 70px * var(--depth, 0));
+  will-change: transform, translate;
 }
 
 .backdrop-symbol img {
@@ -75,68 +77,94 @@
   height: auto;
 }
 
+.backdrop-centerpiece {
+  --symbol-size: min(72vw, 920px);
+  --symbol-opacity: 0.14;
+  --depth: 0;
+  --seed: 0;
+  top: 50%;
+  left: 50%;
+  animation: backdrop-center-rotate 300s linear infinite;
+}
+
 .backdrop-symbol-1 {
-  --symbol-size: clamp(220px, 22vw, 320px);
-  --symbol-opacity: 0.065;
-  top: 4vh;
-  left: -8vw;
-  animation: backdrop-symbol-rotate 190s linear infinite;
+  --symbol-size: clamp(290px, 28vw, 420px);
+  --symbol-opacity: 0.22;
+  --depth: 0.42;
+  --seed: 0.4;
+  top: 3vh;
+  left: -5vw;
+  animation: backdrop-symbol-rotate 210s linear infinite;
 }
 
 .backdrop-symbol-2 {
-  --symbol-size: clamp(170px, 16vw, 225px);
-  --symbol-opacity: 0.09;
-  top: 13vh;
-  right: -6vw;
+  --symbol-size: clamp(220px, 20vw, 310px);
+  --symbol-opacity: 0.34;
+  --depth: 0.56;
+  --seed: 1.6;
+  top: 9vh;
+  right: -4vw;
   animation: backdrop-symbol-drift 21s ease-in-out infinite alternate;
 }
 
 .backdrop-symbol-3 {
-  --symbol-size: clamp(180px, 18vw, 250px);
-  --symbol-opacity: 0.09;
-  top: 54vh;
-  left: -5vw;
+  --symbol-size: clamp(240px, 23vw, 350px);
+  --symbol-opacity: 0.34;
+  --depth: 0.48;
+  --seed: 2.8;
+  top: 42vh;
+  left: -4vw;
   animation: backdrop-symbol-drift 19s ease-in-out infinite alternate;
 }
 
 .backdrop-symbol-4 {
-  --symbol-size: clamp(210px, 19vw, 280px);
-  --symbol-opacity: 0.08;
-  top: 49vh;
-  right: -12vw;
+  --symbol-size: clamp(260px, 25vw, 380px);
+  --symbol-opacity: 0.34;
+  --depth: 0.62;
+  --seed: 3.9;
+  top: 48vh;
+  right: -4vw;
   animation: backdrop-symbol-rotate 230s linear infinite;
 }
 
 .backdrop-symbol-5 {
-  --symbol-size: clamp(200px, 22vw, 300px);
-  --symbol-opacity: 0.08;
-  bottom: -12vh;
-  left: -8vw;
-  animation: backdrop-symbol-rotate 210s linear infinite;
+  --symbol-size: clamp(260px, 25vw, 380px);
+  --symbol-opacity: 0.34;
+  --depth: 0.5;
+  --seed: 5.1;
+  bottom: -4vh;
+  left: -4vw;
+  animation: backdrop-symbol-rotate 220s linear infinite;
 }
 
 .backdrop-symbol-6 {
-  --symbol-size: clamp(200px, 21vw, 290px);
-  --symbol-opacity: 0.065;
-  right: -8vw;
-  bottom: -10vh;
-  animation: backdrop-symbol-rotate 210s linear infinite;
+  --symbol-size: clamp(260px, 27vw, 400px);
+  --symbol-opacity: 0.24;
+  --depth: 0.44;
+  --seed: 6.2;
+  right: -5vw;
+  bottom: -4vh;
+  animation: backdrop-symbol-rotate 220s linear infinite;
 }
 
 .backdrop-symbol-7 {
-  --symbol-size: 160px;
-  --symbol-opacity: 0.08;
-  top: 31vh;
-  left: -3vw;
+  --symbol-size: clamp(205px, 15vw, 270px);
+  --symbol-opacity: 0.36;
+  --depth: 0.36;
+  --seed: 2.2;
+  top: 29vh;
+  left: 4vw;
   animation: backdrop-symbol-drift 20s ease-in-out infinite alternate;
 }
 
 .backdrop-symbol-8 {
-  --symbol-size: 170px;
-  --symbol-opacity: 0.08;
-  top: 30vh;
-  right: -4vw;
-  animation: backdrop-symbol-rotate 190s linear infinite;
+  --symbol-size: clamp(220px, 16vw, 300px);
+  --symbol-opacity: 0.33;
+  --depth: 0.38;
+  --seed: 4.3;
+  top: 28vh;
+  right: 4vw;
+  animation: backdrop-symbol-rotate 200s linear infinite;
 }
 
 @keyframes backdrop-symbol-drift {
@@ -155,6 +183,16 @@
   }
 }
 
+@keyframes backdrop-center-rotate {
+  from {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
+
 @media (max-width: 767px) {
   .backdrop::after {
     background: radial-gradient(
@@ -166,35 +204,68 @@
   }
 
   .backdrop-symbol-1 {
-    --symbol-size: 170px;
+    --symbol-size: 150px;
+    --depth: 0.3;
     top: 2vh;
-    left: -92px;
+    left: -9vw;
   }
 
   .backdrop-symbol-2 {
-    --symbol-size: 135px;
-    top: 15vh;
-    right: -68px;
+    --symbol-size: 124px;
+    --depth: 0.35;
+    top: 20vh;
+    right: -7vw;
   }
 
-  .backdrop-symbol-5,
+  .backdrop-symbol-3 {
+    --symbol-size: 138px;
+    --depth: 0.32;
+    top: 48vh;
+    left: -8vw;
+  }
+
+  .backdrop-symbol-4 {
+    --symbol-size: 154px;
+    --depth: 0.36;
+    top: 60vh;
+    right: -9vw;
+  }
+
+  .backdrop-symbol-5 {
+    --symbol-size: 132px;
+    --depth: 0.28;
+    bottom: -3vh;
+    right: 10vw;
+  }
+
   .backdrop-symbol-6,
   .backdrop-symbol-7,
   .backdrop-symbol-8 {
     display: none;
   }
 
-  .backdrop-symbol-4 {
-    --symbol-size: 195px;
-    top: 52vh;
-    right: -112px;
+  .backdrop-centerpiece {
+    --symbol-size: 86vw;
+    --symbol-opacity: 0.1;
+  }
+
+  .backdrop-symbol img {
+    filter: none;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .backdrop-symbol {
     animation: none;
-    transform: none;
+    translate: none;
     will-change: auto;
+  }
+
+  .backdrop-symbol:not(.backdrop-centerpiece) {
+    transform: none;
+  }
+
+  .backdrop-centerpiece {
+    transform: translate(-50%, -50%);
   }
 }
