@@ -27,8 +27,8 @@ export const journey: JourneyStep[] = [
     place: { fr: "Eugenia School, Paris", en: "Eugenia School, Paris" },
     title: { fr: "Bachelor IA, Data & Business", en: "Bachelor in AI, Data & Business" },
     text: {
-      fr: "Départ pour Paris et un cursus hybride : développement, données et compréhension des enjeux de l'entreprise. Premiers projets : Eugeniagram, Analyse Accidentologie.",
-      en: "Moving to Paris for a hybrid curriculum: development, data and an understanding of how businesses work. First projects: Eugeniagram, Analyse Accidentologie.",
+      fr: "Départ pour Paris et un cursus hybride : développement, données et compréhension des enjeux de l'entreprise. Première année : Eugeniagram et Analyse Accidentologie, puis 1er prix au hackathon PayFit et 1er sur le cas d'usage Mirakl.",
+      en: "Moving to Paris for a hybrid curriculum: development, data and an understanding of how businesses work. First year: Eugeniagram and Analyse Accidentologie, then 1st prize at the PayFit hackathon and 1st on the Mirakl use case.",
     },
   },
   {
@@ -47,8 +47,8 @@ export const journey: JourneyStep[] = [
     place: { fr: "Eugenia School, Paris", en: "Eugenia School, Paris" },
     title: { fr: "Retour à Paris : hackathons et agents IA", en: "Back in Paris: hackathons and AI agents" },
     text: {
-      fr: "Deuxième année. 1er prix PayFit, 1er sur le cas d'usage Mirakl, chef de projet au hackathon ESSEC, puis Nami au hackathon H Company × 42AI sur les agents computer use.",
-      en: "Second year. 1st prize PayFit, 1st on the Mirakl use case, project lead at the ESSEC hackathon, then Nami at the H Company × 42AI hackathon on computer-use agents.",
+      fr: "Deuxième année. Chef de projet au hackathon ESSEC, puis Nami au hackathon H Company × 42AI sur les agents computer use.",
+      en: "Second year. Project lead at the ESSEC hackathon, then Nami at the H Company × 42AI hackathon on computer-use agents.",
     },
   },
   {
