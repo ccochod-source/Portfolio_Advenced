@@ -93,8 +93,6 @@ void main() {
     float field = fbm(p * 3.1 + warp * 1.65 + vec2(u_time * 0.035, -u_time * 0.028));
     float fold = sin((p.x + p.y * 0.35 + warp.x * 0.4) * 5.0 + field * 3.0 + u_time * 0.12);
     float ridges = pow(max(0.0, 1.0 - abs(fold - 0.08)), 7.0);
-    float streaks = pow(max(0.0, cos(angle * 25.0 + field * 7.0 + u_time * 0.04)), 18.0)
-      * (1.0 - smoothstep(radius * 0.35, radius * 0.95, distanceFromCenter));
 
     vec3 night = vec3(0.0784, 0.0431, 0.0275);
     vec3 umber = vec3(0.1412, 0.0784, 0.0471);
@@ -102,8 +100,8 @@ void main() {
     vec3 silk = vec3(0.5412, 0.2431, 0.0941);
     vec3 interior = mix(night, umber, smoothstep(0.18, 0.72, field));
     interior = mix(interior, ember, smoothstep(0.40, 0.76, field + warp.x * 0.12) * 0.72);
-    interior = mix(interior, silk, clamp(ridges * 0.42 + streaks * 0.14, 0.0, 0.42));
-    interior += vec3(0.028, 0.014, 0.006) * streaks + grain * 0.024;
+    interior = mix(interior, silk, clamp(ridges * 0.42, 0.0, 0.42));
+    interior += grain * 0.024;
     color = mix(outside, interior, inside);
   }
 
