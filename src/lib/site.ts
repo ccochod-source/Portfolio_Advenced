@@ -2,7 +2,7 @@ import type { Locale } from "@/i18n";
 
 /** Absolute origin of the deployed site, used for `metadataBase`, canonicals, the sitemap and robots. */
 export const SITE_URL = new URL(
-  (process.env.NEXT_PUBLIC_SITE_URL || "https://portfolio-advanced-navy.vercel.app").replace(/\/$/, ""),
+  (process.env.NEXT_PUBLIC_SITE_URL || "https://clementcochod.online").replace(/\/$/, ""),
 );
 
 export const absoluteUrl = (path: string) => new URL(path, SITE_URL).toString();
