@@ -6,7 +6,6 @@ import { Preloader } from "../Preloader";
 import { Reveal } from "../Reveal";
 
 type PreloaderDemoProps = {
-  greeting: string;
   label: string;
   skipHint: string;
   replayLabel: string;
@@ -15,7 +14,7 @@ type PreloaderDemoProps = {
   children?: ReactNode;
 };
 
-export function PreloaderDemo({ greeting, label, skipHint, replayLabel, doneLabel, children }: PreloaderDemoProps) {
+export function PreloaderDemo({ label, skipHint, replayLabel, doneLabel, children }: PreloaderDemoProps) {
   const [run, setRun] = useState(0);
   const [completed, setCompleted] = useState(0);
 
@@ -24,7 +23,6 @@ export function PreloaderDemo({ greeting, label, skipHint, replayLabel, doneLabe
       <Preloader
         key={run}
         force={run > 0}
-        greeting={greeting}
         label={label}
         skipHint={skipHint}
         onComplete={() => setCompleted((count) => count + 1)}

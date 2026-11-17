@@ -165,9 +165,8 @@
     "nextCursor": "Next"
   },
   "preloader": {
-    "greeting": "Hello.",
     "label": "Clément Cochod — Portfolio",
-    "skipHint": "Click or Esc to skip"
+    "skipHint": "Hold to speed up · Esc to skip"
   },
   "common": {
     "cursorView": "View"

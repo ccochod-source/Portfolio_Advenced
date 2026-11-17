@@ -165,9 +165,8 @@
     "nextCursor": "Suivant"
   },
   "preloader": {
-    "greeting": "Bonjour.",
     "label": "Clément Cochod — Portfolio",
-    "skipHint": "Cliquer ou Échap pour passer"
+    "skipHint": "Maintenir pour accélérer · Échap pour passer"
   },
   "common": {
     "cursorView": "Voir"

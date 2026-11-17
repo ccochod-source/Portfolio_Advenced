@@ -57,7 +57,7 @@ export default async function RootLayout({ children }: LayoutProps<"/[lang]">) {
     >
       <body className="grain min-h-full">
         <Backdrop />
-        <Preloader greeting={dict.preloader.greeting} label={dict.preloader.label} skipHint={dict.preloader.skipHint} />
+        <Preloader label={dict.preloader.label} skipHint={dict.preloader.skipHint} />
         <Cursor label={dict.common.cursorView} />
         <a href="#main" className="skip-link">
           {dict.nav.skip}

@@ -4,6 +4,7 @@ import { HeroVideo } from "@/components/three/hero/HeroVideo";
 import { HeroSceneLazy } from "@/components/three/hero/HeroSceneLazy";
 import { Button } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Container";
+import { HeroTitle } from "./HeroTitle";
 import type { Locale } from "@/i18n";
 import { AVATAR_POSTER_URL } from "@/components/three/avatar/clips";
 import { HERO_MODE } from "@/lib/hero/mode";
@@ -51,15 +52,10 @@ export function Hero({ lang, copy }: HeroProps) {
       {HERO_MODE === "video" ? (
         <div data-hero-copy className="relative z-10 flex flex-1 flex-col">
           <Container className="flex flex-col items-center text-center">
-            <Reveal
-              as="h1"
-              y={24}
-              delay={0.15}
-              start="top bottom"
-              className="bg-gradient-to-b from-sun to-coral bg-clip-text pb-[0.08em] pt-[0.06em] text-[17vw] font-medium leading-[0.86] tracking-[-0.06em] text-transparent md:text-[min(9vw,9.5rem)]"
-            >
-              {copy.name}
-            </Reveal>
+            <HeroTitle
+              name={copy.name}
+              className="pb-[0.08em] pt-[0.06em] text-[17vw] font-medium leading-[0.86] tracking-[-0.06em] text-transparent md:text-[min(9vw,9.5rem)]"
+            />
           </Container>
           <Container className="absolute inset-x-0 bottom-[5.5rem] flex flex-col items-start text-left">
             <Reveal as="p" delay={0.35} start="top bottom" className="max-w-xl text-balance text-lead text-cream">

@@ -19,9 +19,8 @@ const copy = {
     motionOn: "Animations actives",
     motionOff: "Animations réduites",
     preloader: {
-      greeting: "Bonjour.",
       label: "Clément Cochod · Portfolio",
-      skipHint: "Cliquer pour passer",
+      skipHint: "Maintenir pour accélérer · Échap pour passer",
       replay: "Rejouer le preloader",
       done: "page révélée",
     },
@@ -88,9 +87,8 @@ const copy = {
     motionOn: "Motion on",
     motionOff: "Reduced motion",
     preloader: {
-      greeting: "Hello.",
       label: "Clément Cochod · Portfolio",
-      skipHint: "Click to skip",
+      skipHint: "Hold to speed up · Esc to skip",
       replay: "Replay the preloader",
       done: "page revealed",
     },
@@ -197,7 +195,6 @@ export default async function MotionLab() {
               {t.lead}
             </TextReveal>
             <PreloaderDemo
-              greeting={t.preloader.greeting}
               label={t.preloader.label}
               skipHint={t.preloader.skipHint}
               replayLabel={t.preloader.replay}
