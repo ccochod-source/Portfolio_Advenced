@@ -28,3 +28,11 @@ export const SKY_TEXTURE_URL = "/textures/sky-golden-hour.webp";
 export const HERO_SKY_URL = "/textures/hero-sky.webp";
 export const HERO_SKY_PORTRAIT_URL = "/textures/hero-sky-portrait.webp";
 export const CLOUD_PHOTO_URLS = ["/textures/cloud-photo-wide.webp", "/textures/cloud-photo-tall.webp"] as const;
+
+export function heroSceneTextureUrlsForViewport(portrait: boolean) {
+  return [
+    SKY_TEXTURE_URL,
+    portrait ? HERO_SKY_PORTRAIT_URL : HERO_SKY_URL,
+    ...(portrait ? [CLOUD_PHOTO_URLS[0]] : CLOUD_PHOTO_URLS),
+  ];
+}

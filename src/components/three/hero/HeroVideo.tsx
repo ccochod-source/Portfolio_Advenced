@@ -2,26 +2,9 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useAfterLoad } from "@/components/three/useAfterLoad";
+import { getPreloadedHeroVideo, startSiteAssetLoad } from "@/lib/motion/assetLoader";
+import { HERO_VIDEO_ASSETS as ASSETS, heroVideoFormatForViewport, type HeroVideoFormat as Format } from "@/lib/hero/assets";
 import { VIDEO_ZOOM, getZoomProgress, subscribeZoom } from "@/lib/hero/zoom";
-
-type Format = "16x9" | "9x16";
-
-const ASSETS = {
-  "16x9": {
-    width: 1920,
-    height: 1080,
-    video: "/hero/hero-zoom-16x9.mp4",
-    poster: "/hero/hero-zoom-16x9.webp",
-    focus: "desktop",
-  },
-  "9x16": {
-    width: 720,
-    height: 1280,
-    video: "/hero/hero-zoom-9x16.mp4",
-    poster: "/hero/hero-zoom-9x16.webp",
-    focus: "mobile",
-  },
-} as const;
 
 const clamp01 = (value: number) => Math.min(1, Math.max(0, value));
 const FRAME_EPSILON = 1 / 48;
@@ -44,7 +27,7 @@ export function HeroVideo() {
 
   useEffect(() => {
     const query = window.matchMedia("(max-aspect-ratio: 1/1)");
-    const update = () => setFormat(query.matches ? "9x16" : "16x9");
+    const update = () => setFormat(heroVideoFormatForViewport());
     update();
     query.addEventListener("change", update);
     return () => query.removeEventListener("change", update);
@@ -198,13 +181,21 @@ function HeroVideoFrame({
     if (!afterLoad || reducedMotion !== false) return;
     const controller = new AbortController();
     let url: string | null = null;
-    fetch(asset.video, { signal: controller.signal, cache: "force-cache" })
-      .then((response) => {
-        if (!response.ok) throw new Error(`Hero video request failed (${response.status})`);
-        return response.blob();
+    startSiteAssetLoad();
+    getPreloadedHeroVideo(asset.video)
+      .then((preloadedUrl) => {
+        if (controller.signal.aborted) return;
+        if (preloadedUrl) {
+          setVideoSource(preloadedUrl);
+          return null;
+        }
+        return fetch(asset.video, { signal: controller.signal, cache: "force-cache" }).then((response) => {
+          if (!response.ok) throw new Error(`Hero video request failed (${response.status})`);
+          return response.blob();
+        });
       })
       .then((blob) => {
-        if (controller.signal.aborted) return;
+        if (!blob || controller.signal.aborted) return;
         url = URL.createObjectURL(blob);
         setVideoSource(url);
       })

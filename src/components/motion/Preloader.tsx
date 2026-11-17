@@ -2,11 +2,12 @@
 
 import { useEffect, useId, useRef } from "react";
 import { MEDIA } from "@/lib/motion/ease";
-import { markPageRevealed, markPreloaderActive, PRELOADER_STORAGE_KEY } from "@/lib/motion/preloader";
-import { lockScroll, unlockScroll } from "@/lib/motion/scroll";
+import { startSiteAssetLoad } from "@/lib/motion/assetLoader";
+import { markPageRevealed, markPreloaderActive } from "@/lib/motion/preloader";
+import { getLenis, lockScroll, unlockScroll } from "@/lib/motion/scroll";
 
 const MIN_PROGRESS_MS = 2200;
-const MAX_TOTAL_MS = 6000;
+const SAFETY_TIMEOUT_MS = 45000;
 const EXIT_DURATION_MS = 800;
 
 const VERTEX_SHADER = `
@@ -221,14 +222,6 @@ function clamp(value: number, min: number, max: number) {
   return Math.min(max, Math.max(min, value));
 }
 
-function hasIntroQuery() {
-  try {
-    return new URLSearchParams(window.location.search).has("intro");
-  } catch {
-    return false;
-  }
-}
-
 export type PreloaderProps = {
   label?: string;
   skipHint?: string;
@@ -238,22 +231,6 @@ export type PreloaderProps = {
   onComplete?: () => void;
 };
 
-function wasSeen(key: string) {
-  try {
-    return window.sessionStorage.getItem(key) !== null;
-  } catch {
-    return false;
-  }
-}
-
-function markSeen(key: string) {
-  try {
-    window.sessionStorage.setItem(key, "1");
-  } catch {
-    // Storage can be blocked: the preloader then plays on every load.
-  }
-}
-
 export const PRELOADER_INERT_ID = "page";
 
 export function Preloader({
@@ -261,7 +238,6 @@ export function Preloader({
   skipHint,
   duration = 2.2,
   force = false,
-  storageKey = PRELOADER_STORAGE_KEY,
   onComplete,
 }: PreloaderProps) {
   const id = useId();
@@ -280,7 +256,8 @@ export function Preloader({
 
     const page = document.getElementById(PRELOADER_INERT_ID);
     const reduceQuery = window.matchMedia(MEDIA.reduce);
-    const forced = force || hasIntroQuery();
+    const firstEffectMount = !window.__preloaderEffectMounted;
+    window.__preloaderEffectMounted = true;
     let finished = false;
     let locked = false;
     let exiting = false;
@@ -289,14 +266,9 @@ export function Preloader({
     let portal: WebGLPortal | null = null;
     let pixelRatio = 1;
     let removeListeners = () => {};
-    let posterGeneration = 0;
-    let pageReady = document.readyState === "complete";
-    let fontsReady = !document.fonts;
-    let posterReady = false;
     let assetsReady = false;
     let holding = false;
     let progress = 0;
-    let acceleratedElapsed = 0;
     let pulse = 0;
     let pulseVelocity = 0;
     let hiddenAt = 0;
@@ -320,8 +292,14 @@ export function Preloader({
       loseContext();
     };
 
-    const finish = () => {
+    const scrollToTop = () => {
+      getLenis()?.scrollTo(0, { immediate: true, force: true });
+      window.scrollTo(0, 0);
+    };
+
+    const finish = (resetScroll = true) => {
       if (finished) return;
+      if (resetScroll) scrollToTop();
       finished = true;
       removeListeners();
       stopFrame();
@@ -331,22 +309,29 @@ export function Preloader({
       }
       page?.removeAttribute("inert");
       element.dataset.state = "done";
-      markSeen(storageKey);
       markPageRevealed();
       callback.current?.();
     };
 
-    const completeImmediately = () => finish();
-    if (reduceQuery.matches || (!forced && wasSeen(storageKey))) {
-      completeImmediately();
+    if (reduceQuery.matches) {
+      finish(firstEffectMount);
+      return;
+    }
+    if (window.__preloader === "done" && !force) {
+      finish(false);
       return;
     }
 
+    scrollToTop();
     element.dataset.state = "active";
     page?.setAttribute("inert", "");
     markPreloaderActive();
     lockScroll();
     locked = true;
+    const siteAssets = startSiteAssetLoad();
+    void siteAssets.done.then(() => {
+      assetsReady = true;
+    });
     startedAt = performance.now();
     previousFrame = startedAt;
 
@@ -371,54 +356,10 @@ export function Preloader({
     };
     resize();
 
-    const updateAssetsReady = () => {
-      if (pageReady && fontsReady && posterReady) assetsReady = true;
-    };
-    const decodePoster = async () => {
-      const generation = ++posterGeneration;
-      posterReady = false;
-      const mobile = window.matchMedia("(max-aspect-ratio: 1/1)").matches;
-      const image = new Image();
-      image.src = mobile ? "/hero/hero-zoom-9x16.webp" : "/hero/hero-zoom-16x9.webp";
-      let decoded = false;
-      try {
-        if (image.decode) {
-          await image.decode();
-        } else {
-          await new Promise<void>((resolve, reject) => {
-            image.onload = () => resolve();
-            image.onerror = () => reject(new Error("Hero poster could not be loaded"));
-          });
-        }
-        decoded = true;
-      } catch {
-        decoded = false;
-      }
-      if (generation !== posterGeneration) return;
-      posterReady = decoded;
-      updateAssetsReady();
-    };
-
-    const onPageLoad = () => {
-      pageReady = true;
-      updateAssetsReady();
-    };
-    const onFontsReady = () => {
-      fontsReady = true;
-      updateAssetsReady();
-    };
-    const onFormatChange = () => {
-      if (!assetsReady) void decodePoster();
-    };
-    const aspectQuery = window.matchMedia("(max-aspect-ratio: 1/1)");
     const onReducedMotion = () => {
       if (reduceQuery.matches) finish();
     };
 
-    if (!pageReady) window.addEventListener("load", onPageLoad, { once: true });
-    if (document.fonts) void document.fonts.ready.then(onFontsReady, onFontsReady);
-    void decodePoster();
-    aspectQuery.addEventListener("change", onFormatChange);
     reduceQuery.addEventListener("change", onReducedMotion);
 
     const startExit = (now: number) => {
@@ -493,7 +434,6 @@ export function Preloader({
     const onResize = () => resize();
 
     removeListeners = () => {
-      window.removeEventListener("load", onPageLoad);
       window.removeEventListener("resize", onResize);
       window.removeEventListener("pointermove", onPointerMove);
       window.removeEventListener("pointerdown", onPointerDown);
@@ -503,7 +443,6 @@ export function Preloader({
       window.removeEventListener("keyup", onKeyUp);
       window.removeEventListener("blur", onBlur);
       document.removeEventListener("visibilitychange", onVisibilityChange);
-      aspectQuery.removeEventListener("change", onFormatChange);
       reduceQuery.removeEventListener("change", onReducedMotion);
     };
 
@@ -515,16 +454,13 @@ export function Preloader({
       previousFrame = now;
 
       if (!exiting) {
-        acceleratedElapsed += frameDelta * 1000 * (holding ? 2.5 : 1);
-        const minimumDuration = clamp(duration * 1000, MIN_PROGRESS_MS, MAX_TOTAL_MS - EXIT_DURATION_MS);
-        const timeTarget = clamp(acceleratedElapsed / minimumDuration, 0, 1);
-        const target = Math.min(assetsReady ? 1 : 0.9, timeTarget);
-        progress += (target - progress) * (1 - Math.exp(-frameDelta * 8));
-        progress = Math.max(0, progress);
-
         const elapsed = now - startedAt;
-        const maxWait = MAX_TOTAL_MS - EXIT_DURATION_MS;
-        if ((assetsReady && elapsed >= minimumDuration && progress >= 0.98) || elapsed >= maxWait) {
+        const minimumDuration = Math.max(MIN_PROGRESS_MS, duration * 1000);
+        const target = assetsReady && elapsed >= minimumDuration ? 1 : Math.min(0.99, siteAssets.progress());
+        const easing = 1 - Math.exp(-frameDelta * (holding ? 20 : 8));
+        progress = Math.max(progress, Math.min(target, progress + (target - progress) * easing));
+
+        if ((assetsReady && elapsed >= minimumDuration) || elapsed >= SAFETY_TIMEOUT_MS) {
           startExit(now);
         }
       }
@@ -595,9 +531,9 @@ export function Preloader({
         if (locked) unlockScroll();
       }
     };
-  }, [duration, force, storageKey]);
+  }, [duration, force]);
 
-  const script = `(function(){var e=document.getElementById(${JSON.stringify(id)}),s=false,q=false;try{s=sessionStorage.getItem(${JSON.stringify(storageKey)})!==null}catch(_){}try{q=new URLSearchParams(location.search).has("intro")}catch(_){}if(matchMedia(${JSON.stringify(MEDIA.reduce)}).matches||(!${force ? "true" : "false"}&&!q&&s)){if(e)e.setAttribute("data-state","done");window.__preloader="done"}else{window.__preloader="active"}})()`;
+  const script = `(function(){var e=document.getElementById(${JSON.stringify(id)});try{history.scrollRestoration="manual"}catch(_){}try{if(location.hash)history.replaceState(history.state,"",location.pathname+location.search)}catch(_){}try{window.scrollTo(0,0)}catch(_){}if(matchMedia(${JSON.stringify(MEDIA.reduce)}).matches||(!${force ? "true" : "false"}&&window.__preloader==="done")){if(e)e.setAttribute("data-state","done");window.__preloader="done"}else{window.__preloader="active"}})()`;
 
   return (
     <>

@@ -3,8 +3,9 @@
 import { useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 import { ZOOM, getZoomProgress, subscribeZoom } from "@/lib/hero/zoom";
+import { BACKDROP_SYMBOL_ASSETS } from "./assets";
 
-type SymbolArtworkName = "enso" | "lotus" | "flower-of-life" | "unalome" | "mandala";
+type SymbolArtworkName = keyof typeof BACKDROP_SYMBOL_ASSETS;
 
 function SymbolArtwork({
   name,
@@ -18,7 +19,7 @@ function SymbolArtwork({
   return (
     // eslint-disable-next-line @next/next/no-img-element -- pre-cut decorative WebP artwork
     <img
-      src={`/textures/symbols/${name}.webp`}
+      src={BACKDROP_SYMBOL_ASSETS[name]}
       alt=""
       width={width}
       height={height}
@@ -374,7 +375,7 @@ export function Backdrop() {
       <div className="backdrop-fallback" />
       <div className="backdrop-symbols">
         <span className="backdrop-symbol backdrop-centerpiece">
-          <SymbolArtwork name="flower-of-life" width={500} height={494} />
+          <SymbolArtwork name="centerpiece" width={500} height={494} />
         </span>
       </div>
     </div>

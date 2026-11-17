@@ -437,6 +437,7 @@ function GalleryStage({ items, copy, hud }: SelectedWorkGalleryProps) {
       role="region"
       aria-roledescription="carousel"
       aria-label={copy.aria}
+      data-gallery-assets={items.map((galleryItem) => galleryItem.cover.src).join(" ")}
       className="relative h-svh w-full cursor-grab touch-pan-y select-none overflow-hidden"
     >
       <div ref={canvasWrap} className="invisible absolute inset-0 opacity-0">

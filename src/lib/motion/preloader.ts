@@ -9,6 +9,7 @@ declare global {
   interface Window {
     /** Set by the Preloader inline script before hydration. */
     __preloader?: "active" | "done";
+    __preloaderEffectMounted?: boolean;
   }
 }
 
